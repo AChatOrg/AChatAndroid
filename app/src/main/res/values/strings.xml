@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?><!DOCTYPE resources [<!ENTITY appname "A Chat">]>
+
+<resources>
+    <string name="app_name">&appname;</string>
+    <string name="app_name_latina" translatable="false">A Chat</string>
+    <!--login-->
+    <string name="login">Login</string>
+    <string name="username_required">Username (required)</string>
+    <string name="biography_optional">Biography (optional)</string>
+    <string name="male">Male</string>
+    <string name="female">Female</string>
+
+    <string name="this_media_not_exist">This media does not exist.</string>
+    <string name="unable_save_file">Unable to save this file</string>
+    <string name="saved_to">Saved to %1$s</string>
+    <string name="share">Share</string>
+    <string name="photo">Photo</string>
+
+    <string name="permissions_continue">Continue</string>
+    <string name="permissions_not_now">Not now</string>
+    <string name="permissions_permission_required">Permission required</string>
+    <string name="storage_permission_message">Please allow &appname; to access the storage so you can use device files.</string>
+    <string name="storage_permission_need">You need permission to use device files. Please go to settings then "permissions" and activate the storage.</string>
+    <string name="storage_camera_permission_message">Please allow &appname; to access the storage and camera so you can select or take photos.</string>
+    <string name="storage_camera_permission_need">You need permission to select or take photos. Please go to settings then "permissions" and activate the storage and camera.</string>
+    <string name="select_image">Select image</string>
+    <string name="unknown">Unknown</string>
+    <string name="delete">Delete</string>
+    <string name="save_to_gallery">Save to gallery</string>
+    <string name="lastOnlineAvatar">Avatar</string>
+    <string name="change_photo">Change photo</string>
+    <string name="chats">Chats</string>
+    <string name="groups">Groups</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="search">Search</string>
+    <string name="guest">Guest</string>
+    <string name="member">Member</string>
+    <string name="special">Special</string>
+    <string name="active">Active</string>
+    <string name="senior">Senior</string>
+    <string name="admin">Admin</string>
+    <string name="manager">Manager</string>
+    <string name="onile_s">Online: %1$d</string>
+    <string name="groups_s">Groups: %1$d</string>
+    <string name="s_members_s_online">%1$d members, %2$d online</string>
+    <string name="people">People</string>
+    <string name="message">Message</string>
+    <string name="long_time_ago">long time ago</string>
+    <string name="last_seen_chat_s">last seen chat %1$s</string>
+    <string name="no_emoji_found">No emoji found</string>
+</resources>
