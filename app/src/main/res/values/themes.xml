@@ -1,6 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.AChat.Base" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+    <style name="Theme.AChat.Base" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Font. -->
         <item name="android:fontFamily">@font/iran_sans_regular</item>
         <item name="android:lineSpacingMultiplier">0.93</item>
@@ -13,7 +14,7 @@
         <item name="colorPrimaryVariant">@color/primaryLight</item>
         <item name="colorOnPrimary">@color/white</item>
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">#f00</item>
+        <item name="colorSecondary">@color/primary</item>
         <item name="colorSecondaryVariant">#0f0</item>
         <item name="colorOnSecondary">#00f</item>
         <!-- Status bar color. -->
@@ -23,4 +24,29 @@
         <item name="android:textColor">@android:color/black</item>
         <item name="linkColor">@color/link</item>
     </style>
+
+    <style name="RoundedCornersDialog" parent="Theme.MaterialComponents.Light.Dialog">
+        <item name="dialogCornerRadius">8dp</item>
+        <item name="android:dialogCornerRadius" tools:targetApi="p">8dp</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textColorPrimary">@color/black</item>
+        <item name="colorAccent">@color/primary</item>
+        <item name="colorPrimary">@color/primary</item>
+        <item name="android:textAppearanceSmall">@style/MyTextAppearance</item>
+        <item name="android:textAppearanceMedium">@style/MyTextAppearance</item>
+        <item name="android:textAppearanceLarge">@style/MyTextAppearance</item>
+        <item name="android:textViewStyle">@style/StartTextView</item>
+        <item name="windowFixedWidthMajor">90%</item>
+        <item name="windowFixedWidthMinor">90%</item>
+        <item name="android:minWidth">200dp</item>
+    </style>
+
+    <style name="MyTextAppearance" parent="TextAppearance.AppCompat">
+        <item name="android:fontFamily">@font/iran_sans_light</item>
+    </style>
+
+    <style name="StartTextView" parent="@android:style/Widget.TextView">
+        <item name="android:gravity">start|center_vertical</item>
+    </style>
+
 </resources>

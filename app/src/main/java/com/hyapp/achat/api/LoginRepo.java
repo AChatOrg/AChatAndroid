@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData;
 import com.hyapp.achat.Config;
 import com.hyapp.achat.model.Resource;
 import com.hyapp.achat.model.User;
+import com.hyapp.achat.viewmodel.LoginGuestViewModel;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -12,36 +13,43 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class UserHttpRepo {
+public class LoginRepo {
 
-    private static UserHttpRepo instance;
+    private static LoginRepo instance;
 
-    private final UserHttpApi api;
+    private final LoginApi api;
     private final MutableLiveData<Resource<User>> userLive;
 
-    public UserHttpRepo() {
+    public LoginRepo() {
         userLive = new MutableLiveData<>();
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(Config.SERVER_URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-        api = retrofit.create(UserHttpApi.class);
+        api = retrofit.create(LoginApi.class);
     }
 
-    public static UserHttpRepo singletone() {
+    public static LoginRepo singleton() {
         if (instance == null) {
-            instance = new UserHttpRepo();
+            instance = new LoginRepo();
         }
         return instance;
     }
 
     public void loginGuest(String name, String bio, byte gender) {
+        userLive.setValue(Resource.loading(null));
         api.loginGuest(name, bio, gender).enqueue(new Callback<User>() {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {
-                User user = response.body();
-                if (user != null) {
-                    userLive.postValue(Resource.success(user));
+                if (response.isSuccessful()) {
+                    User user = response.body();
+                    if (user != null) {
+                        userLive.postValue(Resource.success(user));
+                    } else {
+                        userLive.postValue(Resource.error(response.message(), null));
+                    }
+                } else {
+                    userLive.postValue(Resource.error(LoginGuestViewModel.MSG_EXIST, null));
                 }
             }
 
