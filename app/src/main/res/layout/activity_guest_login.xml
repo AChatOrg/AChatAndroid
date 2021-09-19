@@ -5,6 +5,9 @@
 
     <data>
 
+        <variable
+            name="viewModel"
+            type="com.hyapp.achat.viewmodel.LoginGuestViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -13,14 +16,14 @@
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:padding="@dimen/padding_page"
-        tools:context=".view.LoginActivity">
+        tools:context=".ui.LoginGuestActivity">
 
         <TextView
             android:id="@+id/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/iran_sans_bold"
-            android:text="@string/login"
+            android:text="@string/login_guest"
             android:textSize="22sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
@@ -97,28 +100,58 @@
         </RadioGroup>
 
         <FrameLayout
-            android:id="@+id/btnLogin"
-            android:layout_width="150dp"
+            android:id="@+id/btnLoginGuest"
+            android:layout_width="200dp"
             android:layout_height="45dp"
-            android:layout_marginBottom="@dimen/margin_24"
+            android:layout_marginBottom="@dimen/margin_16"
             android:background="@drawable/bg_button"
             android:clickable="true"
             android:elevation="4dp"
             android:focusable="true"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/alreadyMember"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent">
 
             <TextView
+                android:id="@+id/btnLoginGuestText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:fontFamily="@font/iran_sans_regular"
-                android:text="@string/login"
+                android:text="@string/login_guest"
+                android:textAllCaps="true"
                 android:textColor="@color/white"
                 android:textSize="@dimen/text_14" />
         </FrameLayout>
+
+        <TextView
+            android:id="@+id/alreadyMember"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/margin_8"
+            android:text="@string/already_a_member"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/login"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="@id/btnLoginGuest" />
+
+        <TextView
+            android:id="@+id/login"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_8"
+            android:layout_marginLeft="@dimen/margin_8"
+            android:gravity="start|center_vertical"
+            android:minWidth="36dp"
+            android:minHeight="36dp"
+            android:text="@string/login"
+            android:textColor="?attr/linkColor"
+            app:layout_constraintBaseline_toBaselineOf="@+id/alreadyMember"
+            app:layout_constraintEnd_toEndOf="@id/btnLoginGuest"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/alreadyMember" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

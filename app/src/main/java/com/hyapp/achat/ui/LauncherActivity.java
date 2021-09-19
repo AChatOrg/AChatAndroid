@@ -1,4 +1,4 @@
-package com.hyapp.achat.view;
+package com.hyapp.achat.ui;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -18,7 +18,7 @@ public class LauncherActivity extends AppCompatActivity {
             finish();
             return;
         }
-        startActivity(new Intent(this, LoginActivity.class));
+        startActivity(new Intent(this, LoginGuestActivity.class));
         finish();
     }
 }

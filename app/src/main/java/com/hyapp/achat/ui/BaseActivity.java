@@ -1,4 +1,4 @@
-package com.hyapp.achat.view;
+package com.hyapp.achat.ui;
 
 import androidx.appcompat.app.AppCompatActivity;
 

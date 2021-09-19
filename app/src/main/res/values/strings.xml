@@ -48,4 +48,6 @@
     <string name="long_time_ago">long time ago</string>
     <string name="last_seen_chat_s">last seen chat %1$s</string>
     <string name="no_emoji_found">No emoji found</string>
+    <string name="login_guest">Login guest</string>
+    <string name="already_a_member">Already a member?</string>
 </resources>
