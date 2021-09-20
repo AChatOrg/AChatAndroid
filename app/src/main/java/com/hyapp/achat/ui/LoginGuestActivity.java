@@ -69,10 +69,17 @@ public class LoginGuestActivity extends BaseActivity {
 
     private void onSuccess(User user) {
         //start main activity
-        alert(R.string.login_guest, user.getName()
-                + " " + user.getBio()
-                + " " + user.getGender()
-                + " " + user.getAvatar());
+        alert(R.string.login_guest,
+                user.getName()
+                        + "\n " + user.getBio()
+                        + "\n " + user.getGender()
+                        + "\n " + user.getAvatar().getUrl()
+                        + "\n " + user.getAvatar().isOnline()
+                        + "\n " + user.getKey().getIpv4()
+                        + "\n " + user.getKey().getRank()
+                        + "\n " + user.getKey().getScore()
+                        + "\n " + user.getKey().getLoginTime()
+        );
     }
 
     private void onError(String message) {

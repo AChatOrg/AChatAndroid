@@ -1,4 +1,4 @@
-package com.hyapp.achat.api;
+package com.hyapp.achat.repo.http;
 
 import com.hyapp.achat.model.User;
 

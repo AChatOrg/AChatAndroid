@@ -1,4 +1,4 @@
-package com.hyapp.achat.api;
+package com.hyapp.achat.repo.http;
 
 import androidx.lifecycle.MutableLiveData;
 
@@ -13,14 +13,14 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class LoginRepo {
+public class LoginService {
 
-    private static LoginRepo instance;
+    private static LoginService instance;
 
     private final LoginApi api;
     private final MutableLiveData<Resource<User>> userLive;
 
-    public LoginRepo() {
+    public LoginService() {
         userLive = new MutableLiveData<>();
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(Config.SERVER_URL)
@@ -29,9 +29,9 @@ public class LoginRepo {
         api = retrofit.create(LoginApi.class);
     }
 
-    public static LoginRepo singleton() {
+    public static LoginService singleton() {
         if (instance == null) {
-            instance = new LoginRepo();
+            instance = new LoginService();
         }
         return instance;
     }
@@ -48,7 +48,7 @@ public class LoginRepo {
                     } else {
                         userLive.postValue(Resource.error(response.message(), null));
                     }
-                } else {
+                } else if (response.code() == 409) {
                     userLive.postValue(Resource.error(LoginGuestViewModel.MSG_EXIST, null));
                 }
             }
