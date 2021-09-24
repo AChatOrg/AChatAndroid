@@ -91,6 +91,12 @@ public class LoginGuestActivity extends BaseActivity {
             case LoginGuestViewModel.MSG_EXIST:
                 alert(R.string.login_guest, R.string.this_user_is_online);
                 break;
+            case LoginGuestViewModel.MSG_NET:
+                alert(R.string.login_guest, R.string.no_network_connection);
+                break;
+            case LoginGuestViewModel.MSG_ERROR:
+                alert(R.string.login_guest,R.string.sorry_an_error_occurred);
+                break;
             default:
                 alert(R.string.login_guest, message);
         }

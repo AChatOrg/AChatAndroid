@@ -8,6 +8,8 @@
         <variable
             name="viewModel"
             type="com.hyapp.achat.viewmodel.LoginGuestViewModel" />
+
+        <import type="com.hyapp.achat.model.User" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -18,7 +20,7 @@
         android:padding="@dimen/padding_page"
         tools:context=".ui.LoginGuestActivity">
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -30,7 +32,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.appcompat.widget.AppCompatEditText
+        <com.google.android.material.textfield.MaterialAutoCompleteTextView
             android:id="@+id/editTextUsername"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -44,13 +46,14 @@
             android:paddingStart="@dimen/padding_8"
             android:paddingEnd="@dimen/padding_8"
             android:singleLine="true"
+            android:text="@{viewModel.savedUserLive.name}"
             android:textSize="@dimen/text_16"
             app:backgroundTint="@color/edit_text_tint_list"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/title" />
 
-        <androidx.appcompat.widget.AppCompatEditText
+        <com.google.android.material.textfield.MaterialAutoCompleteTextView
             android:id="@+id/editTextBio"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -61,6 +64,7 @@
             android:imeOptions="flagNoExtractUi"
             android:inputType="text"
             android:singleLine="true"
+            android:text="@{viewModel.savedUserLive.bio}"
             android:textSize="@dimen/text_16"
             app:backgroundTint="@color/edit_text_tint_list"
             app:layout_constraintEnd_toEndOf="@+id/editTextUsername"
@@ -80,20 +84,22 @@
             app:layout_constraintStart_toStartOf="@+id/editTextBio"
             app:layout_constraintTop_toBottomOf="@+id/editTextBio">
 
-            <androidx.appcompat.widget.AppCompatRadioButton
+            <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/radioBtnMale"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:checked="@{viewModel.savedUserLive.gender == User.MALE}"
                 android:fontFamily="@font/iran_sans_regular"
                 android:text="@string/male"
                 app:buttonTint="@color/radio_button_tint_list" />
 
-            <androidx.appcompat.widget.AppCompatRadioButton
+            <com.google.android.material.radiobutton.MaterialRadioButton
                 android:id="@+id/radioBtnFemale"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_16"
                 android:layout_marginLeft="@dimen/margin_16"
+                android:checked="@{viewModel.savedUserLive.gender == User.FEMALE}"
                 android:fontFamily="@font/iran_sans_regular"
                 android:text="@string/female"
                 app:buttonTint="@color/radio_button_tint_list" />
@@ -114,7 +120,7 @@
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent">
 
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/btnLoginGuestText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -126,7 +132,7 @@
                 android:textSize="@dimen/text_14" />
         </FrameLayout>
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/alreadyMember"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -138,7 +144,7 @@
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="@id/btnLoginGuest" />
 
-        <TextView
+        <com.google.android.material.textview.MaterialTextView
             android:id="@+id/login"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

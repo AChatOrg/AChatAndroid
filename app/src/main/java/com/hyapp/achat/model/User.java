@@ -5,8 +5,12 @@ public class User extends Thing {
     private Avatar avatar;
     private Key key;
 
-    public User(String name, String bio, byte gender, Avatar avatar) {
+    public User(String name, String bio, byte gender) {
         super(name, bio, gender);
+    }
+
+    public User(String name, String bio, byte gender, Avatar avatar) {
+        this(name, bio, gender);
         this.avatar = avatar;
     }
 

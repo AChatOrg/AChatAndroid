@@ -55,7 +55,7 @@ public class LoginService {
 
             @Override
             public void onFailure(Call<User> call, Throwable t) {
-                userLive.postValue(Resource.error(t.getMessage(), null));
+                userLive.postValue(Resource.error(LoginGuestViewModel.MSG_ERROR, null));
             }
         });
     }
