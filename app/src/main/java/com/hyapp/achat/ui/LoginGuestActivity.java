@@ -3,7 +3,7 @@ package com.hyapp.achat.ui;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.view.animation.AnimationUtils;
-import android.widget.Toast;
+import android.widget.ArrayAdapter;
 
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
@@ -25,6 +25,7 @@ public class LoginGuestActivity extends BaseActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         init();
+        setupHistory();
         setupProgressDialog();
         observeUser();
     }
@@ -41,6 +42,17 @@ public class LoginGuestActivity extends BaseActivity {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_guest_login);
         binding.setLifecycleOwner(this);
         binding.setViewModel(viewModel);
+    }
+
+    private void setupHistory() {
+        String[] nameHistory = viewModel.getNameHistory();
+        String[] bioHistory = viewModel.getBioHistory();
+        ArrayAdapter<String> nameAdapter = new ArrayAdapter<>(this, R.layout.item_suggestion, nameHistory);
+        ArrayAdapter<String> bioAdapter = new ArrayAdapter<>(this, R.layout.item_suggestion, bioHistory);
+        binding.editTextUsername.setThreshold(1);
+        binding.editTextBio.setThreshold(1);
+        binding.editTextUsername.setAdapter(nameAdapter);
+        binding.editTextBio.setAdapter(bioAdapter);
     }
 
     private void setupProgressDialog() {
@@ -95,7 +107,7 @@ public class LoginGuestActivity extends BaseActivity {
                 alert(R.string.login_guest, R.string.no_network_connection);
                 break;
             case LoginGuestViewModel.MSG_ERROR:
-                alert(R.string.login_guest,R.string.sorry_an_error_occurred);
+                alert(R.string.login_guest, R.string.sorry_an_error_occurred);
                 break;
             default:
                 alert(R.string.login_guest, message);

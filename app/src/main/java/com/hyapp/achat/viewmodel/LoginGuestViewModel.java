@@ -15,6 +15,8 @@ import com.hyapp.achat.model.User;
 import com.hyapp.achat.repo.local.LoginPreferences;
 import com.hyapp.achat.viewmodel.utils.NetUtils;
 
+import java.util.Set;
+
 public class LoginGuestViewModel extends AndroidViewModel {
 
     public static final String MSG_EMPTY = "empty";
@@ -23,7 +25,6 @@ public class LoginGuestViewModel extends AndroidViewModel {
     public static final String MSG_ERROR = "error";
 
     private MutableLiveData<Resource<User>> userLive;
-    private LiveData<User> savedUserLive;
 
     public LoginGuestViewModel(@NonNull Application application) {
         super(application);
@@ -31,7 +32,6 @@ public class LoginGuestViewModel extends AndroidViewModel {
 
     public void init() {
         userLive = LoginService.singleton().getUserLive();
-        savedUserLive = LoginPreferences.getLoginGuest(getApplication().getApplicationContext());
     }
 
     public void loginGuest(String name, String bio, boolean gender) {
@@ -43,16 +43,37 @@ public class LoginGuestViewModel extends AndroidViewModel {
         } else {
             String nameTrim = name.trim(), bioTrim = bio.trim();
             byte genderByte = gender ? User.MALE : User.FEMALE;
-            LoginPreferences.putLoginGuest(context, nameTrim, bioTrim, genderByte);
+            LoginPreferences.singleton(context).putLoginGuest(nameTrim, bioTrim, genderByte);
             LoginService.singleton().loginGuest(nameTrim, bioTrim, genderByte);
         }
     }
 
-    public MutableLiveData<Resource<User>> getUserLive() {
-        return userLive;
+    public String getSavedName() {
+        return LoginPreferences.singleton(getApplication().getApplicationContext()).getName();
     }
 
-    public LiveData<User> getSavedUserLive() {
-        return savedUserLive;
+    public String getSavedBio() {
+        return LoginPreferences.singleton(getApplication().getApplicationContext()).getBio();
+    }
+
+    public boolean getSavedGender() {
+        int gender = LoginPreferences.singleton(getApplication().getApplicationContext()).getGender();
+        return gender == User.MALE;
+    }
+
+    public String[] getNameHistory() {
+        Set<String> set = LoginPreferences.singleton(getApplication().getApplicationContext()).getNameSet();
+        String[] history = new String[set.size()];
+        return set.toArray(history);
+    }
+
+    public String[] getBioHistory() {
+        Set<String> set = LoginPreferences.singleton(getApplication().getApplicationContext()).getBioSet();
+        String[] history = new String[set.size()];
+        return set.toArray(history);
+    }
+
+    public MutableLiveData<Resource<User>> getUserLive() {
+        return userLive;
     }
 }

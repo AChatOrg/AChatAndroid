@@ -4,12 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
         <variable
             name="viewModel"
             type="com.hyapp.achat.viewmodel.LoginGuestViewModel" />
-
-        <import type="com.hyapp.achat.model.User" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -26,7 +23,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/iran_sans_bold"
             android:text="@string/login_guest"
-            android:textSize="22sp"
+            android:textSize="@dimen/text_22"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
@@ -46,7 +43,7 @@
             android:paddingStart="@dimen/padding_8"
             android:paddingEnd="@dimen/padding_8"
             android:singleLine="true"
-            android:text="@{viewModel.savedUserLive.name}"
+            android:text="@{viewModel.getSavedName()}"
             android:textSize="@dimen/text_16"
             app:backgroundTint="@color/edit_text_tint_list"
             app:layout_constraintEnd_toEndOf="parent"
@@ -64,7 +61,7 @@
             android:imeOptions="flagNoExtractUi"
             android:inputType="text"
             android:singleLine="true"
-            android:text="@{viewModel.savedUserLive.bio}"
+            android:text="@{viewModel.getSavedBio()}"
             android:textSize="@dimen/text_16"
             app:backgroundTint="@color/edit_text_tint_list"
             app:layout_constraintEnd_toEndOf="@+id/editTextUsername"
@@ -88,7 +85,7 @@
                 android:id="@+id/radioBtnMale"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:checked="@{viewModel.savedUserLive.gender == User.MALE}"
+                android:checked="@{viewModel.getSavedGender()}"
                 android:fontFamily="@font/iran_sans_regular"
                 android:text="@string/male"
                 app:buttonTint="@color/radio_button_tint_list" />
@@ -99,7 +96,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_16"
                 android:layout_marginLeft="@dimen/margin_16"
-                android:checked="@{viewModel.savedUserLive.gender == User.FEMALE}"
+                android:checked="@{!viewModel.getSavedGender()}"
                 android:fontFamily="@font/iran_sans_regular"
                 android:text="@string/female"
                 app:buttonTint="@color/radio_button_tint_list" />
