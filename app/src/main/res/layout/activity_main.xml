@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.hyapp.achat.viewmodel.MainViewModel" />
+    </data>
+
+    <androidx.drawerlayout.widget.DrawerLayout
+        android:id="@+id/drawer_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true"
+        tools:openDrawer="start">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:paddingLeft="@dimen/padding_page_16"
+            android:paddingTop="@dimen/padding_page_10"
+            android:paddingRight="@dimen/padding_page_16"
+            android:paddingBottom="@dimen/padding_page_16">
+
+            <com.facebook.drawee.view.SimpleDraweeView
+                android:id="@+id/lastOnlineAvatar"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                app:actualImageScaleType="centerCrop"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:placeholderImage="@drawable/avatar_36"
+                app:placeholderImageScaleType="centerCrop"
+                app:roundAsCircle="true" />
+
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/margin_16"
+                android:layout_marginLeft="@dimen/margin_16"
+                android:fontFamily="@font/iran_sans_bold"
+                android:text="@string/app_name"
+                android:textSize="@dimen/text_20"
+                app:layout_constraintBottom_toBottomOf="@+id/lastOnlineAvatar"
+                app:layout_constraintStart_toEndOf="@+id/lastOnlineAvatar"
+                app:layout_constraintTop_toTopOf="@+id/lastOnlineAvatar" />
+
+            <com.hyapp.achat.ui.model.SearchEditText
+                android:id="@+id/searchEditText"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginStart="@dimen/margin_16"
+                android:layout_marginLeft="@dimen/margin_16"
+                app:layout_constraintBottom_toBottomOf="@+id/title"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/title" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginTop="@dimen/margin_10"
+                android:clipToPadding="false"
+                android:paddingTop="@dimen/padding_10"
+                android:paddingBottom="@dimen/padding_10"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/lastOnlineAvatar" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/addFab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true"
+                android:src="@drawable/add_chat_fab"
+                app:backgroundTint="@color/white"
+                app:elevation="@dimen/fab_elevation"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:rippleColor="@color/white"
+                app:tint="@null"
+                tools:ignore="ContentDescription" />
+
+            <View
+                android:id="@+id/toolbarDivider"
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:layout_marginTop="@dimen/margin_10"
+                android:background="@color/grey_15"
+                android:visibility="invisible"
+                app:layout_constraintTop_toBottomOf="@+id/lastOnlineAvatar" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <include
+                    android:id="@+id/peopleGroups"
+                    layout="@layout/layout_people_groups"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="start" />
+
+    </androidx.drawerlayout.widget.DrawerLayout>
+</layout>

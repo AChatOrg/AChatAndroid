@@ -1,5 +1,6 @@
 package com.hyapp.achat.model;
 
+
 public abstract class Thing {
 
     public static final byte MALE = 1;

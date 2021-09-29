@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+        <variable
+            name="viewModel"
+            type="com.hyapp.achat.viewmodel.MainViewModel" />
+
+        <import type="com.hyapp.achat.model.Resource" />
+
+        <import type="android.view.View" />
+    </data>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingTop="@dimen/padding_8"
+            android:paddingBottom="@dimen/padding_8" />
+
+        <include
+            android:id="@+id/statusMessage"
+            layout="@layout/layout_status_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:visibility="@{viewModel.peopleLive.status == Resource.Status.ERROR ? View.VISIBLE : View.GONE}"
+            app:viewModel="@{viewModel}" />
+
+        <com.google.android.material.progressindicator.LinearProgressIndicator xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/progressBar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:indeterminate="true"
+            android:visibility="@{viewModel.peopleLive.status == Resource.Status.LOADING ? View.VISIBLE : View.GONE}"
+            app:trackCornerRadius="100dp" />
+    </FrameLayout>
+</layout>

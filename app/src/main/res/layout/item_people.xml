@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="people"
+            type="com.hyapp.achat.model.People" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true">
+
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/avatar"
+            android:layout_width="46dp"
+            android:layout_height="46dp"
+            android:layout_marginTop="@dimen/margin_7"
+            android:layout_marginBottom="@dimen/margin_7"
+            app:actualImageScaleType="centerCrop"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:placeholderImage="@drawable/avatar_46"
+            app:placeholderImageScaleType="centerCrop"
+            app:actualImageUri="@{people.avatar.url}"
+            app:roundAsCircle="true" />
+
+        <View
+            android:id="@+id/genderCircle"
+            android:layout_width="13dp"
+            android:layout_height="13dp"
+            android:layout_marginTop="1dp"
+            android:layout_marginEnd="1dp"
+            android:layout_marginRight="1dp"
+            app:layout_constraintBottom_toBottomOf="@+id/avatar"
+            app:layout_constraintEnd_toEndOf="@+id/avatar"
+            tools:background="@drawable/gender_circle_people_male_bg" />
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/margin_12"
+            android:layout_marginLeft="@dimen/margin_12"
+            android:layout_marginEnd="@dimen/margin_8"
+            android:layout_marginRight="@dimen/margin_8"
+            android:ellipsize="end"
+            android:fontFamily="@font/iran_sans_regular"
+            android:gravity="start"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:text="@{people.name}"
+            android:textAlignment="gravity"
+            android:textSize="@dimen/text_14"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintBottom_toTopOf="@+id/bio"
+            app:layout_constraintEnd_toStartOf="@+id/rank"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toEndOf="@+id/avatar"
+            app:layout_constraintTop_toTopOf="@+id/avatar"
+            app:layout_constraintVertical_chainStyle="packed"
+            tools:text="Amir hosein" />
+
+        <TextView
+            android:id="@+id/bio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/margin_8"
+            android:layout_marginRight="@dimen/margin_8"
+            android:ellipsize="end"
+            android:fontFamily="@font/iran_sans_light"
+            android:gravity="start"
+            android:maxLines="1"
+            android:text="@{people.bio}"
+            android:singleLine="true"
+            android:textAlignment="gravity"
+            android:textColor="@color/grey_35"
+            android:textSize="@dimen/text_10"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintBottom_toBottomOf="@+id/avatar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toStartOf="@+id/name"
+            app:layout_constraintTop_toBottomOf="@+id/name"
+            tools:ignore="SmallSp"
+            tools:text="Salam khobi? chekhabar" />
+
+        <TextView
+            android:id="@+id/rank"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/iran_sans_light"
+            android:textSize="@dimen/text_10"
+            app:layout_constraintBaseline_toBaselineOf="@+id/name"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:ignore="SmallSp"
+            tools:text="Guest"
+            tools:textColor="@color/grey_35" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

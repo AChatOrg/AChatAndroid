@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Build;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.util.TypedValue;
 
 public class UiUtils {
 
@@ -14,6 +15,10 @@ public class UiUtils {
         } else {
             v.vibrate(duration);
         }
+    }
+
+    public static int dp2px(Context context, float dp) {
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, context.getResources().getDisplayMetrics());
     }
 
 }

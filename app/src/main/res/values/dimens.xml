@@ -1,22 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <dimen name="padding_page">16dp</dimen>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <dimen name="padding_page_16">16dp</dimen>
+    <dimen name="padding_page_10">10dp</dimen>
 
     <dimen name="margin_4">4dp</dimen>
+    <dimen name="margin_7">7dp</dimen>
     <dimen name="margin_8">8dp</dimen>
+    <dimen name="margin_10">10dp</dimen>
+    <dimen name="margin_12">12dp</dimen>
     <dimen name="margin_16">16dp</dimen>
     <dimen name="margin_24">24dp</dimen>
 
     <dimen name="padding_4">4dp</dimen>
     <dimen name="padding_8">8dp</dimen>
+    <dimen name="padding_10">10dp</dimen>
     <dimen name="padding_16">16dp</dimen>
     <dimen name="margin_20">20dp</dimen>
     <dimen name="padding_24">24dp</dimen>
 
+    <dimen name="text_10">10sp</dimen>
     <dimen name="text_12">12sp</dimen>
     <dimen name="text_14">14sp</dimen>
     <dimen name="text_16">16sp</dimen>
     <dimen name="text_18">18sp</dimen>
     <dimen name="text_20">20sp</dimen>
     <dimen name="text_22">22sp</dimen>
+
+    <dimen name="design_fab_image_size" tools:override="true">56dp</dimen>
+    <dimen name="fab_elevation">4dp</dimen>
 </resources>

@@ -2,11 +2,11 @@ package com.hyapp.achat.model;
 
 public class Key {
         private String ipv4;
-        private int rank;
+        private byte rank;
         private int score;
         private long loginTime;
 
-        public Key(String ipv4, int rank, int score, long loginTime) {
+        public Key(String ipv4, byte rank, int score, long loginTime) {
             this.ipv4 = ipv4;
             this.rank = rank;
             this.score = score;
@@ -21,11 +21,11 @@ public class Key {
             this.ipv4 = ipv4;
         }
 
-        public int getRank() {
+        public byte getRank() {
             return rank;
         }
 
-        public void setRank(int rank) {
+        public void setRank(byte rank) {
             this.rank = rank;
         }
 

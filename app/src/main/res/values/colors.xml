@@ -3,6 +3,7 @@
     <color name="primary">#000</color>
     <color name="primaryLight">@color/grey_50</color>
     <color name="link">#0645AD</color>
+    <color name="red_nice">#EE4957</color>
 
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
@@ -12,6 +13,17 @@
 
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="male">#0000FF</color>
+    <color name="female">#FF00FF</color>
+
+    <color name="rank_guest">@color/grey_35</color>
+    <color name="rank_member">#FF000D3E</color>
+    <color name="rank_special">#FF5C1E00</color>
+    <color name="rank_active">#FF093C00</color>
+    <color name="rank_senior">#FF3C0000</color>
+    <color name="rank_admin">#FF1E8800</color>
+    <color name="rank_manager">#FFAF9200</color>
 
     <color name="grey_01">#FCFCFC</color>
     <color name="grey_02">#f6f6f6</color>

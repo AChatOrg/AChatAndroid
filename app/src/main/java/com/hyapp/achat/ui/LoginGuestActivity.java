@@ -11,7 +11,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.hyapp.achat.R;
 import com.hyapp.achat.databinding.ActivityGuestLoginBinding;
-import com.hyapp.achat.model.User;
+import com.hyapp.achat.model.People;
 import com.hyapp.achat.ui.utils.UiUtils;
 import com.hyapp.achat.viewmodel.LoginGuestViewModel;
 
@@ -79,18 +79,18 @@ public class LoginGuestActivity extends BaseActivity {
         });
     }
 
-    private void onSuccess(User user) {
+    private void onSuccess(People people) {
         //start main activity
         alert(R.string.login_guest,
-                user.getName()
-                        + "\n " + user.getBio()
-                        + "\n " + user.getGender()
-                        + "\n " + user.getAvatar().getUrl()
-                        + "\n " + user.getAvatar().isOnline()
-                        + "\n " + user.getKey().getIpv4()
-                        + "\n " + user.getKey().getRank()
-                        + "\n " + user.getKey().getScore()
-                        + "\n " + user.getKey().getLoginTime()
+                people.getName()
+                        + "\n " + people.getBio()
+                        + "\n " + people.getGender()
+                        + "\n " + people.getAvatar().getUrl()
+                        + "\n " + people.getAvatar().isOnline()
+                        + "\n " + people.getKey().getIpv4()
+                        + "\n " + people.getKey().getRank()
+                        + "\n " + people.getKey().getScore()
+                        + "\n " + people.getKey().getLoginTime()
         );
     }
 

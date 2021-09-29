@@ -14,7 +14,7 @@
         android:layout_height="match_parent"
         android:focusable="true"
         android:focusableInTouchMode="true"
-        android:padding="@dimen/padding_page"
+        android:padding="@dimen/padding_page_16"
         tools:context=".ui.LoginGuestActivity">
 
         <com.google.android.material.textview.MaterialTextView

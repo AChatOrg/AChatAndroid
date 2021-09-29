@@ -1,10 +1,11 @@
 package com.hyapp.achat.repo.http;
 
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.hyapp.achat.Config;
+import com.hyapp.achat.model.People;
 import com.hyapp.achat.model.Resource;
-import com.hyapp.achat.model.User;
 import com.hyapp.achat.viewmodel.LoginGuestViewModel;
 
 import retrofit2.Call;
@@ -18,7 +19,7 @@ public class LoginService {
     private static LoginService instance;
 
     private final LoginApi api;
-    private final MutableLiveData<Resource<User>> userLive;
+    private final MutableLiveData<Resource<People>> userLive;
 
     public LoginService() {
         userLive = new MutableLiveData<>();
@@ -38,13 +39,13 @@ public class LoginService {
 
     public void loginGuest(String name, String bio, byte gender) {
         userLive.setValue(Resource.loading(null));
-        api.loginGuest(name, bio, gender).enqueue(new Callback<User>() {
+        api.loginGuest(name, bio, gender).enqueue(new Callback<People>() {
             @Override
-            public void onResponse(Call<User> call, Response<User> response) {
+            public void onResponse(Call<People> call, Response<People> response) {
                 if (response.isSuccessful()) {
-                    User user = response.body();
-                    if (user != null) {
-                        userLive.postValue(Resource.success(user));
+                    People people = response.body();
+                    if (people != null) {
+                        userLive.postValue(Resource.success(people));
                     } else {
                         userLive.postValue(Resource.error(response.message(), null));
                     }
@@ -54,13 +55,13 @@ public class LoginService {
             }
 
             @Override
-            public void onFailure(Call<User> call, Throwable t) {
+            public void onFailure(Call<People> call, Throwable t) {
                 userLive.postValue(Resource.error(LoginGuestViewModel.MSG_ERROR, null));
             }
         });
     }
 
-    public MutableLiveData<Resource<User>> getUserLive() {
+    public LiveData<Resource<People>> getUserLive() {
         return userLive;
     }
 }
