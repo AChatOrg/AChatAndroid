@@ -1,13 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-
-    <data>
-
-        <variable
-            name="viewModel"
-            type="com.hyapp.achat.viewmodel.MainViewModel" />
-    </data>
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -21,7 +15,6 @@
             android:layout_marginTop="@dimen/margin_12"
             android:layout_marginBottom="@dimen/margin_12"
             android:fontFamily="@font/iran_sans_regular"
-            android:text="@string/no_network_connection"
             android:textColor="@color/red_nice"
             android:textSize="@dimen/text_14"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -29,7 +22,8 @@
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="@string/no_network_connection" />
 
         <TextView
             android:id="@+id/tryAgain"
@@ -38,7 +32,6 @@
             android:layout_marginStart="@dimen/margin_12"
             android:layout_marginLeft="@dimen/margin_12"
             android:gravity="center"
-            android:onClick="@{v -> viewModel.initPeople()}"
             android:text="@string/tray_again"
             android:textColor="?attr/linkColor"
             app:layout_constraintBottom_toBottomOf="parent"

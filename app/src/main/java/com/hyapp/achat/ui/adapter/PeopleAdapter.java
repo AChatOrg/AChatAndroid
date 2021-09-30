@@ -67,6 +67,8 @@ public class PeopleAdapter extends RecyclerView.Adapter<PeopleAdapter.Holder> {
             binding.setPeople(people);
             binding.executePendingBindings();
 
+            binding.avatar.setImageURI(people.getAvatar().getUrl());
+
             if (people.getGender() == People.MALE) {
                 binding.genderCircle.setBackgroundResource(R.drawable.gender_circle_people_male_bg);
             } else {

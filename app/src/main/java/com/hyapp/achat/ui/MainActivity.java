@@ -1,18 +1,19 @@
 package com.hyapp.achat.ui;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GravityCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Bundle;
-import android.widget.TextView;
 
 import com.google.android.material.tabs.TabLayout;
 import com.hyapp.achat.R;
 import com.hyapp.achat.databinding.ActivityMainBinding;
+import com.hyapp.achat.model.People;
 import com.hyapp.achat.model.Resource;
 import com.hyapp.achat.ui.fragment.GroupsFragment;
 import com.hyapp.achat.ui.fragment.PeopleFragment;
@@ -26,12 +27,29 @@ public class MainActivity extends AppCompatActivity {
     private MainViewModel viewModel;
     private ActivityMainBinding binding;
 
+    private int peopleSize = 0, groupsSize = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         init();
         setupPeopleGroups();
+        observePeopleGroupsSize();
+        setupFab();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (binding.peopleGroups.peopleGroupsSearchEditText.isFocused()) {
+            binding.peopleGroups.peopleGroupsSearchEditText.clearFocus();
+        } else if (binding.drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            binding.drawerLayout.closeDrawer(GravityCompat.START);
+        } else if (binding.searchEditText.isFocused()) {
+            binding.searchEditText.clearFocus();
+        } else {
+            super.onBackPressed();
+        }
     }
 
     private void init() {
@@ -46,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
         final PeopleFragment peopleFragment = new PeopleFragment();
         final GroupsFragment groupsFragment = new GroupsFragment();
 
-        binding.peopleGroups.peopleGroupsTitle.setText(String.format(getString(R.string.onile_s), viewModel.getPeopleSize()));
+        binding.peopleGroups.peopleGroupsTitle.setText(String.format(getString(R.string.onile_s), peopleSize));
 
         FragmentManager manager = getSupportFragmentManager();
         manager.beginTransaction()
@@ -62,18 +80,35 @@ public class MainActivity extends AppCompatActivity {
                 final FragmentTransaction transaction = manager.beginTransaction();
                 switch (tab.getPosition()) {
                     case 0:
-                        binding.peopleGroups.peopleGroupsTitle.setText(String.format(getString(R.string.onile_s), viewModel.getPeopleSize()));
+                        binding.peopleGroups.peopleGroupsTitle.setText(String.format(getString(R.string.onile_s), peopleSize));
                         transaction.show(peopleFragment);
                         transaction.hide(groupsFragment);
                         break;
                     case 1:
-                        binding.peopleGroups.peopleGroupsTitle.setText(String.format(getString(R.string.groups_s), viewModel.getGroupsSize()));
+                        binding.peopleGroups.peopleGroupsTitle.setText(String.format(getString(R.string.groups_s), groupsSize));
                         transaction.hide(peopleFragment);
                         transaction.show(groupsFragment);
                         break;
                 }
                 transaction.commit();
             }
+        });
+    }
+
+    private void observePeopleGroupsSize() {
+        viewModel.getPeopleLive().observe(this, listResource -> {
+            if (listResource.status == Resource.Status.SUCCESS) {
+                peopleSize = listResource.data.size();
+                if (binding.peopleGroups.tabLayout.getSelectedTabPosition() == 0) {
+                    binding.peopleGroups.peopleGroupsTitle.setText(String.format(getString(R.string.onile_s), peopleSize));
+                }
+            }
+        });
+    }
+
+    private void setupFab() {
+        binding.addFab.setOnClickListener(v -> {
+            binding.drawerLayout.openDrawer(GravityCompat.START);
         });
     }
 

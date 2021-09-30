@@ -14,7 +14,7 @@
     <string name="biography_optional">Biography (optional)</string>
     <string name="male">Male</string>
     <string name="female">Female</string>
-    <string name="this_user_is_online">This people is online</string>
+    <string name="this_user_is_online">This user is online</string>
 
 
     <string name="this_media_not_exist">This media does not exist.</string>

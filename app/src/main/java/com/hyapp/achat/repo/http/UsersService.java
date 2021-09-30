@@ -7,6 +7,7 @@ import com.hyapp.achat.Config;
 import com.hyapp.achat.model.Resource;
 import com.hyapp.achat.model.People;
 import com.hyapp.achat.viewmodel.MainViewModel;
+import com.hyapp.achat.viewmodel.livevent.LiveEvent;
 
 import java.util.List;
 

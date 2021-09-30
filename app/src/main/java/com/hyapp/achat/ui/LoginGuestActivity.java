@@ -1,6 +1,7 @@
 package com.hyapp.achat.ui;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
@@ -80,18 +81,9 @@ public class LoginGuestActivity extends BaseActivity {
     }
 
     private void onSuccess(People people) {
-        //start main activity
-        alert(R.string.login_guest,
-                people.getName()
-                        + "\n " + people.getBio()
-                        + "\n " + people.getGender()
-                        + "\n " + people.getAvatar().getUrl()
-                        + "\n " + people.getAvatar().isOnline()
-                        + "\n " + people.getKey().getIpv4()
-                        + "\n " + people.getKey().getRank()
-                        + "\n " + people.getKey().getScore()
-                        + "\n " + people.getKey().getLoginTime()
-        );
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     private void onError(String message) {

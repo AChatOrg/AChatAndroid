@@ -21,6 +21,8 @@
             android:id="@+id/avatar"
             android:layout_width="46dp"
             android:layout_height="46dp"
+            android:layout_marginStart="@dimen/margin_12"
+            android:layout_marginLeft="@dimen/margin_12"
             android:layout_marginTop="@dimen/margin_7"
             android:layout_marginBottom="@dimen/margin_7"
             app:actualImageScaleType="centerCrop"
@@ -29,7 +31,6 @@
             app:layout_constraintTop_toTopOf="parent"
             app:placeholderImage="@drawable/avatar_46"
             app:placeholderImageScaleType="centerCrop"
-            app:actualImageUri="@{people.avatar.url}"
             app:roundAsCircle="true" />
 
         <View
@@ -78,8 +79,8 @@
             android:fontFamily="@font/iran_sans_light"
             android:gravity="start"
             android:maxLines="1"
-            android:text="@{people.bio}"
             android:singleLine="true"
+            android:text="@{people.bio}"
             android:textAlignment="gravity"
             android:textColor="@color/grey_35"
             android:textSize="@dimen/text_10"
@@ -96,6 +97,8 @@
             android:id="@+id/rank"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/margin_12"
+            android:layout_marginRight="@dimen/margin_12"
             android:fontFamily="@font/iran_sans_light"
             android:textSize="@dimen/text_10"
             app:layout_constraintBaseline_toBaselineOf="@+id/name"

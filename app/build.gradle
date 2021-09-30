@@ -47,6 +47,7 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycle_version"
 
     implementation "androidx.constraintlayout:constraintlayout:$constraintlayout_version"
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
 
     implementation 'com.facebook.fresco:fresco:2.5.0'
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'

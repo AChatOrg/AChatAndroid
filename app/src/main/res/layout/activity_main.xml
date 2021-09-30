@@ -21,16 +21,15 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:focusable="true"
-            android:focusableInTouchMode="true"
-            android:paddingLeft="@dimen/padding_page_16"
-            android:paddingTop="@dimen/padding_page_10"
-            android:paddingRight="@dimen/padding_page_16"
-            android:paddingBottom="@dimen/padding_page_16">
+            android:focusableInTouchMode="true">
 
             <com.facebook.drawee.view.SimpleDraweeView
                 android:id="@+id/lastOnlineAvatar"
                 android:layout_width="36dp"
                 android:layout_height="36dp"
+                android:layout_marginStart="@dimen/margin_16"
+                android:layout_marginLeft="@dimen/margin_16"
+                android:layout_marginTop="@dimen/margin_10"
                 app:actualImageScaleType="centerCrop"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -58,6 +57,8 @@
                 android:layout_height="36dp"
                 android:layout_marginStart="@dimen/margin_16"
                 android:layout_marginLeft="@dimen/margin_16"
+                android:layout_marginEnd="@dimen/margin_16"
+                android:layout_marginRight="@dimen/margin_16"
                 app:layout_constraintBottom_toBottomOf="@+id/title"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/title" />
@@ -79,6 +80,9 @@
                 android:id="@+id/addFab"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/margin_16"
+                android:layout_marginRight="@dimen/margin_16"
+                android:layout_marginBottom="@dimen/margin_16"
                 android:clickable="true"
                 android:focusable="true"
                 android:src="@drawable/add_chat_fab"
@@ -101,12 +105,12 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-                <include
-                    android:id="@+id/peopleGroups"
-                    layout="@layout/layout_people_groups"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="start" />
+        <include
+            android:id="@+id/peopleGroups"
+            layout="@layout/layout_people_groups"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="start" />
 
     </androidx.drawerlayout.widget.DrawerLayout>
 </layout>
