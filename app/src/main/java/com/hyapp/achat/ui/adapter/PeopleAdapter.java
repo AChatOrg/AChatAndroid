@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.hyapp.achat.R;
 import com.hyapp.achat.databinding.ItemPeopleBinding;
 import com.hyapp.achat.model.People;
+import com.hyapp.achat.model.SortedList;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,11 +23,11 @@ import java.util.List;
 public class PeopleAdapter extends RecyclerView.Adapter<PeopleAdapter.Holder> {
 
     private final Context context;
-    private List<People> people;
+    private final List<People> people;
 
     public PeopleAdapter(Context context) {
         this.context = context;
-        this.people = new ArrayList<>();
+        this.people = new SortedList<>(People::compare);
     }
 
     @NonNull
@@ -49,7 +50,8 @@ public class PeopleAdapter extends RecyclerView.Adapter<PeopleAdapter.Holder> {
 
     @SuppressLint("NotifyDataSetChanged")
     public void resetList(List<People> people) {
-        this.people = people;
+        this.people.clear();
+        this.people.addAll(people);
         notifyDataSetChanged();
     }
 

@@ -18,7 +18,7 @@ public class LauncherActivity extends AppCompatActivity {
             finish();
             return;
         }
-        startActivity(new Intent(this, MainActivity.class));
+        startActivity(new Intent(this, LoginGuestActivity.class));
         finish();
     }
 }
