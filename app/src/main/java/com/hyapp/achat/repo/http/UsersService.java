@@ -52,6 +52,8 @@ public class UsersService {
                     } else {
                         peopleLive.postValue(Resource.error(response.message(), null));
                     }
+                } else if (response.code() == 403) {
+                    peopleLive.postValue(Resource.error(response.message(), null));
                 }
             }
 

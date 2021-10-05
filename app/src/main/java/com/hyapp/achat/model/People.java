@@ -43,4 +43,15 @@ public class People extends Thing {
     public void setKey(Key key) {
         this.key = key;
     }
+
+    public static int compare(People o1, People o2) {
+        if (o1.getKey().getIpv4().equals(o2.getKey().getIpv4())) return 0;
+        if (o1.getKey().getRank() < o2.getKey().getRank()) return 1;
+        if (o1.getKey().getRank() > o2.getKey().getRank()) return -1;
+        if (o1.getKey().getScore() < o2.getKey().getScore()) return 1;
+        if (o1.getKey().getScore() > o2.getKey().getScore()) return -1;
+        if (o1.getKey().getLoginTime() < o2.getKey().getLoginTime()) return -1;
+        if (o1.getKey().getLoginTime() > o2.getKey().getLoginTime()) return 1;
+        return 0;
+    }
 }

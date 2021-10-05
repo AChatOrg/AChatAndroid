@@ -34,6 +34,7 @@ public class PeopleFragment extends Fragment {
     private FragmentPeopleGroupsBinding binding;
 
     private PeopleAdapter adapter;
+    private boolean isFirstLoaded = false;
 
     @Nullable
     @Override
@@ -57,6 +58,7 @@ public class PeopleFragment extends Fragment {
     }
 
     private void setupRecyclerView(Context context, View view) {
+        binding.recyclerView.setHasFixedSize(true);
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(context));
         adapter = new PeopleAdapter(context);
         binding.recyclerView.setAdapter(adapter);
@@ -66,20 +68,13 @@ public class PeopleFragment extends Fragment {
         viewModel.getPeopleLive().observe(getViewLifecycleOwner(), listResource -> {
             switch (listResource.status) {
                 case SUCCESS:
-                    binding.setIsStatusVisible(false);
-                    binding.progressBar.setVisibility(View.GONE);
-                    binding.swipeRefreshLayout.setRefreshing(false);
                     onSuccess(listResource.data);
                     break;
                 case ERROR:
-                    binding.swipeRefreshLayout.setRefreshing(false);
-                    binding.setIsStatusVisible(true);
-                    binding.progressBar.setVisibility(View.GONE);
                     onError(listResource.message);
                     break;
                 case LOADING:
-                    binding.setIsStatusVisible(false);
-                    binding.progressBar.setVisibility(View.VISIBLE);
+                    onLoading();
                     break;
             }
         });
@@ -89,6 +84,9 @@ public class PeopleFragment extends Fragment {
         viewModel.getNetLive().observe(getViewLifecycleOwner(), aBoolean -> {
             if (aBoolean) {
                 binding.setIsStatusVisible(false);
+                if (!isFirstLoaded) {
+                    viewModel.initPeople();
+                }
             } else {
                 binding.setIsStatusVisible(true);
                 onError(MainViewModel.MSG_NET);
@@ -97,10 +95,17 @@ public class PeopleFragment extends Fragment {
     }
 
     private void onSuccess(List<People> people) {
+        binding.setIsStatusVisible(false);
+        binding.progressBar.setVisibility(View.GONE);
+        binding.swipeRefreshLayout.setRefreshing(false);
+        isFirstLoaded = true;
         adapter.resetList(people);
     }
 
     private void onError(String message) {
+        binding.swipeRefreshLayout.setRefreshing(false);
+        binding.setIsStatusVisible(true);
+        binding.progressBar.setVisibility(View.GONE);
         switch (message) {
             case MainViewModel.MSG_NET:
                 binding.statusMessage.text.setText(R.string.no_network_connection);
@@ -111,5 +116,10 @@ public class PeopleFragment extends Fragment {
             default:
                 binding.statusMessage.text.setText(message);
         }
+    }
+
+    private void onLoading() {
+        binding.setIsStatusVisible(false);
+        binding.progressBar.setVisibility(View.VISIBLE);
     }
 }

@@ -67,26 +67,26 @@ public class LoginGuestActivity extends BaseActivity {
         viewModel.getUserLive().observe(this, userResource -> {
             switch (userResource.status) {
                 case SUCCESS:
-                    progressDialog.dismiss();
                     onSuccess(userResource.data);
                     break;
                 case ERROR:
-                    progressDialog.dismiss();
                     onError(userResource.message);
                     break;
                 case LOADING:
-                    progressDialog.show();
+                    onLoading();
             }
         });
     }
 
     private void onSuccess(People people) {
+        progressDialog.dismiss();
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         finish();
     }
 
     private void onError(String message) {
+        progressDialog.dismiss();
         switch (message) {
             case LoginGuestViewModel.MSG_EMPTY:
                 UiUtils.vibrate(this, 200);
@@ -104,5 +104,10 @@ public class LoginGuestActivity extends BaseActivity {
             default:
                 alert(R.string.login_guest, message);
         }
+    }
+
+
+    private void onLoading() {
+        progressDialog.show();
     }
 }
