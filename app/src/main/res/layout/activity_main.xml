@@ -7,7 +7,7 @@
 
         <variable
             name="viewModel"
-            type="com.hyapp.achat.viewmodel.MainViewModel" />
+            type="com.hyapp.achat.bl.MainViewModel" />
     </data>
 
     <androidx.drawerlayout.widget.DrawerLayout

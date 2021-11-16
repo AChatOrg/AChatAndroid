@@ -1,26 +1,21 @@
 package com.hyapp.achat.ui;
 
+import android.os.Bundle;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-
-import android.os.Bundle;
 
 import com.google.android.material.tabs.TabLayout;
 import com.hyapp.achat.R;
+import com.hyapp.achat.bl.MainViewModel;
 import com.hyapp.achat.databinding.ActivityMainBinding;
-import com.hyapp.achat.model.People;
-import com.hyapp.achat.model.Resource;
 import com.hyapp.achat.ui.fragment.GroupsFragment;
 import com.hyapp.achat.ui.fragment.PeopleFragment;
 import com.hyapp.achat.ui.model.AbstractTabSelectedListener;
-import com.hyapp.achat.viewmodel.MainViewModel;
-
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -96,14 +91,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void observePeopleGroupsSize() {
-        viewModel.getPeopleLive().observe(this, listResource -> {
-            if (listResource.status == Resource.Status.SUCCESS) {
-                peopleSize = listResource.data.size();
-                if (binding.peopleGroups.tabLayout.getSelectedTabPosition() == 0) {
-                    binding.peopleGroups.peopleGroupsTitle.setText(String.format(getString(R.string.onile_s), peopleSize));
-                }
-            }
-        });
+//        viewModel.getPeopleLive().observe(this, listResource -> {
+//            if (listResource.status == Resource.Status.SUCCESS) {
+//                peopleSize = listResource.data.size();
+//                if (binding.peopleGroups.tabLayout.getSelectedTabPosition() == 0) {
+//                    binding.peopleGroups.peopleGroupsTitle.setText(String.format(getString(R.string.onile_s), peopleSize));
+//                }
+//            }
+//        });
     }
 
     private void setupFab() {

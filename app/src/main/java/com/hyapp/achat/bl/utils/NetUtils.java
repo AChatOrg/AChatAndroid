@@ -1,4 +1,4 @@
-package com.hyapp.achat.viewmodel.utils;
+package com.hyapp.achat.bl.utils;
 
 import android.content.Context;
 import android.net.ConnectivityManager;

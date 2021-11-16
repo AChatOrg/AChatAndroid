@@ -6,7 +6,7 @@
     <data>
         <variable
             name="viewModel"
-            type="com.hyapp.achat.viewmodel.LoginGuestViewModel" />
+            type="com.hyapp.achat.bl.LoginGuestViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

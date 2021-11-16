@@ -1,6 +1,7 @@
 package com.hyapp.achat.ui;
 
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.animation.AnimationUtils;
@@ -13,10 +14,15 @@ import androidx.lifecycle.ViewModelProvider;
 import com.hyapp.achat.R;
 import com.hyapp.achat.databinding.ActivityGuestLoginBinding;
 import com.hyapp.achat.model.People;
+import com.hyapp.achat.model.event.Event;
+import com.hyapp.achat.model.event.LoggedEvent;
 import com.hyapp.achat.ui.utils.UiUtils;
-import com.hyapp.achat.viewmodel.LoginGuestViewModel;
+import com.hyapp.achat.bl.LoginGuestViewModel;
 
-public class LoginGuestActivity extends BaseActivity {
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
+public class LoginGuestActivity extends EventActivity {
 
     private LoginGuestViewModel viewModel;
     private ActivityGuestLoginBinding binding;
@@ -28,7 +34,6 @@ public class LoginGuestActivity extends BaseActivity {
         init();
         setupHistory();
         setupProgressDialog();
-        observeUser();
     }
 
     @Override
@@ -39,7 +44,6 @@ public class LoginGuestActivity extends BaseActivity {
 
     private void init() {
         viewModel = new ViewModelProvider(this).get(LoginGuestViewModel.class);
-        viewModel.init();
         binding = DataBindingUtil.setContentView(this, R.layout.activity_guest_login);
         binding.setLifecycleOwner(this);
         binding.setViewModel(viewModel);
@@ -61,20 +65,9 @@ public class LoginGuestActivity extends BaseActivity {
         progressDialog.setTitle(R.string.login_guest);
         progressDialog.setMessage(getString(R.string.loading));
         progressDialog.setCancelable(false);
-    }
-
-    private void observeUser() {
-        viewModel.getUserLive().observe(this, userResource -> {
-            switch (userResource.status) {
-                case SUCCESS:
-                    onSuccess(userResource.data);
-                    break;
-                case ERROR:
-                    onError(userResource.message);
-                    break;
-                case LOADING:
-                    onLoading();
-            }
+        progressDialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.cancel), (dialog, which) -> {
+            viewModel.cancelLogin();
+            dialog.dismiss();
         });
     }
 
@@ -88,17 +81,17 @@ public class LoginGuestActivity extends BaseActivity {
     private void onError(String message) {
         progressDialog.dismiss();
         switch (message) {
-            case LoginGuestViewModel.MSG_EMPTY:
+            case Event.MSG_EMPTY:
                 UiUtils.vibrate(this, 200);
                 binding.editTextUsername.startAnimation(AnimationUtils.loadAnimation(this, R.anim.shake));
                 break;
-            case LoginGuestViewModel.MSG_EXIST:
+            case Event.MSG_EXIST:
                 alert(R.string.login_guest, R.string.this_user_is_online);
                 break;
-            case LoginGuestViewModel.MSG_NET:
+            case Event.MSG_NET:
                 alert(R.string.login_guest, R.string.no_network_connection);
                 break;
-            case LoginGuestViewModel.MSG_ERROR:
+            case Event.MSG_ERROR:
                 alert(R.string.login_guest, R.string.sorry_an_error_occurred);
                 break;
             default:
@@ -109,5 +102,20 @@ public class LoginGuestActivity extends BaseActivity {
 
     private void onLoading() {
         progressDialog.show();
+        progressDialog.getButton(DialogInterface.BUTTON_NEGATIVE).setTextColor(UiUtils.getStyleColor(this, R.attr.colorPrimary));
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onlogged(LoggedEvent event) {
+        switch (event.status) {
+            case SUCCESS:
+                onSuccess(event.getPeople());
+                break;
+            case ERROR:
+                onError(event.message);
+                break;
+            case LOADING:
+                onLoading();
+        }
     }
 }

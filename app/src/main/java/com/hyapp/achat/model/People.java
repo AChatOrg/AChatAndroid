@@ -13,6 +13,9 @@ public class People extends Thing {
     private Avatar avatar;
     private Key key;
 
+    public People() {
+    }
+
     public People(String name, String bio, byte gender) {
         super(name, bio, gender);
     }
@@ -45,7 +48,7 @@ public class People extends Thing {
     }
 
     public static int compare(People o1, People o2) {
-        if (o1.getKey().getIpv4().equals(o2.getKey().getIpv4())) return 0;
+        if (o1.getKey().getUuid().equals(o2.getKey().getUuid())) return 0;
         if (o1.getKey().getRank() < o2.getKey().getRank()) return 1;
         if (o1.getKey().getRank() > o2.getKey().getRank()) return -1;
         if (o1.getKey().getScore() < o2.getKey().getScore()) return 1;

@@ -58,4 +58,8 @@
     <string name="sorry_an_error_occurred">Sorry, an error occurred</string>
     <string name="no_network_connection">No network connection</string>
     <string name="tray_again">Tray again</string>
+    <string name="you_are_connected">You are connected.</string>
+    <string name="start_chatting">Start chatting</string>
+    <string name="tap_to_enter">Tap to enter</string>
+    <string name="cancel">Cancel</string>
 </resources>

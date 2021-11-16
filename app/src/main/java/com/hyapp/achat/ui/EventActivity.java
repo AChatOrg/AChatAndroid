@@ -6,7 +6,21 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.hyapp.achat.R;
 
-public class BaseActivity extends AppCompatActivity {
+import org.greenrobot.eventbus.EventBus;
+
+public class EventActivity extends AppCompatActivity {
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
+    }
 
     protected void alert(@StringRes int titleRes, String message) {
         new AlertDialog.Builder(this, R.style.RoundedCornersDialog)

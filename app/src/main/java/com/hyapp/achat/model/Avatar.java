@@ -5,6 +5,9 @@ public class Avatar {
     private String url;
     private boolean isOnline;
 
+    public Avatar() {
+    }
+
     public Avatar(String url, boolean isOnline) {
         this.url = url;
         this.isOnline = isOnline;

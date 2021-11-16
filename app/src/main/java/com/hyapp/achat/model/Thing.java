@@ -11,6 +11,9 @@ public abstract class Thing {
     private String bio;
     private byte gender;
 
+    public Thing() {
+    }
+
     public Thing(String name, String bio, byte gender) {
         this.name = name;
         this.bio = bio;
