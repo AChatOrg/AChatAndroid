@@ -5,6 +5,7 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
@@ -13,11 +14,12 @@ import com.google.android.material.tabs.TabLayout;
 import com.hyapp.achat.R;
 import com.hyapp.achat.bl.MainViewModel;
 import com.hyapp.achat.databinding.ActivityMainBinding;
+import com.hyapp.achat.model.Resource;
 import com.hyapp.achat.ui.fragment.GroupsFragment;
 import com.hyapp.achat.ui.fragment.PeopleFragment;
 import com.hyapp.achat.ui.model.AbstractTabSelectedListener;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
 
     private MainViewModel viewModel;
     private ActivityMainBinding binding;
@@ -62,7 +64,11 @@ public class MainActivity extends AppCompatActivity {
         binding.peopleGroups.peopleGroupsTitle.setText(String.format(getString(R.string.onile_s), peopleSize));
 
         FragmentManager manager = getSupportFragmentManager();
-        manager.beginTransaction()
+        FragmentTransaction transaction = manager.beginTransaction();
+        for (Fragment fragment : manager.getFragments()) {
+            transaction.remove(fragment);
+        }
+        transaction
                 .add(R.id.fragment, peopleFragment)
                 .add(R.id.fragment, groupsFragment)
                 .show(peopleFragment)
@@ -91,14 +97,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void observePeopleGroupsSize() {
-//        viewModel.getPeopleLive().observe(this, listResource -> {
-//            if (listResource.status == Resource.Status.SUCCESS) {
-//                peopleSize = listResource.data.size();
-//                if (binding.peopleGroups.tabLayout.getSelectedTabPosition() == 0) {
-//                    binding.peopleGroups.peopleGroupsTitle.setText(String.format(getString(R.string.onile_s), peopleSize));
-//                }
-//            }
-//        });
+        viewModel.getPeopleLive().observe(this, listResource -> {
+            if (listResource.status == Resource.Status.SUCCESS) {
+                peopleSize = listResource.data.size();
+                if (binding.peopleGroups.tabLayout.getSelectedTabPosition() == 0) {
+                    binding.peopleGroups.peopleGroupsTitle.setText(String.format(getString(R.string.onile_s), peopleSize));
+                }
+            }
+        });
     }
 
     private void setupFab() {

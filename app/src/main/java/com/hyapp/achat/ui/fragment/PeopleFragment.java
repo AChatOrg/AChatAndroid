@@ -16,10 +16,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.hyapp.achat.R;
 import com.hyapp.achat.databinding.FragmentPeopleGroupsBinding;
 import com.hyapp.achat.model.People;
+import com.hyapp.achat.model.SortedList;
+import com.hyapp.achat.model.event.Event;
 import com.hyapp.achat.ui.adapter.PeopleAdapter;
 import com.hyapp.achat.bl.MainViewModel;
-
-import java.util.List;
 
 public class PeopleFragment extends Fragment {
 
@@ -43,11 +43,11 @@ public class PeopleFragment extends Fragment {
         binding.setLifecycleOwner(getViewLifecycleOwner());
         binding.setViewModel(viewModel);
         binding.setIsStatusVisible(false);
-        binding.statusMessage.tryAgain.setOnClickListener(v -> viewModel.initPeople());
-        binding.swipeRefreshLayout.setOnRefreshListener(() -> viewModel.initPeople());
+        binding.statusMessage.tryAgain.setOnClickListener(v -> viewModel.reloadPeople());
+        binding.swipeRefreshLayout.setOnRefreshListener(() -> viewModel.reloadPeople());
         setupRecyclerView(requireContext(), view);
         observePeople();
-        observeNet();
+//        observeNet();
     }
 
     private void setupRecyclerView(Context context, View view) {
@@ -58,22 +58,22 @@ public class PeopleFragment extends Fragment {
     }
 
     private void observePeople() {
-//        viewModel.getPeopleLive().observe(getViewLifecycleOwner(), listResource -> {
-//            switch (listResource.status) {
-//                case SUCCESS:
-//                    onSuccess(listResource.data);
-//                    break;
-//                case ERROR:
-//                    onError(listResource.message);
-//                    break;
-//                case LOADING:
-//                    onLoading();
-//                    break;
-//            }
-//        });
+        viewModel.getPeopleLive().observe(getViewLifecycleOwner(), listResource -> {
+            switch (listResource.status) {
+                case SUCCESS:
+                    onSuccess(listResource.data);
+                    break;
+                case ERROR:
+                    onError(listResource.message);
+                    break;
+                case LOADING:
+                    onLoading();
+                    break;
+            }
+        });
     }
 
-    private void observeNet() {
+//    private void observeNet() {
 //        viewModel.getNetLive().observe(getViewLifecycleOwner(), aBoolean -> {
 //            if (aBoolean) {
 //                binding.setIsStatusVisible(false);
@@ -85,9 +85,9 @@ public class PeopleFragment extends Fragment {
 //                onError(MainViewModel.MSG_NET);
 //            }
 //        });
-    }
+//    }
 
-    private void onSuccess(List<People> people) {
+    private void onSuccess(SortedList<People> people) {
         binding.setIsStatusVisible(false);
         binding.progressBar.setVisibility(View.GONE);
         binding.swipeRefreshLayout.setRefreshing(false);
@@ -99,16 +99,16 @@ public class PeopleFragment extends Fragment {
         binding.swipeRefreshLayout.setRefreshing(false);
         binding.setIsStatusVisible(true);
         binding.progressBar.setVisibility(View.GONE);
-//        switch (message) {
-//            case MainViewModel.MSG_NET:
-//                binding.statusMessage.text.setText(R.string.no_network_connection);
-//                break;
-//            case MainViewModel.MSG_ERROR:
-//                binding.statusMessage.text.setText(R.string.sorry_an_error_occurred);
-//                break;
-//            default:
-//                binding.statusMessage.text.setText(message);
-//        }
+        switch (message) {
+            case Event.MSG_NET:
+                binding.statusMessage.text.setText(R.string.no_network_connection);
+                break;
+            case Event.MSG_ERROR:
+                binding.statusMessage.text.setText(R.string.sorry_an_error_occurred);
+                break;
+            default:
+                binding.statusMessage.text.setText(message);
+        }
     }
 
     private void onLoading() {

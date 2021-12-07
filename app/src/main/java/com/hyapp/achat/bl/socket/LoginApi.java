@@ -14,7 +14,13 @@ import io.socket.emitter.Emitter;
 
 public class LoginApi {
 
-    public void listen(Socket socket) {
+    private final Socket socket;
+
+    public LoginApi(Socket socket) {
+        this.socket = socket;
+    }
+
+    public void listen() {
         socket.on(Config.ON_LOGGED, onLogged);
         socket.on(Config.ON_USER_CAME, onUserCame);
     }

@@ -23,7 +23,7 @@ import java.util.List;
 public class PeopleAdapter extends RecyclerView.Adapter<PeopleAdapter.Holder> {
 
     private final Context context;
-    private final List<People> people;
+    private SortedList<People> people;
 
     public PeopleAdapter(Context context) {
         this.context = context;
@@ -49,9 +49,9 @@ public class PeopleAdapter extends RecyclerView.Adapter<PeopleAdapter.Holder> {
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    public void resetList(List<People> people) {
-        this.people.clear();
-        this.people.addAll(people);
+    public void resetList(SortedList<People> people) {
+        this.people = null;
+        this.people = people;
         notifyDataSetChanged();
     }
 

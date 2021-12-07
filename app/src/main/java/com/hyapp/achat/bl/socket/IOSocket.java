@@ -12,40 +12,39 @@ import io.socket.client.Socket;
 public class IOSocket {
 
     private Socket socket;
-    private LoginApi loginApi;
+    public LoginApi loginApi;
 
-    public IOSocket() {
-        this.loginApi = new LoginApi();
+    public Socket getSocket() {
+        return socket;
     }
 
-    private void create(String data) {
+    public IOSocket(LoginEvent loginEvent) {
         IO.Options options = IO.Options.builder()
-                .setQuery(Config.SOCKET_QUERY_DATA + "=" + data)
+                .setQuery(Config.SOCKET_QUERY_DATA + "=" + JSON.toJSONString(loginEvent))
                 .build();
         try {
             socket = IO.socket(Config.SERVER_URL, options);
+            socket.connect();
+            createApis();
+            listen();
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
     }
 
-    public void connect(LoginEvent loginEvent) {
-        create(JSON.toJSONString(loginEvent));
-        if (socket != null) {
-            socket.connect();
-        }
-    }
-
-    public void disconnect() {
+    public void destroy() {
         if (socket != null) {
             socket.off();
             socket.disconnect();
         }
     }
 
-    public void listen() {
-        if (socket != null) {
-            loginApi.listen(socket);
-        }
+    private void createApis() {
+        loginApi = new LoginApi(socket);
+    }
+
+    private void listen() {
+        loginApi.listen();
+        PeopleApi.singleton().listen(socket);
     }
 }

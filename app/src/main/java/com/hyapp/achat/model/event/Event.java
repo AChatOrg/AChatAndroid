@@ -20,6 +20,10 @@ public abstract class Event {
         this.status = status;
     }
 
+    public Event(byte action) {
+        this.action = action;
+    }
+
     public Event(Status status, String message) {
         this.status = status;
         this.message = message;

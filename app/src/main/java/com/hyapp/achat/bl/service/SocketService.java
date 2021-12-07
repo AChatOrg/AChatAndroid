@@ -6,12 +6,11 @@ import android.os.IBinder;
 
 import androidx.annotation.Nullable;
 
-import com.hyapp.achat.Config;
 import com.hyapp.achat.bl.socket.IOSocket;
+import com.hyapp.achat.bl.socket.PeopleApi;
 import com.hyapp.achat.bl.utils.NotifUtils;
-import com.hyapp.achat.model.event.Event;
-import com.hyapp.achat.model.event.LoggedEvent;
 import com.hyapp.achat.model.event.LoginEvent;
+import com.hyapp.achat.model.event.PeopleEvent;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -31,9 +30,7 @@ public class SocketService extends Service {
 
     @Override
     public void onCreate() {
-        super.onCreate();
-//        EventBus.getDefault().register(this);
-        ioSocket = new IOSocket();
+        EventBus.getDefault().register(this);
     }
 
     @Override
@@ -41,8 +38,7 @@ public class SocketService extends Service {
 
         LoginEvent loginEvent = intent.getParcelableExtra(EXTRA_LOGIN_EVENT);
         if (loginEvent != null) {
-            ioSocket.connect(loginEvent);
-            ioSocket.listen();
+            ioSocket = new IOSocket(loginEvent);
         }
 
         NotifUtils.createSocketChannel(this);
@@ -52,8 +48,14 @@ public class SocketService extends Service {
 
     @Override
     public void onDestroy() {
-//        EventBus.getDefault().unregister(this);
-        ioSocket.disconnect();
-        super.onDestroy();
+        EventBus.getDefault().unregister(this);
+        ioSocket.destroy();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onRequestPeople(PeopleEvent event) {
+        if (event.action == PeopleEvent.ACTION_REQUEST) {
+            PeopleApi.singleton().requestPeople(ioSocket.getSocket());
+        }
     }
 }

@@ -8,7 +8,7 @@ import com.hyapp.achat.R;
 
 import org.greenrobot.eventbus.EventBus;
 
-public class EventActivity extends AppCompatActivity {
+public class EventActivity extends BaseActivity {
 
     @Override
     public void onStart() {

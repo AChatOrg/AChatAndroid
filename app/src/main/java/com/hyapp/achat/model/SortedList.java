@@ -34,7 +34,6 @@ import java.util.NoSuchElementException;
  * @param <T> the type of element that this sorted list will store.
  */
 public class SortedList<T> extends AbstractList<T> implements Serializable {
-    public static int iii=0;
 	private static final long serialVersionUID = -7115342129716877152L;
  
 	//to be used as like a static var to get the next node's id..
@@ -96,7 +95,6 @@ public class SortedList<T> extends AbstractList<T> implements Serializable {
     	} else { //non-null root case..
 	        Node current = root;
 	        while(current != null) { //should always break!
-	            iii++;
 	            int comparison = toAdd.compareTo(current);
 	            if(comparison < 0){ //toAdd < node
 	                if(current.leftChild == null){ 
@@ -403,7 +401,6 @@ public class SortedList<T> extends AbstractList<T> implements Serializable {
         //the the number of smaller elements of the current node as we traverse the tree..
         int totalSmallerElements = (current.leftChild == null) ? 0 : current.leftChild.sizeOfSubTree();
         while(current!= null){  //should always break, due to constraint above..
-            iii++;
             if(totalSmallerElements == index){
                 break;
             }
@@ -530,7 +527,6 @@ public class SortedList<T> extends AbstractList<T> implements Serializable {
    private void rebalanceTree(Node startNode){
        Node current = startNode;
        while(current!= null){
-           iii++;
            //get the difference between the left and right subtrees at this point..
            int balanceFactor = current.getBalanceFactor();
            
@@ -926,7 +922,6 @@ public class SortedList<T> extends AbstractList<T> implements Serializable {
         protected final void updateCachedValues(){
             Node current = this;
             while(current != null){
-                iii++;
                 if(current.isLeaf()){
                     current.height = 0;
                     current.numChildren = 0;
