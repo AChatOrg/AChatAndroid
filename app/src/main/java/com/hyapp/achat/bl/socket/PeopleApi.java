@@ -8,6 +8,13 @@ import com.hyapp.achat.Config;
 import com.hyapp.achat.model.People;
 import com.hyapp.achat.model.Resource;
 import com.hyapp.achat.model.SortedList;
+import com.hyapp.achat.model.event.Event;
+import com.hyapp.achat.model.event.LoggedEvent;
+
+import org.greenrobot.eventbus.EventBus;
+
+import java.util.Iterator;
+import java.util.function.Predicate;
 
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
@@ -32,6 +39,8 @@ public class PeopleApi {
 
     public void listen(Socket socket) {
         socket.on(Config.ON_PEOPLE, onPeopleList);
+        socket.on(Config.ON_USER_CAME, onUserCame);
+        socket.on(Config.ON_USER_LEFT, onUserLeft);
     }
 
     public void requestPeople(Socket socket) {
@@ -45,10 +54,48 @@ public class PeopleApi {
             People people = jsonArray.getObject(i, People.class);
             peopleList.add(people);
         }
-        getPeopleLive().postValue(Resource.success(peopleList));
+        getPeopleLive().postValue(Resource.add(peopleList, Resource.INDEX_ALL));
+    };
+
+    private final Emitter.Listener onUserCame = args -> {
+        People people = JSON.parseObject(args[0].toString(), People.class);
+        Resource<SortedList<People>> value = getPeopleLive().getValue();
+        if (value != null) {
+            SortedList<People> peopleList = value.data;
+            if (peopleList != null) {
+                peopleList.add(people);
+                int index = peopleList.indexOf(people);
+                getPeopleLive().postValue(Resource.add(peopleList, index));
+            }
+        }
+    };
+
+    private final Emitter.Listener onUserLeft = args -> {
+        String uuid = args[0].toString();
+        Resource<SortedList<People>> value = getPeopleLive().getValue();
+        if (value != null) {
+            SortedList<People> peopleList = value.data;
+            if (peopleList != null) {
+                int index = remove(peopleList, uuid);
+                if (index != -1) {
+                    getPeopleLive().postValue(Resource.remove(peopleList, index));
+                }
+            }
+        }
     };
 
     public MutableLiveData<Resource<SortedList<People>>> getPeopleLive() {
         return peopleLive;
+    }
+
+    private int remove(SortedList<People> peopleList, String uuid) {
+        int i = 0;
+        for (Iterator<People> iterator = peopleList.iterator(); iterator.hasNext(); i++) {
+            if (iterator.next().getKey().getUuid().equals(uuid)) {
+                iterator.remove();
+                return i;
+            }
+        }
+        return -1;
     }
 }

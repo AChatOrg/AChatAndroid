@@ -50,9 +50,23 @@ public class PeopleAdapter extends RecyclerView.Adapter<PeopleAdapter.Holder> {
 
     @SuppressLint("NotifyDataSetChanged")
     public void resetList(SortedList<People> people) {
-        this.people = null;
         this.people = people;
         notifyDataSetChanged();
+    }
+
+    public void addAt(SortedList<People> people, int index) {
+        this.people = people;
+        notifyItemInserted(index);
+    }
+
+    public void removeAt(SortedList<People> people, int index) {
+        this.people = people;
+        notifyItemRemoved(index);
+    }
+
+    public void updateAt(SortedList<People> people, int index) {
+        this.people = people;
+        notifyItemChanged(index);
     }
 
     public class Holder extends RecyclerView.ViewHolder implements View.OnClickListener {

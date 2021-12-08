@@ -12,6 +12,7 @@ public interface Config {
     /*On login*/
     String ON_LOGGED = "logged";
     String ON_USER_CAME = "userCame";
+    String ON_USER_LEFT = "userLeft";
 
     /*On People*/
     String ON_PEOPLE = "people";

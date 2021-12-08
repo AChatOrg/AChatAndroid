@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.hyapp.achat.R;
 import com.hyapp.achat.databinding.FragmentPeopleGroupsBinding;
 import com.hyapp.achat.model.People;
+import com.hyapp.achat.model.Resource;
 import com.hyapp.achat.model.SortedList;
 import com.hyapp.achat.model.event.Event;
 import com.hyapp.achat.ui.adapter.PeopleAdapter;
@@ -61,7 +62,7 @@ public class PeopleFragment extends Fragment {
         viewModel.getPeopleLive().observe(getViewLifecycleOwner(), listResource -> {
             switch (listResource.status) {
                 case SUCCESS:
-                    onSuccess(listResource.data);
+                    onSuccess(listResource);
                     break;
                 case ERROR:
                     onError(listResource.message);
@@ -87,12 +88,30 @@ public class PeopleFragment extends Fragment {
 //        });
 //    }
 
-    private void onSuccess(SortedList<People> people) {
-        binding.setIsStatusVisible(false);
-        binding.progressBar.setVisibility(View.GONE);
-        binding.swipeRefreshLayout.setRefreshing(false);
-        isFirstLoaded = true;
-        adapter.resetList(people);
+    private void onSuccess(Resource<SortedList<People>> resource) {
+        switch (resource.action) {
+            case ADD:
+                addPeople(resource);
+                break;
+            case REMOVE:
+                adapter.removeAt(resource.data, resource.index);
+                break;
+            case UPDATE:
+                adapter.updateAt(resource.data, resource.index);
+                break;
+        }
+    }
+
+    public void addPeople(Resource<SortedList<People>> resource) {
+        if (resource.index == Resource.INDEX_ALL) {
+            binding.setIsStatusVisible(false);
+            binding.progressBar.setVisibility(View.GONE);
+            binding.swipeRefreshLayout.setRefreshing(false);
+            isFirstLoaded = true;
+            adapter.resetList(resource.data);
+        } else {
+            adapter.addAt(resource.data, resource.index);
+        }
     }
 
     private void onError(String message) {

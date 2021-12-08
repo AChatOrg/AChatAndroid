@@ -22,16 +22,10 @@ public class LoginApi {
 
     public void listen() {
         socket.on(Config.ON_LOGGED, onLogged);
-        socket.on(Config.ON_USER_CAME, onUserCame);
     }
 
     private final Emitter.Listener onLogged = args -> {
         People people = JSON.parseObject(args[0].toString(), People.class);
         EventBus.getDefault().post(new LoggedEvent(Event.Status.SUCCESS, LoggedEvent.ACTION_ME, people));
-    };
-
-    private final Emitter.Listener onUserCame = args -> {
-        People people = JSON.parseObject(args[0].toString(), People.class);
-        EventBus.getDefault().post(new LoggedEvent(Event.Status.SUCCESS, LoggedEvent.ACTION_OTHER, people));
     };
 }
