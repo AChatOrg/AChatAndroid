@@ -12,12 +12,8 @@ import com.hyapp.achat.model.People;
 import com.hyapp.achat.model.Resource;
 import com.hyapp.achat.model.SortedList;
 import com.hyapp.achat.model.event.Event;
-import com.hyapp.achat.model.event.LoggedEvent;
-import com.hyapp.achat.model.event.PeopleEvent;
 
 import org.greenrobot.eventbus.EventBus;
-
-import java.util.List;
 
 public class MainViewModel extends AndroidViewModel {
 
@@ -34,7 +30,7 @@ public class MainViewModel extends AndroidViewModel {
     public void reloadPeople() {
         if (NetUtils.isNetConnected(getApplication().getApplicationContext())) {
             peopleLive.setValue(Resource.loading(null));
-            EventBus.getDefault().post(new PeopleEvent(PeopleEvent.ACTION_REQUEST));
+            EventBus.getDefault().post(new Event(Event.ACTION_REQUEST_PEOPLE));
         } else {
             peopleLive.setValue(Resource.error(Event.MSG_NET, null));
         }

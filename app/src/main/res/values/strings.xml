@@ -62,4 +62,5 @@
     <string name="start_chatting">Start chatting</string>
     <string name="tap_to_enter">Tap to enter</string>
     <string name="cancel">Cancel</string>
+    <string name="exit">Exit</string>
 </resources>

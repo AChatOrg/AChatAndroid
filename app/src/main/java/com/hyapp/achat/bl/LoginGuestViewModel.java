@@ -30,14 +30,14 @@ public class LoginGuestViewModel extends AndroidViewModel {
     public void loginGuest(String name, String bio, boolean gender) {
         Context context = getApplication().getApplicationContext();
         if (name.isEmpty()) {
-            EventBus.getDefault().post(new LoggedEvent(Event.Status.ERROR, Event.MSG_EMPTY));
+            EventBus.getDefault().post(new LoggedEvent(Event.Status.ERROR, Event.MSG_EMPTY, LoggedEvent.ACTION_ME));
         } else if (!NetUtils.isNetConnected(context)) {
-            EventBus.getDefault().post(new LoggedEvent(Event.Status.ERROR, Event.MSG_NET));
+            EventBus.getDefault().post(new LoggedEvent(Event.Status.ERROR, Event.MSG_NET, LoggedEvent.ACTION_ME));
         } else {
             String nameTrim = name.trim(), bioTrim = bio.trim();
             byte genderByte = gender ? People.MALE : People.FEMALE;
             LoginPreferences.singleton(context).putLoginGuest(nameTrim, bioTrim, genderByte);
-            EventBus.getDefault().post(new LoggedEvent(Event.Status.LOADING));
+            EventBus.getDefault().post(new LoggedEvent(Event.Status.LOADING, LoggedEvent.ACTION_ME));
             loginGuest(context, new LoginEvent(Config.OPERATION_LOGIN_GUEST, nameTrim, bioTrim, genderByte));
         }
     }

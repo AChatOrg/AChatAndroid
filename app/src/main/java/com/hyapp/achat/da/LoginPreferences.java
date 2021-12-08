@@ -10,6 +10,8 @@ public class LoginPreferences {
 
     private static final String DEFAULT_NAME = "login";
 
+    public static final String LOGGED = "logged";
+
     public static final String NAME = "name";
     public static final String BIO = "bio";
     public static final String GENDER = "gender";
@@ -30,6 +32,16 @@ public class LoginPreferences {
             instance = new LoginPreferences(context);
         }
         return instance;
+    }
+
+    public void putLogged(boolean logged) {
+        SharedPreferences.Editor writerPrefs = preferences.edit();
+        writerPrefs.putBoolean(LOGGED, logged);
+        writerPrefs.apply();
+    }
+
+    public boolean getLogged() {
+        return preferences.getBoolean(LOGGED, false);
     }
 
     public void putLoginGuest(String name, String bio, byte gender) {

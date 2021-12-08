@@ -21,6 +21,14 @@ public class LoggedEvent extends Event {
         super(status, message);
     }
 
+    public LoggedEvent(Status status, String message, byte action) {
+        super(status, message, action);
+    }
+
+    public LoggedEvent(Status status, byte action) {
+        super(status, action);
+    }
+
     public People getPeople() {
         return people;
     }

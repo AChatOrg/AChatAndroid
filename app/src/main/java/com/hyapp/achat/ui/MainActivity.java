@@ -2,7 +2,6 @@ package com.hyapp.achat.ui;
 
 import android.os.Bundle;
 
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
@@ -19,7 +18,7 @@ import com.hyapp.achat.ui.fragment.GroupsFragment;
 import com.hyapp.achat.ui.fragment.PeopleFragment;
 import com.hyapp.achat.ui.model.AbstractTabSelectedListener;
 
-public class MainActivity extends BaseActivity {
+public class MainActivity extends EventActivity {
 
     private MainViewModel viewModel;
     private ActivityMainBinding binding;

@@ -2,16 +2,21 @@ package com.hyapp.achat.bl.socket;
 
 import com.alibaba.fastjson.JSON;
 import com.hyapp.achat.Config;
+import com.hyapp.achat.model.event.Event;
 import com.hyapp.achat.model.event.LoginEvent;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.net.URISyntaxException;
 
 import io.socket.client.IO;
 import io.socket.client.Socket;
+import io.socket.emitter.Emitter;
 
 public class IOSocket {
 
     private Socket socket;
+    private Runnable onDisconnectListener;
     public LoginApi loginApi;
 
     public Socket getSocket() {
@@ -32,6 +37,11 @@ public class IOSocket {
         }
     }
 
+    public IOSocket(LoginEvent loginEvent, Runnable onDisconnectListener) {
+        this(loginEvent);
+        this.onDisconnectListener = onDisconnectListener;
+    }
+
     public void destroy() {
         if (socket != null) {
             socket.off();
@@ -44,7 +54,19 @@ public class IOSocket {
     }
 
     private void listen() {
+        socket.on(Config.ON_DISCONNECT, onDisconnect);
         loginApi.listen();
         PeopleApi.singleton().listen(socket);
+    }
+
+    private final Emitter.Listener onDisconnect = args -> {
+        EventBus.getDefault().post(new Event(Event.ACTION_EXIT_APP));
+        if (onDisconnectListener != null) {
+            onDisconnectListener.run();
+        }
+    };
+
+    public void setOnDisconnectListener(Runnable onDisconnectListener) {
+        this.onDisconnectListener = onDisconnectListener;
     }
 }

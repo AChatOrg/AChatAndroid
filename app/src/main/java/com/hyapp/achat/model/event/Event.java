@@ -1,6 +1,6 @@
 package com.hyapp.achat.model.event;
 
-public abstract class Event {
+public class Event {
 
     public enum Status {SUCCESS, ERROR, LOADING}
 
@@ -8,6 +8,9 @@ public abstract class Event {
     public static final String MSG_EXIST = "exist";
     public static final String MSG_NET = "net";
     public static final String MSG_ERROR = "error";
+
+    public static final byte ACTION_REQUEST_PEOPLE = 1;
+    public static final byte ACTION_EXIT_APP = 2;
 
     public transient Status status;
     public transient String message;

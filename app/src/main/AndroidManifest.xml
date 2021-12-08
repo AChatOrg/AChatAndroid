@@ -5,7 +5,7 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
         android:name=".App"
@@ -42,6 +42,12 @@
             android:name=".bl.service.SocketService"
             android:enabled="true"
             android:exported="true" />
+
+        <receiver android:name=".bl.NotifReceiver">
+            <intent-filter>
+                <action android:name="ACTION_EXIT" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

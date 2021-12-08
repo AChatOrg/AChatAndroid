@@ -74,6 +74,7 @@ public class LoginGuestActivity extends EventActivity {
     private void onSuccess(People people) {
         progressDialog.dismiss();
         Intent intent = new Intent(this, MainActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
     }
@@ -107,15 +108,17 @@ public class LoginGuestActivity extends EventActivity {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onlogged(LoggedEvent event) {
-        switch (event.status) {
-            case SUCCESS:
-                onSuccess(event.getPeople());
-                break;
-            case ERROR:
-                onError(event.message);
-                break;
-            case LOADING:
-                onLoading();
+        if (event.action == LoggedEvent.ACTION_ME) {
+            switch (event.status) {
+                case SUCCESS:
+                    onSuccess(event.getPeople());
+                    break;
+                case ERROR:
+                    onError(event.message);
+                    break;
+                case LOADING:
+                    onLoading();
+            }
         }
     }
 }

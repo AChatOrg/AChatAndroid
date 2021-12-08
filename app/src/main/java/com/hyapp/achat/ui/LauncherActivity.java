@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 
+import com.hyapp.achat.da.LoginPreferences;
+
 public class LauncherActivity extends AppCompatActivity {
 
     @Override
@@ -19,7 +21,11 @@ public class LauncherActivity extends AppCompatActivity {
             return;
         }
 
-        startActivity(new Intent(this, LoginGuestActivity.class));
+        if (LoginPreferences.singleton(this).getLogged()) {
+            startActivity(new Intent(this, MainActivity.class));
+        } else {
+            startActivity(new Intent(this, LoginGuestActivity.class));
+        }
         finish();
     }
 }
