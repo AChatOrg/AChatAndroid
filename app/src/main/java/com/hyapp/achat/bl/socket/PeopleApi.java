@@ -8,13 +8,8 @@ import com.hyapp.achat.Config;
 import com.hyapp.achat.model.People;
 import com.hyapp.achat.model.Resource;
 import com.hyapp.achat.model.SortedList;
-import com.hyapp.achat.model.event.Event;
-import com.hyapp.achat.model.event.LoggedEvent;
-
-import org.greenrobot.eventbus.EventBus;
 
 import java.util.Iterator;
-import java.util.function.Predicate;
 
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
@@ -91,7 +86,7 @@ public class PeopleApi {
     private int remove(SortedList<People> peopleList, String uuid) {
         int i = 0;
         for (Iterator<People> iterator = peopleList.iterator(); iterator.hasNext(); i++) {
-            if (iterator.next().getKey().getUuid().equals(uuid)) {
+            if (iterator.next().getKey().getIpv4().equals(uuid)) {
                 iterator.remove();
                 return i;
             }

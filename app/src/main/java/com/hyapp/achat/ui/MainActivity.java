@@ -7,12 +7,14 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.tabs.TabLayout;
 import com.hyapp.achat.R;
 import com.hyapp.achat.bl.MainViewModel;
 import com.hyapp.achat.databinding.ActivityMainBinding;
+import com.hyapp.achat.model.ConnLive;
 import com.hyapp.achat.model.Resource;
 import com.hyapp.achat.ui.fragment.GroupsFragment;
 import com.hyapp.achat.ui.fragment.PeopleFragment;
@@ -32,6 +34,7 @@ public class MainActivity extends EventActivity {
         init();
         setupPeopleGroups();
         observePeopleGroupsSize();
+        observeConnectivity();
         setupFab();
     }
 
@@ -102,6 +105,25 @@ public class MainActivity extends EventActivity {
                 if (binding.peopleGroups.tabLayout.getSelectedTabPosition() == 0) {
                     binding.peopleGroups.peopleGroupsTitle.setText(String.format(getString(R.string.onile_s), peopleSize));
                 }
+            }
+        });
+    }
+
+    private void observeConnectivity() {
+        ConnLive.singleton().observe(this, status -> {
+            switch (status) {
+                case CONNECTING:
+                    binding.title.setText(R.string.connecting);
+                    break;
+                case CONNECTED:
+                    binding.title.setText(R.string.app_name);
+                    break;
+                case DISCONNECTED:
+                    binding.title.setText(R.string.disconnected);
+                    break;
+                case NO_NET:
+                    binding.title.setText(R.string.no_network_connection);
+                    break;
             }
         });
     }

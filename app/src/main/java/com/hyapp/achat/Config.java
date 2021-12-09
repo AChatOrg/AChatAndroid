@@ -8,6 +8,7 @@ public interface Config {
     String OPERATION_LOGIN_GUEST = "loginGuest";
 
     String ON_DISCONNECT = "disconnect";
+    String ON_CONNECT = "connect";
 
     /*On login*/
     String ON_LOGGED = "logged";

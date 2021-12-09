@@ -63,4 +63,6 @@
     <string name="tap_to_enter">Tap to enter</string>
     <string name="cancel">Cancel</string>
     <string name="exit">Exit</string>
+    <string name="connecting">Connecting…</string>
+    <string name="disconnected">Disconnected</string>
 </resources>

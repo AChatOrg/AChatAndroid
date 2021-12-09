@@ -1,15 +1,21 @@
 package com.hyapp.achat.bl.service;
 
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.os.IBinder;
 
 import androidx.annotation.Nullable;
 
 import com.hyapp.achat.bl.socket.IOSocket;
 import com.hyapp.achat.bl.socket.PeopleApi;
+import com.hyapp.achat.bl.utils.NetUtils;
 import com.hyapp.achat.bl.utils.NotifUtils;
 import com.hyapp.achat.da.LoginPreferences;
+import com.hyapp.achat.model.ConnLive;
 import com.hyapp.achat.model.event.Event;
 import com.hyapp.achat.model.event.LoginEvent;
 
@@ -32,6 +38,7 @@ public class SocketService extends Service {
     @Override
     public void onCreate() {
         EventBus.getDefault().register(this);
+        registerReceiver(netReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
     }
 
     @Override
@@ -39,7 +46,8 @@ public class SocketService extends Service {
 
         LoginEvent loginEvent = intent.getParcelableExtra(EXTRA_LOGIN_EVENT);
         if (loginEvent != null) {
-            ioSocket = new IOSocket(loginEvent, this::stopSelf);
+            ConnLive.singleton().setValue(ConnLive.Status.CONNECTING);
+            ioSocket = new IOSocket(loginEvent);
             LoginPreferences.singleton(this).putLogged(true);
         }
 
@@ -51,9 +59,25 @@ public class SocketService extends Service {
     @Override
     public void onDestroy() {
         EventBus.getDefault().unregister(this);
+        unregisterReceiver(netReceiver);
         ioSocket.destroy();
         LoginPreferences.singleton(this).putLogged(false);
     }
+
+    private final BroadcastReceiver netReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (NetUtils.isNetConnected(context)) {
+                if (ioSocket.getSocket().connected()) {
+                    ConnLive.singleton().setValue(ConnLive.Status.CONNECTED);
+                } else {
+                    ConnLive.singleton().setValue(ConnLive.Status.CONNECTING);
+                }
+            } else {
+                ConnLive.singleton().setValue(ConnLive.Status.NO_NET);
+            }
+        }
+    };
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onRequestPeople(Event event) {
