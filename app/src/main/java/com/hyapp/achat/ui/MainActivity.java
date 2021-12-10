@@ -1,7 +1,10 @@
 package com.hyapp.achat.ui;
 
+import android.Manifest;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.view.GravityCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
@@ -13,6 +16,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.tabs.TabLayout;
 import com.hyapp.achat.R;
 import com.hyapp.achat.bl.MainViewModel;
+import com.hyapp.achat.bl.permissions.Permissions;
 import com.hyapp.achat.databinding.ActivityMainBinding;
 import com.hyapp.achat.model.ConnLive;
 import com.hyapp.achat.model.Resource;
@@ -83,16 +87,15 @@ public class MainActivity extends EventActivity {
                 final FragmentTransaction transaction = manager.beginTransaction();
                 switch (tab.getPosition()) {
                     case 0:
-                        binding.peopleGroups.peopleGroupsTitle.setText(String.format(getString(R.string.onile_s), peopleSize));
                         transaction.show(peopleFragment);
                         transaction.hide(groupsFragment);
                         break;
                     case 1:
-                        binding.peopleGroups.peopleGroupsTitle.setText(String.format(getString(R.string.groups_s), groupsSize));
                         transaction.hide(peopleFragment);
                         transaction.show(groupsFragment);
                         break;
                 }
+                resetPeopleGroupsTitle(ConnLive.singleton().getValue());
                 transaction.commit();
             }
         });
@@ -102,30 +105,43 @@ public class MainActivity extends EventActivity {
         viewModel.getPeopleLive().observe(this, listResource -> {
             if (listResource.status == Resource.Status.SUCCESS) {
                 peopleSize = listResource.data.size();
-                if (binding.peopleGroups.tabLayout.getSelectedTabPosition() == 0) {
-                    binding.peopleGroups.peopleGroupsTitle.setText(String.format(getString(R.string.onile_s), peopleSize));
-                }
+                resetPeopleGroupsTitle();
             }
         });
     }
 
     private void observeConnectivity() {
-        ConnLive.singleton().observe(this, status -> {
-            switch (status) {
-                case CONNECTING:
-                    binding.title.setText(R.string.connecting);
-                    break;
-                case CONNECTED:
-                    binding.title.setText(R.string.app_name);
-                    break;
-                case DISCONNECTED:
-                    binding.title.setText(R.string.disconnected);
-                    break;
-                case NO_NET:
-                    binding.title.setText(R.string.no_network_connection);
-                    break;
-            }
-        });
+        ConnLive.singleton().observe(this, this::resetPeopleGroupsTitle);
+    }
+
+    private void resetPeopleGroupsTitle(@Nullable ConnLive.Status status) {
+        if (status == null) return;
+        switch (status) {
+            case CONNECTING:
+                binding.title.setText(R.string.connecting);
+                binding.peopleGroups.peopleGroupsTitle.setText(R.string.connecting);
+                break;
+            case CONNECTED:
+                binding.title.setText(R.string.app_name);
+                resetPeopleGroupsTitle();
+                break;
+            case DISCONNECTED:
+                binding.title.setText(R.string.disconnected);
+                binding.peopleGroups.peopleGroupsTitle.setText(R.string.disconnected);
+                break;
+            case NO_NET:
+                binding.title.setText(R.string.no_network_connection);
+                binding.peopleGroups.peopleGroupsTitle.setText(R.string.no_network_connection);
+                break;
+        }
+    }
+
+    private void resetPeopleGroupsTitle() {
+        if (binding.peopleGroups.tabLayout.getSelectedTabPosition() == 0) {
+            binding.peopleGroups.peopleGroupsTitle.setText(String.format(getString(R.string.onile_s), peopleSize));
+        } else {
+            binding.peopleGroups.peopleGroupsTitle.setText(String.format(getString(R.string.groups_s), groupsSize));
+        }
     }
 
     private void setupFab() {
@@ -133,5 +149,4 @@ public class MainActivity extends EventActivity {
             binding.drawerLayout.openDrawer(GravityCompat.START);
         });
     }
-
 }

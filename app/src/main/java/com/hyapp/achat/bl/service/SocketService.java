@@ -6,10 +6,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
+import android.os.Build;
 import android.os.IBinder;
 
 import androidx.annotation.Nullable;
 
+import com.alibaba.fastjson.JSON;
+import com.hyapp.achat.bl.permissions.Permissions;
 import com.hyapp.achat.bl.socket.IOSocket;
 import com.hyapp.achat.bl.socket.PeopleApi;
 import com.hyapp.achat.bl.utils.NetUtils;
@@ -29,6 +32,16 @@ public class SocketService extends Service {
 
     private IOSocket ioSocket;
 
+    public static void start(Context context, String loginEventJsonStr) {
+        Intent intent = new Intent(context, SocketService.class);
+        intent.putExtra(SocketService.EXTRA_LOGIN_EVENT, loginEventJsonStr);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            context.startForegroundService(intent);
+        } else {
+            context.startService(intent);
+        }
+    }
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -37,28 +50,31 @@ public class SocketService extends Service {
 
     @Override
     public void onCreate() {
-        EventBus.getDefault().register(this);
+        if (!EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().register(this);
+        }
         registerReceiver(netReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
+        ConnLive.singleton().setValue(ConnLive.Status.CONNECTING);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
-        LoginEvent loginEvent = intent.getParcelableExtra(EXTRA_LOGIN_EVENT);
-        if (loginEvent != null) {
-            ConnLive.singleton().setValue(ConnLive.Status.CONNECTING);
-            ioSocket = new IOSocket(loginEvent);
+        String loginEventJsonStr = intent.getStringExtra(EXTRA_LOGIN_EVENT);
+        if (loginEventJsonStr != null && ioSocket == null) {
+            ioSocket = new IOSocket(loginEventJsonStr);
             LoginPreferences.singleton(this).putLogged(true);
         }
 
         NotifUtils.createSocketChannel(this);
         startForeground(NotifUtils.ID_SOCKET, NotifUtils.getSocketNotif(this));
-        return START_NOT_STICKY;
+        return START_STICKY;
     }
 
     @Override
     public void onDestroy() {
-        EventBus.getDefault().unregister(this);
+        if (EventBus.getDefault().isRegistered(this)) {
+            EventBus.getDefault().unregister(this);
+        }
         unregisterReceiver(netReceiver);
         ioSocket.destroy();
         LoginPreferences.singleton(this).putLogged(false);

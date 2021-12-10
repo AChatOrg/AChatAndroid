@@ -1,9 +1,7 @@
 package com.hyapp.achat.bl.socket;
 
-import com.alibaba.fastjson.JSON;
 import com.hyapp.achat.Config;
 import com.hyapp.achat.model.ConnLive;
-import com.hyapp.achat.model.event.LoginEvent;
 
 import java.net.URISyntaxException;
 
@@ -20,9 +18,9 @@ public class IOSocket {
         return socket;
     }
 
-    public IOSocket(LoginEvent loginEvent) {
+    public IOSocket(String loginEventJsonStr) {
         IO.Options options = IO.Options.builder()
-                .setQuery(Config.SOCKET_QUERY_DATA + "=" + JSON.toJSONString(loginEvent))
+                .setQuery(Config.SOCKET_QUERY_DATA + "=" + loginEventJsonStr)
                 .build();
         try {
             socket = IO.socket(Config.SERVER_URL, options);

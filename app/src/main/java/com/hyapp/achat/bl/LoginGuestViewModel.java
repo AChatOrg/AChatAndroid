@@ -8,6 +8,7 @@ import android.os.Build;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 
+import com.alibaba.fastjson.JSON;
 import com.hyapp.achat.Config;
 import com.hyapp.achat.bl.service.SocketService;
 import com.hyapp.achat.bl.utils.NetUtils;
@@ -38,17 +39,9 @@ public class LoginGuestViewModel extends AndroidViewModel {
             byte genderByte = gender ? People.MALE : People.FEMALE;
             LoginPreferences.singleton(context).putLoginGuest(nameTrim, bioTrim, genderByte);
             EventBus.getDefault().post(new LoggedEvent(Event.Status.LOADING, LoggedEvent.ACTION_ME));
-            loginGuest(context, new LoginEvent(Config.OPERATION_LOGIN_GUEST, nameTrim, bioTrim, genderByte));
-        }
-    }
-
-    private void loginGuest(Context context, LoginEvent loginEvent) {
-        Intent intent = new Intent(context, SocketService.class);
-        intent.putExtra(SocketService.EXTRA_LOGIN_EVENT, loginEvent);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            context.startForegroundService(intent);
-        } else {
-            context.startService(intent);
+            String loginEventJsonStr = JSON.toJSONString(new LoginEvent(Config.OPERATION_LOGIN_GUEST, nameTrim, bioTrim, genderByte));
+            SocketService.start(context, loginEventJsonStr);
+            LoginPreferences.singleton(context).putLoginEvent(loginEventJsonStr);
         }
     }
 

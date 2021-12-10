@@ -3,6 +3,11 @@ package com.hyapp.achat.da;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.alibaba.fastjson.JSON;
+import com.hyapp.achat.Config;
+import com.hyapp.achat.model.event.LoggedEvent;
+import com.hyapp.achat.model.event.LoginEvent;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -18,6 +23,8 @@ public class LoginPreferences {
 
     public static final String NAME_SET = "nameSet";
     public static final String BIO_SET = "bioSet";
+
+    public static final String LOGIN_EVENT = "logginEvent";
 
     private static LoginPreferences instance;
 
@@ -80,6 +87,18 @@ public class LoginPreferences {
 
     public Set<String> getBioSet() {
         return new HashSet<>(preferences.getStringSet(BIO_SET, new HashSet<>()));
+    }
+
+    public void putLoginEvent(String loginEventStr) {
+        SharedPreferences.Editor writerPrefs = preferences.edit();
+        writerPrefs.putString(LOGIN_EVENT, loginEventStr);
+        writerPrefs.apply();
+    }
+
+    public String getLoginEvent() {
+        return preferences.getString(LOGIN_EVENT
+                , JSON.toJSONString(
+                        new LoginEvent(Config.OPERATION_LOGIN_GUEST, "unknown", "", (byte) 1)));
     }
 }
 

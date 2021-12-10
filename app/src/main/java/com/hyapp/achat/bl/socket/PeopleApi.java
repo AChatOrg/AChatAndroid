@@ -66,12 +66,12 @@ public class PeopleApi {
     };
 
     private final Emitter.Listener onUserLeft = args -> {
-        String uuid = args[0].toString();
+        String ipv4 = args[0].toString();
         Resource<SortedList<People>> value = getPeopleLive().getValue();
         if (value != null) {
             SortedList<People> peopleList = value.data;
             if (peopleList != null) {
-                int index = remove(peopleList, uuid);
+                int index = remove(peopleList, ipv4);
                 if (index != -1) {
                     getPeopleLive().postValue(Resource.remove(peopleList, index));
                 }
@@ -83,10 +83,10 @@ public class PeopleApi {
         return peopleLive;
     }
 
-    private int remove(SortedList<People> peopleList, String uuid) {
+    private int remove(SortedList<People> peopleList, String ipv4) {
         int i = 0;
         for (Iterator<People> iterator = peopleList.iterator(); iterator.hasNext(); i++) {
-            if (iterator.next().getKey().getIpv4().equals(uuid)) {
+            if (iterator.next().getKey().getIpv4().equals(ipv4)) {
                 iterator.remove();
                 return i;
             }

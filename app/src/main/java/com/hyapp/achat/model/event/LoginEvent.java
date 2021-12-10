@@ -9,6 +9,9 @@ public class LoginEvent extends Event implements Parcelable {
     private String bio;
     private byte gender;
 
+    public LoginEvent() {
+    }
+
     public LoginEvent(String operation, String name, String bio, byte gender) {
         this.operation = operation;
         this.name = name;

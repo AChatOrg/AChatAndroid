@@ -14,6 +14,7 @@
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.2203125" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/drawable/add_chat_fab.xml" value="0.2203125" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/drawable/bg_button.xml" value="0.2203125" />
+        <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/drawable/bg_dialog_permission_rational.xml" value="0.20625" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/drawable/gender_circle_people_female_bg.xml" value="0.2203125" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/drawable/gender_circle_people_male_bg.xml" value="0.2203125" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/drawable/gender_circle_people_mixed_bg.xml" value="0.2203125" />
@@ -23,6 +24,7 @@
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/activity_guest_login.xml" value="0.25" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/activity_login.xml" value="0.2" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/activity_main.xml" value="0.25" />
+        <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/dialog_permissions_rationale.xml" value="0.25" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/fragment_people_groups.xml" value="0.2" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/item_people.xml" value="0.25" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/item_suggestion.xml" value="0.15443840579710144" />

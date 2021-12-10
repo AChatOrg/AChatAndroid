@@ -41,7 +41,8 @@
         <service
             android:name=".bl.service.SocketService"
             android:enabled="true"
-            android:exported="false" />
+            android:exported="true"
+            android:process=":SocketService" />
 
         <receiver android:name=".bl.NotifReceiver">
             <intent-filter>
