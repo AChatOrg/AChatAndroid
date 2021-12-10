@@ -13,6 +13,7 @@
         android:fullBackupContent="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:process=":AChat"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AChat"
@@ -42,7 +43,7 @@
             android:name=".bl.service.SocketService"
             android:enabled="true"
             android:exported="true"
-            android:process=":SocketService" />
+            android:process=":AChat" />
 
         <receiver android:name=".bl.NotifReceiver">
             <intent-filter>
