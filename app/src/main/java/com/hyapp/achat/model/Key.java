@@ -1,7 +1,7 @@
 package com.hyapp.achat.model;
 
 public class Key {
-        private String ipv4;
+        private String id;
         private byte rank;
         private int score;
         private long loginTime;
@@ -9,19 +9,19 @@ public class Key {
     public Key() {
     }
 
-    public Key(String ipv4, byte rank, int score, long loginTime) {
-            this.ipv4 = ipv4;
+    public Key(String id, byte rank, int score, long loginTime) {
+            this.id = id;
             this.rank = rank;
             this.score = score;
             this.loginTime = loginTime;
         }
 
-        public String getIpv4() {
-            return ipv4;
+        public String getId() {
+            return id;
         }
 
-        public void setIpv4(String ipv4) {
-            this.ipv4 = ipv4;
+        public void setId(String id) {
+            this.id = id;
         }
 
         public byte getRank() {

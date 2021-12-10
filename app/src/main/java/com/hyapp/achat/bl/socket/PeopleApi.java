@@ -86,7 +86,7 @@ public class PeopleApi {
     private int remove(SortedList<People> peopleList, String ipv4) {
         int i = 0;
         for (Iterator<People> iterator = peopleList.iterator(); iterator.hasNext(); i++) {
-            if (iterator.next().getKey().getIpv4().equals(ipv4)) {
+            if (iterator.next().getKey().getId().equals(ipv4)) {
                 iterator.remove();
                 return i;
             }
