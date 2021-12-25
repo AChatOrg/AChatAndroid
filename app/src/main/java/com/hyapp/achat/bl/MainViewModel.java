@@ -5,6 +5,7 @@ import android.content.Context;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.alibaba.fastjson.JSON;
@@ -38,7 +39,7 @@ public class MainViewModel extends AndroidViewModel {
         EventBus.getDefault().post(new Event(Event.ACTION_REQUEST_PEOPLE));
     }
 
-    public MutableLiveData<Resource<SortedList<People>>> getPeopleLive() {
+    public LiveData<Resource<SortedList<People>>> getPeopleLive() {
         return peopleLive;
     }
 }

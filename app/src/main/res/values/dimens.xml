@@ -28,4 +28,11 @@
 
     <dimen name="design_fab_image_size" tools:override="true">56dp</dimen>
     <dimen name="fab_elevation">4dp</dimen>
+
+    <dimen name="chat_bubble_corner_radius">16dp</dimen>
+    <dimen name="chat_bubble_corner_radius_middle">4dp</dimen>
+    <dimen name="chat_message_send_margin_left_right">4dp</dimen>
+    <dimen name="chat_message_receive_avatar_margin_left_right">8dp</dimen>
+    <dimen name="chat_message_receive_bubble_margin_left_right">42dp</dimen>
+    <dimen name="chat_message_margin_bottom_top">1dp</dimen>
 </resources>

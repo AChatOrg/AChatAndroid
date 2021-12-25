@@ -47,4 +47,10 @@
     <color name="grey_85">#262626</color>
     <color name="grey_90">#1b1b1b</color>
     <color name="grey_95">#121212</color>
+
+    <color name="green_50">#12D61C</color>
+    <color name="green_40">#37833B</color>
+
+    <color name="chat_bubble_receive">@color/grey_025</color>
+    <color name="chat_bubble_send">@color/black</color>
 </resources>

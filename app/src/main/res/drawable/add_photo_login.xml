@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="oval">
+            <gradient
+                android:angle="0"
+                android:endColor="@color/primary"
+                android:startColor="@color/primaryLight" />
+        </shape>
+    </item>
+    <item
+        android:bottom="20dp"
+        android:drawable="@drawable/add_photo_32"
+        android:left="16dp"
+        android:right="20dp"
+        android:top="16dp" />
+</layer-list>

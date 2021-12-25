@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="@color/white">
+    <item>
+        <layer-list>
+            <item>
+                <shape android:shape="oval">
+                    <gradient
+                        android:angle="0"
+                        android:endColor="@color/primary"
+                        android:startColor="@color/primaryLight"
+                        android:type="linear" />
+                </shape>
+
+            </item>
+            <item
+                android:bottom="16dp"
+                android:gravity="center"
+                android:left="16dp"
+                android:right="16dp"
+                android:top="16dp">
+                <bitmap
+                    android:gravity="center"
+                    android:src="@drawable/ic_action_add_group"
+                    android:tint="@color/white" />
+            </item>
+
+        </layer-list>
+    </item>
+</ripple>

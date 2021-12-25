@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
 
@@ -12,12 +13,16 @@ import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.hyapp.achat.R;
+import com.hyapp.achat.bl.LoginGuestViewModel;
+import com.hyapp.achat.da.ContactDao;
 import com.hyapp.achat.databinding.ActivityGuestLoginBinding;
+import com.hyapp.achat.model.Contact;
+import com.hyapp.achat.model.Key;
 import com.hyapp.achat.model.People;
+import com.hyapp.achat.model.Person;
 import com.hyapp.achat.model.event.Event;
 import com.hyapp.achat.model.event.LoggedEvent;
 import com.hyapp.achat.ui.utils.UiUtils;
-import com.hyapp.achat.bl.LoginGuestViewModel;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -34,6 +39,22 @@ public class LoginGuestActivity extends EventActivity {
         init();
         setupHistory();
         setupProgressDialog();
+        //////////////////
+//        ContactDao.put(new Contact(
+//                "ali"
+//                , "ahmadi"
+//                , Person.GENDER_MALE
+//                , new Key("aliUid", (byte) 10, 1000, 10000)
+//                , new String[]{"avatar1", "avatar2"}
+//                , 16000
+//                , 17000
+//                , Contact.DELIVERY_HIDDEN
+//                , "19"
+//                , "mediaPath"));
+//
+//        for (Contact c : ContactDao.getAll()) {
+//            Log.e("ssss", c.getId()+" "+c.getName()+" "+c.getBio()+" "+c.getGender()+" "+c.getUid()+" "+c.getLoginTime()+" "+c.getOnlineTime()+" "+c.getMediaMessagePath());
+//        }
     }
 
     @Override

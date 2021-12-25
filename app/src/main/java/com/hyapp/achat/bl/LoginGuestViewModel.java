@@ -3,7 +3,6 @@ package com.hyapp.achat.bl;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -36,7 +35,7 @@ public class LoginGuestViewModel extends AndroidViewModel {
             EventBus.getDefault().post(new LoggedEvent(Event.Status.ERROR, Event.MSG_NET, LoggedEvent.ACTION_ME));
         } else {
             String nameTrim = name.trim(), bioTrim = bio.trim();
-            byte genderByte = gender ? People.MALE : People.FEMALE;
+            byte genderByte = gender ? People.GENDER_MALE : People.GENDER_FEMALE;
             LoginPreferences.singleton(context).putLoginGuest(nameTrim, bioTrim, genderByte);
             EventBus.getDefault().post(new LoggedEvent(Event.Status.LOADING, LoggedEvent.ACTION_ME));
             String loginEventJsonStr = JSON.toJSONString(new LoginEvent(Config.OPERATION_LOGIN_GUEST, nameTrim, bioTrim, genderByte));
@@ -60,7 +59,7 @@ public class LoginGuestViewModel extends AndroidViewModel {
 
     public boolean getSavedGender() {
         int gender = LoginPreferences.singleton(getApplication().getApplicationContext()).getGender();
-        return gender == People.MALE;
+        return gender == People.GENDER_MALE;
     }
 
     public String[] getNameHistory() {

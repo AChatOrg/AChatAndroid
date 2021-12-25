@@ -65,4 +65,6 @@
     <string name="exit">Exit</string>
     <string name="connecting">Connecting…</string>
     <string name="disconnected">Disconnected</string>
+    <string name="you_don_t_have_any_contact">You don\'t have any contact</string>
+    <string name="you_can_add_your_contacts">You can add your contacts and chat with them</string>
 </resources>

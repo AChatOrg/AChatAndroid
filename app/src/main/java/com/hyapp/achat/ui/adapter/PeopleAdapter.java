@@ -17,9 +17,6 @@ import com.hyapp.achat.databinding.ItemPeopleBinding;
 import com.hyapp.achat.model.People;
 import com.hyapp.achat.model.SortedList;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class PeopleAdapter extends RecyclerView.Adapter<PeopleAdapter.Holder> {
 
     private final Context context;
@@ -83,9 +80,10 @@ public class PeopleAdapter extends RecyclerView.Adapter<PeopleAdapter.Holder> {
             binding.setPeople(people);
             binding.executePendingBindings();
 
-            binding.avatar.setImageURI(people.getAvatar().getUrl());
+            String[] avatars = people.getAvatars();
+            binding.avatar.setImageURI(avatars.length > 0 ? avatars[0] : null);
 
-            if (people.getGender() == People.MALE) {
+            if (people.getGender() == People.GENDER_MALE) {
                 binding.genderCircle.setBackgroundResource(R.drawable.gender_circle_people_male_bg);
             } else {
                 binding.genderCircle.setBackgroundResource(R.drawable.gender_circle_people_female_bg);

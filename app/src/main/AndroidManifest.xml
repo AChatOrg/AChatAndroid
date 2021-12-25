@@ -45,7 +45,9 @@
             android:exported="true"
             android:process=":AChat" />
 
-        <receiver android:name=".bl.NotifReceiver">
+        <receiver
+            android:name=".bl.NotifReceiver"
+            android:exported="false">
             <intent-filter>
                 <action android:name="ACTION_EXIT" />
             </intent-filter>

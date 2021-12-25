@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <attr name="linkColor" format="color" />
+
+    <declare-styleable name="GroupAvatarView">
+        <attr name="cornerRadius" format="dimension" />
+        <attr name="placeholderCircle" format="reference" />
+    </declare-styleable>
+
 </resources>
