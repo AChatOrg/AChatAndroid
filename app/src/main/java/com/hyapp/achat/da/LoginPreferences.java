@@ -3,9 +3,8 @@ package com.hyapp.achat.da;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.alibaba.fastjson.JSON;
+import com.google.gson.Gson;
 import com.hyapp.achat.Config;
-import com.hyapp.achat.model.event.LoggedEvent;
 import com.hyapp.achat.model.event.LoginEvent;
 
 import java.util.HashSet;
@@ -97,7 +96,7 @@ public class LoginPreferences {
 
     public String getLoginEvent() {
         return preferences.getString(LOGIN_EVENT
-                , JSON.toJSONString(
+                , new Gson().toJson(
                         new LoginEvent(Config.OPERATION_LOGIN_GUEST, "unknown", "", (byte) 1)));
     }
 }

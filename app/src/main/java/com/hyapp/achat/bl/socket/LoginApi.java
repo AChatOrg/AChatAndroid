@@ -1,7 +1,6 @@
 package com.hyapp.achat.bl.socket;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
+import com.google.gson.Gson;
 import com.hyapp.achat.Config;
 import com.hyapp.achat.model.People;
 import com.hyapp.achat.model.event.Event;
@@ -25,7 +24,7 @@ public class LoginApi {
     }
 
     private final Emitter.Listener onLogged = args -> {
-        People people = JSON.parseObject(args[0].toString(), People.class);
+        People people = new Gson().fromJson(args[0].toString(), People.class);
         EventBus.getDefault().post(new LoggedEvent(Event.Status.SUCCESS, LoggedEvent.ACTION_ME, people));
     };
 }

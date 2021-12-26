@@ -34,12 +34,12 @@ open class People : Person {
         @JvmStatic
         fun compare(o1: People, o2: People): Int {
             if (o1.key!!.uid == o2.key!!.uid) return 0
-            if (o1.key!!.rank < o1.key!!.rank) return 1
-            if (o1.key!!.rank > o1.key!!.rank) return -1
-            if (o1.key!!.score < o1.key!!.score) return 1
-            if (o1.key!!.score > o1.key!!.score) return -1
-            if (o1.key!!.loginTime < o1.key!!.loginTime) return -1
-            return if (o1.key!!.loginTime > o1.key!!.loginTime) return 1 else 0
+            if (o1.key!!.rank < o2.key!!.rank) return 1
+            if (o1.key!!.rank > o2.key!!.rank) return -1
+            if (o1.key!!.score < o2.key!!.score) return 1
+            if (o1.key!!.score > o2.key!!.score) return -1
+            if (o1.key!!.loginTime < o2.key!!.loginTime) return -1
+            return if (o1.key!!.loginTime > o2.key!!.loginTime) return 1 else 0
         }
     }
 }

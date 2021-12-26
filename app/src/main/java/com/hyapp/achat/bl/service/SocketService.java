@@ -11,8 +11,6 @@ import android.os.IBinder;
 
 import androidx.annotation.Nullable;
 
-import com.alibaba.fastjson.JSON;
-import com.hyapp.achat.bl.permissions.Permissions;
 import com.hyapp.achat.bl.socket.IOSocket;
 import com.hyapp.achat.bl.socket.PeopleApi;
 import com.hyapp.achat.bl.utils.NetUtils;
@@ -20,7 +18,6 @@ import com.hyapp.achat.bl.utils.NotifUtils;
 import com.hyapp.achat.da.LoginPreferences;
 import com.hyapp.achat.model.ConnLive;
 import com.hyapp.achat.model.event.Event;
-import com.hyapp.achat.model.event.LoginEvent;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
