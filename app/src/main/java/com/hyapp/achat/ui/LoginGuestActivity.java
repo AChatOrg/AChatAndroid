@@ -4,7 +4,6 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
 
@@ -14,12 +13,8 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.hyapp.achat.R;
 import com.hyapp.achat.bl.LoginGuestViewModel;
-import com.hyapp.achat.da.ContactDao;
 import com.hyapp.achat.databinding.ActivityGuestLoginBinding;
-import com.hyapp.achat.model.Contact;
-import com.hyapp.achat.model.Key;
 import com.hyapp.achat.model.People;
-import com.hyapp.achat.model.Person;
 import com.hyapp.achat.model.event.Event;
 import com.hyapp.achat.model.event.LoggedEvent;
 import com.hyapp.achat.ui.utils.UiUtils;

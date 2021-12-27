@@ -59,8 +59,6 @@ public class MainActivity extends EventActivity {
         viewModel = new ViewModelProvider(this).get(MainViewModel.class);
         viewModel.init();
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
-        binding.setLifecycleOwner(this);
-        binding.setViewModel(viewModel);
     }
 
     private void setupPeopleGroups() {

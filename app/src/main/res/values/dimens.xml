@@ -35,4 +35,7 @@
     <dimen name="chat_message_receive_avatar_margin_left_right">8dp</dimen>
     <dimen name="chat_message_receive_bubble_margin_left_right">42dp</dimen>
     <dimen name="chat_message_margin_bottom_top">1dp</dimen>
+
+    <dimen name="emoji_grid_view_column_width">46dp</dimen>
+    <dimen name="sticker_grid_view_column_width">88dp</dimen>
 </resources>

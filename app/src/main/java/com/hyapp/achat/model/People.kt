@@ -1,5 +1,6 @@
 package com.hyapp.achat.model
 
+import android.os.Bundle
 import io.objectbox.annotation.BaseEntity
 import io.objectbox.annotation.Transient
 
@@ -10,18 +11,33 @@ open class People : Person {
     var key: Key? = null
     var avatars: Array<String?>? = null
 
-    constructor()
-
-    constructor(name: String, bio: String?, gender: Byte, avatars: Array<String?>?) : super(name, bio, gender) {
-        this.avatars = avatars
-    }
-
-    constructor(name: String, bio: String?, gender: Byte, key: Key?, avatars: Array<String?>?) : super(name, bio, gender) {
+    constructor(name: String = "",
+                bio: String? = null,
+                gender: Byte = GENDER_MALE,
+                key: Key? = null,
+                avatars: Array<String?>? = null
+    ) : super(name, bio, gender) {
         this.key = key
         this.avatars = avatars
     }
 
+
+    constructor(bundle: Bundle) : super(bundle) {
+        key = bundle.getParcelable(EXTRA_KEY) ?: Key()
+        avatars = bundle.getStringArray(EXTRA_AVATARS)
+    }
+
+    override val bundle: Bundle
+        get() {
+            return super.bundle.apply {
+                putParcelable(EXTRA_KEY, key)
+                putStringArray(EXTRA_AVATARS, avatars)
+            }
+        }
+
     companion object {
+        const val EXTRA_KEY = "key"
+        const val EXTRA_AVATARS = "avatars"
 
         const val RANK_GUEST: Byte = 0
         const val RANK_MEMBER: Byte = 1

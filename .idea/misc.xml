@@ -26,10 +26,14 @@
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/drawable/placeholder_avatar_group_bottom_left.xml" value="0.20625" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/drawable/toolbar_action_bg.xml" value="0.2203125" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/drawable/toolbar_action_bg_light.xml" value="0.2203125" />
+        <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/activity_chat.xml" value="0.25" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/activity_guest_login.xml" value="0.25" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/activity_login.xml" value="0.2" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/activity_main.xml" value="0.25" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/dialog_permissions_rationale.xml" value="0.25" />
+        <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/dimens.xml" value="0.14855072463768115" />
+        <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/emoji_item.xml" value="0.14855072463768115" />
+        <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/emoji_skin_popup.xml" value="0.14855072463768115" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/fragment_people_groups.xml" value="0.2" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/group_avatar.xml" value="0.18659420289855072" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/item_contact_group.xml" value="0.22" />

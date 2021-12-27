@@ -14,8 +14,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.hyapp.achat.R;
 import com.hyapp.achat.databinding.ItemPeopleBinding;
+import com.hyapp.achat.model.Contact;
 import com.hyapp.achat.model.People;
 import com.hyapp.achat.model.SortedList;
+import com.hyapp.achat.ui.ChatActivity;
 
 public class PeopleAdapter extends RecyclerView.Adapter<PeopleAdapter.Holder> {
 
@@ -126,7 +128,9 @@ public class PeopleAdapter extends RecyclerView.Adapter<PeopleAdapter.Holder> {
 
         @Override
         public void onClick(View v) {
-
+            People p = people.get(getAdapterPosition());
+            Contact contact = new Contact(p, Contact.TIME_ONLINE);
+            ChatActivity.start(context, contact);
         }
     }
 }

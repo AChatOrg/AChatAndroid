@@ -1,7 +1,7 @@
 package com.hyapp.achat;
 
 public interface Config {
-    String SERVER_URL = "http://192.168.1.105:24240";
+    String SERVER_URL = "http://192.168.1.104:24240";
 
     String SOCKET_QUERY_DATA = "data";
 
