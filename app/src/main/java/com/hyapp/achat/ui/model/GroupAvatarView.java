@@ -166,7 +166,7 @@ public class GroupAvatarView extends ConstraintLayout {
         hierarchy.setRoundingParams(circleParams);
     }
 
-    public void setAvatars(String[] avatars) {
+    public void setAvatars(String... avatars) {
         int length = Math.min(draweeViews.length, avatars.length);
 
         switch (length) {

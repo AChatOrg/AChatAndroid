@@ -10,6 +10,7 @@
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/drawable-anydpi/ic_action_search.xml" value="0.2203125" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/drawable-v21/add_chat_fab.xml" value="0.2203125" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/drawable-v21/bg_button.xml" value="0.2203125" />
+        <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/drawable-v21/chat_inputs_ripple_bg_circle.xml" value="0.2169230769230769" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/drawable-v21/toolbar_action_bg.xml" value="0.2203125" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/drawable-v21/toolbar_action_bg_light.xml" value="0.2203125" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.2203125" />
@@ -18,6 +19,7 @@
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/drawable/bg_button.xml" value="0.2203125" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/drawable/bg_dialog_permission_rational.xml" value="0.20625" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/drawable/chat_bubble_receive_end.xml" value="0.10260416666666666" />
+        <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/drawable/chat_inputs_ripple_bg_circle.xml" value="0.2169230769230769" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/drawable/gender_circle_people_female_bg.xml" value="0.2203125" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/drawable/gender_circle_people_male_bg.xml" value="0.2203125" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/drawable/gender_circle_people_mixed_bg.xml" value="0.2203125" />
@@ -38,6 +40,14 @@
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/group_avatar.xml" value="0.18659420289855072" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/item_contact_group.xml" value="0.22" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/item_contact_single.xml" value="0.18659420289855072" />
+        <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/item_message_details.xml" value="0.15942028985507245" />
+        <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/item_message_lottie_receive.xml" value="0.15942028985507245" />
+        <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/item_message_lottie_send.xml" value="0.15942028985507245" />
+        <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/item_message_profile.xml" value="0.1" />
+        <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/item_message_profile_group.xml" value="0.15942028985507245" />
+        <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/item_message_profile_single.xml" value="0.15942028985507245" />
+        <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/item_message_text_receive.xml" value="0.15942028985507245" />
+        <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/item_message_text_send.xml" value="0.15942028985507245" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/item_people.xml" value="0.25" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/item_suggestion.xml" value="0.15443840579710144" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/layout_empty_contact.xml" value="0.2" />

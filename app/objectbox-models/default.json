@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "1:7499101650816396696",
-      "lastPropertyId": "14:5785374247205098261",
+      "lastPropertyId": "15:7805158805110346611",
       "name": "Contact",
       "properties": [
         {
@@ -78,6 +78,11 @@
           "id": "14:5785374247205098261",
           "name": "mediaMessagePath",
           "type": 9
+        },
+        {
+          "id": "15:7805158805110346611",
+          "name": "type",
+          "type": 2
         }
       ],
       "relations": []

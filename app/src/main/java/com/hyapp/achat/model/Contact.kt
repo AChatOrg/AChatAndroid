@@ -1,39 +1,77 @@
 package com.hyapp.achat.model
 
 import android.os.Bundle
-import android.os.Message
+import android.view.View
+import com.hyapp.achat.bl.utils.TimeUtils
+import com.hyapp.achat.model.utils.PersonUtils
 import io.objectbox.annotation.Entity
 import io.objectbox.annotation.Id
 
 @Entity
 class Contact : People {
+
+    companion object {
+        const val EXTRA_TYPE = "type"
+        const val EXTRA_ONLINE_TIME = "onlineTime"
+        const val EXTRA_MESSAGE_TIME = "messageTime"
+        const val EXTRA_MESSAGE_DELIVERY = "messageDelivery"
+        const val EXTRA_NOTIF_COUNT = "notifCount"
+        const val EXTRA_MEDIA_MESSAGE_PATH = "mediaMessagePath"
+
+        const val TYPE_SINGLE: Byte = 1
+        const val TYPE_GROUP: Byte = 2
+
+        const val TIME_ONLINE: Long = 0
+
+        const val ONLINE_TYPE_CONTACT: Byte = 1
+        const val ONLINE_TYPE_CHAT: Byte = 2
+        const val ONLINE_TYPE_PROFILE: Byte = 3
+    }
+
     @Id
     var id: Long = 0
+
+    var type: Byte = TYPE_SINGLE
 
     var uid: String = ""
     var rank: Byte = 0
     var score: Int = 0
     var loginTime: Long = 0
 
-    var onlineTime: Long = 0
-    var messageTime: Long = 0
-    var messageDelivery: Byte = DELIVERY_HIDDEN
+    var onlineTime: Long = TIME_ONLINE
+        set(value) {
+            field = value
+            setupOnlineTime(ONLINE_TYPE_CONTACT)
+        }
+    var messageTime: Long = -1
+    var messageDelivery: Byte = ChatMessage.DELIVERY_HIDDEN
     var notifCount: String? = null
     var mediaMessagePath: String? = null
 
+    @Transient
+    var onlineTimeStr: String = ""
+
+    @Transient
+    var onlineTimeRes: Int = PersonUtils.LAST_ONLINE_CONTACT_BG_RES_GREY
+
+    @Transient
+    var notifRes: Int = PersonUtils.NOTIF_CONTACT_BG_RES_GREY
+
     constructor()
 
-    constructor(name: String = "",
+    constructor(type: Byte = TYPE_SINGLE,
+                name: String = "",
                 bio: String? = null,
                 gender: Byte = GENDER_MALE,
                 key: Key = Key(),
-                avatars: Array<String?>? = null,
+                avatars: Array<String?> = emptyArray(),
                 onlineTime: Long = 0,
                 messageTime: Long = 0,
-                messageDelivery: Byte = DELIVERY_HIDDEN,
+                messageDelivery: Byte = ChatMessage.DELIVERY_HIDDEN,
                 notifCount: String? = null,
                 mediaMessagePath: String? = null
     ) : super(name, bio, gender, avatars = avatars) {
+        this.type = type
         this.uid = key.uid
         this.rank = key.rank
         this.score = key.score
@@ -45,7 +83,13 @@ class Contact : People {
         this.mediaMessagePath = mediaMessagePath
     }
 
+    init {
+        setupRank(rank)
+        setupOnlineTime(ONLINE_TYPE_CONTACT)
+    }
+
     constructor(people: People, onlineTime: Long) : this(
+            TYPE_SINGLE,
             people.name,
             people.bio,
             people.gender,
@@ -60,6 +104,7 @@ class Contact : People {
         score = super.key!!.score
         loginTime = super.key!!.loginTime
         super.key = null
+        type = bundle.getByte(EXTRA_TYPE)
         onlineTime = bundle.getLong(EXTRA_ONLINE_TIME)
         messageTime = bundle.getLong(EXTRA_MESSAGE_TIME)
         messageDelivery = bundle.getByte(EXTRA_MESSAGE_DELIVERY)
@@ -70,6 +115,8 @@ class Contact : People {
     override val bundle: Bundle
         get() {
             return super.bundle.apply {
+                putParcelable(EXTRA_KEY, Key(uid, rank, score, loginTime))
+                putByte(EXTRA_TYPE, type)
                 putLong(EXTRA_ONLINE_TIME, onlineTime)
                 putLong(EXTRA_MESSAGE_TIME, messageTime)
                 putByte(EXTRA_MESSAGE_DELIVERY, messageDelivery)
@@ -78,19 +125,21 @@ class Contact : People {
             }
         }
 
-    companion object {
-        const val EXTRA_ONLINE_TIME = "onlineTime"
-        const val EXTRA_MESSAGE_TIME = "messageTime"
-        const val EXTRA_MESSAGE_DELIVERY = "messageDelivery"
-        const val EXTRA_NOTIF_COUNT = "notifCount"
-        const val EXTRA_MEDIA_MESSAGE_PATH = "mediaMessagePath"
-
-
-        const val TIME_ONLINE: Long = 0
-
-        const val DELIVERY_HIDDEN: Byte = 1
-        const val DELIVERY_WAITING: Byte = 2
-        const val DELIVERY_UNREAD: Byte = 3
-        const val DELIVERY_READ: Byte = 4
+    fun setupOnlineTime(type: Byte) {
+        if (onlineTime == TIME_ONLINE) {
+            onlineTimeStr = ""
+            when (type) {
+                ONLINE_TYPE_CONTACT -> onlineTimeRes = PersonUtils.LAST_ONLINE_CONTACT_BG_RES_GREEN
+                ONLINE_TYPE_CHAT -> onlineTimeRes = PersonUtils.LAST_ONLINE_CHAT_BG_RES_GREEN
+                ONLINE_TYPE_PROFILE -> onlineTimeRes = PersonUtils.LAST_ONLINE_PROFILE_BG_RES_GREEN
+            }
+        } else {
+            onlineTimeStr = TimeUtils.timeAgoShort(System.currentTimeMillis() - onlineTime)
+            when (type) {
+                ONLINE_TYPE_CONTACT -> onlineTimeRes = PersonUtils.LAST_ONLINE_CONTACT_BG_RES_GREY
+                ONLINE_TYPE_CHAT -> onlineTimeRes = PersonUtils.LAST_ONLINE_CHAT_BG_RES_GREY
+                ONLINE_TYPE_PROFILE -> onlineTimeRes = PersonUtils.LAST_ONLINE_PROFILE_BG_RES_GREY
+            }
+        }
     }
 }

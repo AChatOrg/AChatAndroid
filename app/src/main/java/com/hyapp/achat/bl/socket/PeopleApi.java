@@ -3,15 +3,14 @@ package com.hyapp.achat.bl.socket;
 import androidx.lifecycle.MutableLiveData;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.hyapp.achat.Config;
 import com.hyapp.achat.model.People;
+import com.hyapp.achat.model.PeopleDeserializer;
 import com.hyapp.achat.model.Resource;
 import com.hyapp.achat.model.SortedList;
 
-import org.json.JSONArray;
-
-import java.lang.reflect.Type;
 import java.util.Iterator;
 import java.util.List;
 
@@ -47,15 +46,20 @@ public class PeopleApi {
     }
 
     private final Emitter.Listener onPeopleList = args -> {
-        List<People> people = new Gson().fromJson(args[0].toString(), new TypeToken<List<People>>() {
-        }.getType());
+        List<People> people = new GsonBuilder()
+                .registerTypeAdapter(People.class, new PeopleDeserializer())
+                .create()
+                .fromJson(args[0].toString(), new TypeToken<List<People>>() {
+                }.getType());
         SortedList<People> peopleList = new SortedList<>(People::compare);
         peopleList.addAll(people);
         getPeopleLive().postValue(Resource.add(peopleList, Resource.INDEX_ALL));
     };
 
     private final Emitter.Listener onUserCame = args -> {
-        People people = new Gson().fromJson(args[0].toString(), People.class);
+        People people = new GsonBuilder()
+                .registerTypeAdapter(People.class, new PeopleDeserializer())
+                .create().fromJson(args[0].toString(), People.class);
         Resource<SortedList<People>> value = getPeopleLive().getValue();
         if (value != null) {
             SortedList<People> peopleList = value.data;

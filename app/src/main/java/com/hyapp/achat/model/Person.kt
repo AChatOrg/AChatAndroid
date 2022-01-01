@@ -1,14 +1,32 @@
 package com.hyapp.achat.model
 
 import android.os.Bundle
+import com.hyapp.achat.model.utils.PersonUtils
 import io.objectbox.annotation.BaseEntity
 
 @BaseEntity
-abstract class Person(
-        var name: String = "",
-        var bio: String? = null,
-        var gender: Byte = GENDER_MALE
-) {
+abstract class Person {
+
+    var name: String = ""
+    var bio: String? = null
+    var gender: Byte = GENDER_MALE
+        set(value) {
+            field = value
+            setupGenderCircleRes(field)
+        }
+
+    @Transient
+    var genderCircleRes: Int = PersonUtils.GENDER_PEOPLE_CIRCLE_MALE_BG_RES
+
+    init {
+        setupGenderCircleRes(gender)
+    }
+
+    constructor(name: String = "", bio: String? = null, gender: Byte = GENDER_MALE) {
+        this.name = name
+        this.bio = bio
+        this.gender = gender
+    }
 
     constructor(bundle: Bundle) : this(
             bundle.getString(EXTRA_NAME) ?: "",
@@ -24,6 +42,14 @@ abstract class Person(
                 putByte(EXTRA_GENDER, gender)
             }
         }
+
+    fun setupGenderCircleRes(gender: Byte) {
+        when (gender) {
+            GENDER_MALE -> genderCircleRes = PersonUtils.GENDER_PEOPLE_CIRCLE_MALE_BG_RES
+            GENDER_FEMALE -> genderCircleRes = PersonUtils.GENDER_PEOPLE_CIRCLE_FEMALE_BG_RES
+            GENDER_MIXED -> genderCircleRes = PersonUtils.GENDER_PEOPLE_CIRCLE_MIXED_BG_RES
+        }
+    }
 
     companion object {
         const val EXTRA_NAME = "name"

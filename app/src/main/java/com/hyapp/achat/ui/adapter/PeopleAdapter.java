@@ -85,45 +85,9 @@ public class PeopleAdapter extends RecyclerView.Adapter<PeopleAdapter.Holder> {
             String[] avatars = people.getAvatars();
             binding.avatar.setImageURI(avatars.length > 0 ? avatars[0] : null);
 
-            if (people.getGender() == People.GENDER_MALE) {
-                binding.genderCircle.setBackgroundResource(R.drawable.gender_circle_people_male_bg);
-            } else {
-                binding.genderCircle.setBackgroundResource(R.drawable.gender_circle_people_female_bg);
-            }
-            setRank(people.getKey().getRank());
-        }
-
-        private void setRank(byte rank) {
-            switch (rank) {
-                case People.RANK_GUEST:
-                    binding.rank.setText(R.string.guest);
-                    binding.rank.setTextColor(ContextCompat.getColor(context, R.color.rank_guest));
-                    break;
-                case People.RANK_MEMBER:
-                    binding.rank.setText(R.string.member);
-                    binding.rank.setTextColor(ContextCompat.getColor(context, R.color.rank_member));
-                    break;
-                case People.RANK_SPECIAL:
-                    binding.rank.setText(R.string.special);
-                    binding.rank.setTextColor(ContextCompat.getColor(context, R.color.rank_special));
-                    break;
-                case People.RANK_ACTIVE:
-                    binding.rank.setText(R.string.active);
-                    binding.rank.setTextColor(ContextCompat.getColor(context, R.color.rank_active));
-                    break;
-                case People.RANK_SENIOR:
-                    binding.rank.setText(R.string.senior);
-                    binding.rank.setTextColor(ContextCompat.getColor(context, R.color.rank_senior));
-                    break;
-                case People.RANK_ADMIN:
-                    binding.rank.setText(R.string.admin);
-                    binding.rank.setTextColor(ContextCompat.getColor(context, R.color.rank_admin));
-                    break;
-                case People.RANK_MANAGER:
-                    binding.rank.setText(R.string.manager);
-                    binding.rank.setTextColor(ContextCompat.getColor(context, R.color.rank_manager));
-                    break;
-            }
+            binding.genderCircle.setBackgroundResource(people.getGenderCircleRes());
+            binding.rank.setText(people.getRankStrRes());
+            binding.rank.setTextColor(people.getRankColor());
         }
 
         @Override

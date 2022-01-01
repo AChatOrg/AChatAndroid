@@ -1,8 +1,10 @@
 package com.hyapp.achat.bl.socket;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.hyapp.achat.Config;
 import com.hyapp.achat.model.People;
+import com.hyapp.achat.model.PeopleDeserializer;
 import com.hyapp.achat.model.event.Event;
 import com.hyapp.achat.model.event.LoggedEvent;
 
@@ -24,7 +26,9 @@ public class LoginApi {
     }
 
     private final Emitter.Listener onLogged = args -> {
-        People people = new Gson().fromJson(args[0].toString(), People.class);
+        People people = new GsonBuilder()
+                .registerTypeAdapter(People.class, new PeopleDeserializer())
+                .create().fromJson(args[0].toString(), People.class);
         EventBus.getDefault().post(new LoggedEvent(Event.Status.SUCCESS, LoggedEvent.ACTION_ME, people));
     };
 }

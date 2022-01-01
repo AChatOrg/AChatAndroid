@@ -1,6 +1,7 @@
 package com.hyapp.achat.model
 
 import android.os.Bundle
+import com.hyapp.achat.model.utils.PersonUtils
 import io.objectbox.annotation.BaseEntity
 import io.objectbox.annotation.Transient
 
@@ -9,22 +10,35 @@ open class People : Person {
 
     @Transient
     var key: Key? = null
-    var avatars: Array<String?>? = null
+        set(value) {
+            field = value
+            setupRank(field)
+        }
+    var avatars: Array<String?> = emptyArray()
+
+    @Transient
+    var rankStrRes: Int = PersonUtils.RANK_STR_GUEST
+
+    @Transient
+    var rankColor: Int = PersonUtils.RANK_COLOR_GUEST
 
     constructor(name: String = "",
                 bio: String? = null,
                 gender: Byte = GENDER_MALE,
                 key: Key? = null,
-                avatars: Array<String?>? = null
+                avatars: Array<String?> = emptyArray()
     ) : super(name, bio, gender) {
         this.key = key
         this.avatars = avatars
     }
 
+    init {
+        setupRank(key)
+    }
 
     constructor(bundle: Bundle) : super(bundle) {
         key = bundle.getParcelable(EXTRA_KEY) ?: Key()
-        avatars = bundle.getStringArray(EXTRA_AVATARS)
+        avatars = bundle.getStringArray(EXTRA_AVATARS) ?: emptyArray()
     }
 
     override val bundle: Bundle
@@ -35,17 +49,21 @@ open class People : Person {
             }
         }
 
+    fun setupRank(key: Key?) {
+        key?.let {
+            setupRank(it.rank)
+        }
+    }
+
+    fun setupRank(rank: Byte) {
+        val pair = PersonUtils.rankInt2rankStrResAndColor(rank)
+        rankStrRes = pair.first
+        rankColor = pair.second
+    }
+
     companion object {
         const val EXTRA_KEY = "key"
         const val EXTRA_AVATARS = "avatars"
-
-        const val RANK_GUEST: Byte = 0
-        const val RANK_MEMBER: Byte = 1
-        const val RANK_SPECIAL: Byte = 2
-        const val RANK_ACTIVE: Byte = 3
-        const val RANK_SENIOR: Byte = 4
-        const val RANK_ADMIN: Byte = 5
-        const val RANK_MANAGER: Byte = 6
 
         @JvmStatic
         fun compare(o1: People, o2: People): Int {
