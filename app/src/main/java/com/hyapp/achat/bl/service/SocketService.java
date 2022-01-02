@@ -18,6 +18,7 @@ import com.hyapp.achat.bl.utils.NotifUtils;
 import com.hyapp.achat.da.LoginPreferences;
 import com.hyapp.achat.model.ConnLive;
 import com.hyapp.achat.model.event.Event;
+import com.hyapp.achat.model.event.MessageEvent;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -96,6 +97,13 @@ public class SocketService extends Service {
     public void onRequestPeople(Event event) {
         if (event.action == Event.ACTION_REQUEST_PEOPLE) {
             PeopleApi.singleton().requestPeople(ioSocket.getSocket());
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onSendPvMessage(MessageEvent event) {
+        if (event.action == MessageEvent.ACTION_SEND) {
+            ioSocket.chatApi.sendPvMessage(event.getJson());
         }
     }
 }

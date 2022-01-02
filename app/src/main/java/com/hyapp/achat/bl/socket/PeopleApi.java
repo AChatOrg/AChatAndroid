@@ -2,12 +2,11 @@ package com.hyapp.achat.bl.socket;
 
 import androidx.lifecycle.MutableLiveData;
 
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.hyapp.achat.Config;
 import com.hyapp.achat.model.People;
-import com.hyapp.achat.model.PeopleDeserializer;
+import com.hyapp.achat.model.gson.PeopleDeserializer;
 import com.hyapp.achat.model.Resource;
 import com.hyapp.achat.model.SortedList;
 

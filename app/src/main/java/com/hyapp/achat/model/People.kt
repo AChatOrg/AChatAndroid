@@ -1,6 +1,7 @@
 package com.hyapp.achat.model
 
 import android.os.Bundle
+import com.google.gson.annotations.Expose
 import com.hyapp.achat.model.utils.PersonUtils
 import io.objectbox.annotation.BaseEntity
 import io.objectbox.annotation.Transient
@@ -14,6 +15,7 @@ open class People : Person {
             field = value
             setupRank(field)
         }
+    @Expose
     var avatars: Array<String?> = emptyArray()
 
     @Transient

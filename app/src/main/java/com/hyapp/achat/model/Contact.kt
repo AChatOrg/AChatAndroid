@@ -2,6 +2,7 @@ package com.hyapp.achat.model
 
 import android.os.Bundle
 import android.view.View
+import com.google.gson.annotations.Expose
 import com.hyapp.achat.bl.utils.TimeUtils
 import com.hyapp.achat.model.utils.PersonUtils
 import io.objectbox.annotation.Entity
@@ -31,13 +32,22 @@ class Contact : People {
     @Id
     var id: Long = 0
 
+    @Expose
     var type: Byte = TYPE_SINGLE
 
+    @Expose
     var uid: String = ""
+
+    @Expose
     var rank: Byte = 0
+
+    @Expose
     var score: Int = 0
+
+    @Expose
     var loginTime: Long = 0
 
+    @Expose
     var onlineTime: Long = TIME_ONLINE
         set(value) {
             field = value

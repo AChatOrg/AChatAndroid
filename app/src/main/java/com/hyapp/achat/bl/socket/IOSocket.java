@@ -13,6 +13,7 @@ public class IOSocket {
 
     private Socket socket;
     public LoginApi loginApi;
+    public ChatApi chatApi;
 
     public Socket getSocket() {
         return socket;
@@ -41,12 +42,14 @@ public class IOSocket {
 
     private void createApis() {
         loginApi = new LoginApi(socket);
+        chatApi = new ChatApi(socket);
     }
 
     private void listen() {
         socket.on(Config.ON_DISCONNECT, onDisconnect);
         socket.on(Config.ON_CONNECT, onConnect);
         loginApi.listen();
+        chatApi.listen();
         PeopleApi.singleton().listen(socket);
     }
 

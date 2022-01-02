@@ -1,14 +1,18 @@
 package com.hyapp.achat.model
 
 import android.os.Bundle
+import com.google.gson.annotations.Expose
 import com.hyapp.achat.model.utils.PersonUtils
 import io.objectbox.annotation.BaseEntity
 
 @BaseEntity
 abstract class Person {
 
+    @Expose
     var name: String = ""
+    @Expose
     var bio: String? = null
+    @Expose
     var gender: Byte = GENDER_MALE
         set(value) {
             field = value
