@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <com.facebook.drawee.view.SimpleDraweeView
+        android:id="@+id/avatar"
+        android:layout_width="26dp"
+        android:layout_height="26dp"
+        android:layout_marginEnd="@dimen/chat_message_receive_avatar_margin_left_right"
+        android:layout_marginRight="@dimen/chat_message_receive_avatar_margin_left_right"
+        app:actualImageScaleType="centerCrop"
+        app:layout_constraintBottom_toBottomOf="@+id/text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:placeholderImage="@drawable/avatar_26"
+        app:placeholderImageScaleType="centerCrop"
+        app:roundAsCircle="true" />
+
+    <View
+        android:id="@+id/lastOnline"
+        android:layout_width="8dp"
+        android:layout_height="8dp"
+        android:background="@drawable/last_online_message_bg_green"
+        app:layout_constraintBottom_toBottomOf="@+id/avatar"
+        app:layout_constraintStart_toStartOf="@+id/avatar" />
+
+    <com.hyapp.achat.ui.emojiview.view.AXEmojiTextView
+        android:id="@+id/text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/chat_message_margin_bottom_top"
+        android:layout_marginEnd="@dimen/chat_message_receive_bubble_margin_left_right"
+        android:layout_marginRight="@dimen/chat_message_receive_bubble_margin_left_right"
+        android:layout_marginBottom="@dimen/chat_message_margin_bottom_top"
+        android:fontFamily="@font/iran_sans_regular"
+        android:maxWidth="230dp"
+        android:minWidth="34dp"
+        android:paddingStart="12dp"
+        android:paddingLeft="12dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="12dp"
+        android:paddingRight="12dp"
+        android:paddingBottom="8dp"
+        android:textColor="@color/black"
+        android:textSize="14sp"
+        app:emojiSize="36sp"
+        app:layout_constraintBottom_toTopOf="@id/time"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:background="@drawable/chat_bubble_receive_start"
+        tools:text="لورم ایپسوم متن ساختگی با تولید " />
+
+    <TextView
+        android:id="@+id/time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:fontFamily="@font/iran_sans_light"
+        android:textColor="@color/grey_35"
+        android:textSize="10sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/text"
+        app:layout_constraintTop_toBottomOf="@id/text"
+        tools:ignore="SmallSp"
+        tools:text="21:54" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

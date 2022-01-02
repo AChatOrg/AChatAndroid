@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".ui.ChatActivity">
+
+        <com.hyapp.achat.ui.model.GroupAvatarView
+            android:id="@+id/avatar"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="8dp"
+            app:cornerRadius="19dp"
+            app:layout_constraintStart_toEndOf="@id/back"
+            app:layout_constraintTop_toTopOf="parent"
+            app:placeholderCircle="@drawable/avatar_group_38" />
+
+        <TextView
+            android:id="@+id/lastOnline"
+            android:layout_width="wrap_content"
+            android:layout_height="14dp"
+            android:layout_marginEnd="-1dp"
+            android:layout_marginRight="-1dp"
+            android:layout_marginBottom="-1dp"
+            android:background="@drawable/last_online_chat_bg_grey"
+            android:fontFamily="@font/iran_sans_light"
+            android:gravity="center"
+            android:minWidth="14dp"
+            android:paddingLeft="3dp"
+            android:paddingTop="1.5dp"
+            android:paddingRight="3dp"
+            android:textSize="7sp"
+            app:layout_constraintBottom_toBottomOf="@+id/avatar"
+            app:layout_constraintEnd_toEndOf="@+id/avatar"
+            tools:ignore="SmallSp"
+            tools:text="7m" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/back"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginLeft="5dp"
+            android:background="?selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="6dp"
+            android:src="@drawable/ic_action_back"
+            app:layout_constraintBottom_toBottomOf="@+id/avatar"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/avatar"
+            app:tint="?colorPrimary" />
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:ellipsize="end"
+            android:fontFamily="@font/iran_sans_medium"
+            android:gravity="start"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:textAlignment="gravity"
+            android:textSize="@dimen/text_16"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintBottom_toTopOf="@+id/bio"
+            app:layout_constraintEnd_toStartOf="@+id/voiceCall"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toEndOf="@+id/avatar"
+            app:layout_constraintTop_toTopOf="@+id/avatar"
+            app:layout_constraintVertical_chainStyle="packed"
+            tools:text="Amir hosein" />
+
+        <TextView
+            android:id="@+id/bio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:fontFamily="@font/iran_sans_regular"
+            android:gravity="start"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:textAlignment="gravity"
+            android:textColor="@color/grey_35"
+            android:textSize="@dimen/text_12"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintBottom_toBottomOf="@+id/avatar"
+            app:layout_constraintEnd_toStartOf="@+id/voiceCall"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toStartOf="@+id/name"
+            app:layout_constraintTop_toBottomOf="@+id/name"
+            tools:text="20:54" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/voiceCall"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginRight="10dp"
+            android:background="?selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="6dp"
+            android:src="@drawable/ic_action_voice_call"
+            app:layout_constraintBottom_toBottomOf="@+id/avatar"
+            app:layout_constraintEnd_toStartOf="@+id/videoCall"
+            app:layout_constraintTop_toTopOf="@+id/avatar"
+            app:tint="?colorPrimary" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/videoCall"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginRight="10dp"
+            android:background="?selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="6dp"
+            android:src="@drawable/ic_action_video_call"
+            app:layout_constraintBottom_toBottomOf="@+id/voiceCall"
+            app:layout_constraintEnd_toStartOf="@+id/more"
+            app:layout_constraintTop_toTopOf="@+id/voiceCall"
+            app:tint="?colorPrimary" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/more"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginRight="5dp"
+            android:background="?selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="6dp"
+            android:src="@drawable/ic_action_more"
+            app:layout_constraintBottom_toBottomOf="@+id/videoCall"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/videoCall"
+            app:tint="?colorPrimary" />
+
+        <View
+            android:id="@+id/toolbarDivider"
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:layout_marginTop="8dp"
+            android:background="@color/grey_15"
+            android:visibility="invisible"
+            app:layout_constraintTop_toBottomOf="@+id/avatar" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginBottom="8dp"
+            android:clipToPadding="false"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            app:layout_constraintBottom_toTopOf="@+id/messageEditText"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/toolbarDivider" />
+
+        <View
+            android:id="@+id/editTextDivider"
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:layout_marginTop="8dp"
+            android:background="@color/grey_15"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="@+id/recyclerView" />
+
+        <com.hyapp.achat.ui.emojiview.view.AXEmojiEditText
+            android:id="@+id/messageEditText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/chat_message_edit_text_bg"
+            android:fontFamily="@font/iran_sans_regular"
+            android:gravity="start|center_vertical"
+            android:hint="@string/message"
+            android:inputType="textMultiLine"
+            android:minHeight="40dp"
+            android:paddingStart="40dp"
+            android:paddingLeft="40dp"
+            android:paddingTop="6dp"
+            android:paddingEnd="6dp"
+            android:paddingRight="6dp"
+            android:paddingBottom="6dp"
+            android:textSize="@dimen/text_14"
+            app:emojiSize="17sp"
+            app:layout_constraintBottom_toTopOf="@id/emojiPopupLayout"
+            app:layout_constraintEnd_toStartOf="@+id/sendImageSwitcher"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <ImageSwitcher
+            android:id="@+id/sendImageSwitcher"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:background="?selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="6dp"
+            app:layout_constraintBottom_toBottomOf="@+id/emoji"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/emoji"
+            tools:background="@drawable/ic_action_mic" />
+
+        <ImageView
+            android:id="@+id/emoji"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginBottom="2dp"
+            android:background="@drawable/chat_inputs_ripple_bg_circle"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="6dp"
+            android:src="@drawable/ic_action_emoji"
+            app:layout_constraintBottom_toBottomOf="@+id/messageEditText"
+            app:layout_constraintStart_toStartOf="@+id/messageEditText"
+            app:tint="@color/black" />
+
+        <ImageView
+            android:id="@+id/attach"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginEnd="2dp"
+            android:layout_marginRight="2dp"
+            android:background="@drawable/chat_inputs_ripple_bg_circle"
+            android:clickable="true"
+            android:focusable="true"
+            android:padding="6dp"
+            android:src="@drawable/ic_action_attach"
+            app:layout_constraintBottom_toBottomOf="@+id/emoji"
+            app:layout_constraintEnd_toEndOf="@+id/messageEditText"
+            app:layout_constraintTop_toTopOf="@+id/emoji"
+            app:tint="@color/black" />
+
+        <com.hyapp.achat.ui.emojiview.view.AXEmojiPopupLayout
+            android:id="@+id/emojiPopupLayout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

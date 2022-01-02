@@ -1,0 +1,97 @@
+{
+  "_note1": "KEEP THIS FILE! Check it into a version control system (VCS) like git.",
+  "_note2": "ObjectBox manages crucial IDs for your object model. See docs for details.",
+  "_note3": "If you have VCS merge conflicts, you must resolve them according to ObjectBox docs.",
+  "entities": [
+    {
+      "id": "1:7499101650816396696",
+      "lastPropertyId": "14:5785374247205098261",
+      "name": "Contact",
+      "properties": [
+        {
+          "id": "1:7487004668583255850",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "2:6046171689512173922",
+          "name": "bio",
+          "type": 9
+        },
+        {
+          "id": "3:7993169865064838075",
+          "name": "gender",
+          "type": 2
+        },
+        {
+          "id": "4:1207241941151335418",
+          "name": "avatars",
+          "type": 30
+        },
+        {
+          "id": "5:2501586826548794325",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "6:3010526955655070355",
+          "name": "uid",
+          "type": 9
+        },
+        {
+          "id": "7:1845830432610862867",
+          "name": "rank",
+          "type": 2
+        },
+        {
+          "id": "8:7592849592039177097",
+          "name": "score",
+          "type": 5
+        },
+        {
+          "id": "9:2069766805639642533",
+          "name": "loginTime",
+          "type": 6
+        },
+        {
+          "id": "10:570660138932507896",
+          "name": "onlineTime",
+          "type": 6
+        },
+        {
+          "id": "11:7791744248628368240",
+          "name": "messageTime",
+          "type": 6
+        },
+        {
+          "id": "12:3775214188909674568",
+          "name": "messageDelivery",
+          "type": 2
+        },
+        {
+          "id": "13:2699959260647555868",
+          "name": "notifCount",
+          "type": 9
+        },
+        {
+          "id": "14:5785374247205098261",
+          "name": "mediaMessagePath",
+          "type": 9
+        }
+      ],
+      "relations": []
+    }
+  ],
+  "lastEntityId": "1:7499101650816396696",
+  "lastIndexId": "0:0",
+  "lastRelationId": "0:0",
+  "lastSequenceId": "0:0",
+  "modelVersion": 5,
+  "modelVersionParserMinimum": 5,
+  "retiredEntityUids": [],
+  "retiredIndexUids": [],
+  "retiredPropertyUids": [],
+  "retiredRelationUids": [],
+  "version": 1
+}

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/read"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/chat_message_send_margin_left_right"
+        android:layout_marginLeft="@dimen/chat_message_send_margin_left_right"
+        app:layout_constraintBottom_toBottomOf="@+id/lottieImageView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/msg_unread_contact"
+        app:tint="@color/black" />
+
+        <com.aghajari.rlottie.AXrLottieImageView
+            android:id="@+id/lottieImageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/chat_message_send_margin_left_right"
+            android:layout_marginLeft="@dimen/chat_message_send_margin_left_right"
+            android:layout_marginTop="@dimen/chat_message_margin_bottom_top"
+            android:layout_marginBottom="@dimen/chat_message_margin_bottom_top"
+            android:maxWidth="230dp"
+            android:minWidth="34dp"
+            app:layout_constraintBottom_toTopOf="@id/time"
+            app:layout_constraintStart_toEndOf="@+id/read"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:fontFamily="@font/iran_sans_light"
+        android:textColor="@color/grey_35"
+        android:textSize="10sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/lottieImageView"
+        app:layout_constraintTop_toBottomOf="@id/lottieImageView"
+        tools:ignore="SmallSp"
+        tools:text="21:54" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
