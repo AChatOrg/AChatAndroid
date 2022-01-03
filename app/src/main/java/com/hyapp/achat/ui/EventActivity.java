@@ -5,6 +5,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.hyapp.achat.R;
+import com.hyapp.achat.model.event.ActionEvent;
 import com.hyapp.achat.model.event.Event;
 
 import org.greenrobot.eventbus.EventBus;
@@ -38,8 +39,8 @@ public class EventActivity extends AppCompatActivity {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onExitApp(Event event) {
-        if (event.action == Event.ACTION_EXIT_APP) {
+    public void onExitApp(ActionEvent event) {
+        if (event.action == ActionEvent.ACTION_EXIT_APP) {
             finishAffinity();
         }
     }

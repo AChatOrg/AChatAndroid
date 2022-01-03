@@ -14,7 +14,7 @@ public class MessageUtils {
     public static final int BUBBLE_RES_RECEIVE_END = R.drawable.chat_bubble_receive_end;
     public static final int BUBBLE_RES_RECEIVE_SINGLE = R.drawable.chat_bubble_receive_single;
 
-    public static final int WAITING_ICON_RES = R.drawable.msg_waiting_contact;
-    public static final int UNREAD_ICON_RES = R.drawable.msg_unread_contact;
-    public static final int READ_ICON_RES = R.drawable.msg_read_contact;
+    public static final int DELIVERY_WAITING_RES = R.drawable.msg_waiting_contact;
+    public static final int DELIVERY_UNREAD_RES = R.drawable.msg_unread_contact;
+    public static final int DELIVERY_READ_RES = R.drawable.msg_read_contact;
 }

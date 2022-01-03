@@ -11,13 +11,14 @@ import android.os.IBinder;
 
 import androidx.annotation.Nullable;
 
-import com.hyapp.achat.bl.socket.IOSocket;
-import com.hyapp.achat.bl.socket.PeopleApi;
+import com.hyapp.achat.da.socket.ChatRepo;
+import com.hyapp.achat.da.socket.IOSocket;
+import com.hyapp.achat.da.socket.PeopleRepo;
 import com.hyapp.achat.bl.utils.NetUtils;
 import com.hyapp.achat.bl.utils.NotifUtils;
 import com.hyapp.achat.da.LoginPreferences;
 import com.hyapp.achat.model.ConnLive;
-import com.hyapp.achat.model.event.Event;
+import com.hyapp.achat.model.event.ActionEvent;
 import com.hyapp.achat.model.event.MessageEvent;
 
 import org.greenrobot.eventbus.EventBus;
@@ -94,16 +95,16 @@ public class SocketService extends Service {
     };
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onRequestPeople(Event event) {
-        if (event.action == Event.ACTION_REQUEST_PEOPLE) {
-            PeopleApi.singleton().requestPeople(ioSocket.getSocket());
+    public void onRequestPeople(ActionEvent event) {
+        if (event.action == ActionEvent.ACTION_REQUEST_PEOPLE) {
+            PeopleRepo.singleton().requestPeople(ioSocket.getSocket());
         }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onSendPvMessage(MessageEvent event) {
         if (event.action == MessageEvent.ACTION_SEND) {
-            ioSocket.chatApi.sendPvMessage(event.getJson());
+            ChatRepo.INSTANCE.sendPvMessage(ioSocket.getSocket(), event.getJson());
         }
     }
 }

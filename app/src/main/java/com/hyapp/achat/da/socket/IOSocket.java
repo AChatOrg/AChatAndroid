@@ -1,4 +1,4 @@
-package com.hyapp.achat.bl.socket;
+package com.hyapp.achat.da.socket;
 
 import com.hyapp.achat.Config;
 import com.hyapp.achat.model.ConnLive;
@@ -12,9 +12,7 @@ import io.socket.emitter.Emitter;
 public class IOSocket {
 
     private Socket socket;
-    public LoginApi loginApi;
-    public ChatApi chatApi;
-
+    public LoginRepo loginRepo;
     public Socket getSocket() {
         return socket;
     }
@@ -41,16 +39,15 @@ public class IOSocket {
     }
 
     private void createApis() {
-        loginApi = new LoginApi(socket);
-        chatApi = new ChatApi(socket);
+        loginRepo = new LoginRepo(socket);
     }
 
     private void listen() {
         socket.on(Config.ON_DISCONNECT, onDisconnect);
         socket.on(Config.ON_CONNECT, onConnect);
-        loginApi.listen();
-        chatApi.listen();
-        PeopleApi.singleton().listen(socket);
+        loginRepo.listen();
+        PeopleRepo.singleton().listen(socket);
+        ChatRepo.INSTANCE.listen(socket);
     }
 
     private final Emitter.Listener onDisconnect = args -> {

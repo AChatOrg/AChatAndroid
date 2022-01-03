@@ -11,7 +11,7 @@ import com.aghajari.rlottie.AXrLottie;
 import com.aghajari.rlottie.AXrLottieImageView;
 import com.hyapp.achat.ui.emojiview.iosprovider.AXIOSEmojiProvider;
 import com.facebook.drawee.backends.pipeline.Fresco;
-import com.hyapp.achat.da.ObjectBox;
+import com.hyapp.achat.da.objectbox.ObjectBox;
 import com.hyapp.achat.ui.emojiview.AXEmojiManager;
 import com.hyapp.achat.ui.emojiview.listener.StickerViewCreatorListener;
 import com.hyapp.achat.ui.emojiview.sticker.StickerCategory;

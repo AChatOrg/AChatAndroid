@@ -1,4 +1,4 @@
-package com.hyapp.achat.bl.socket;
+package com.hyapp.achat.da.socket;
 
 import androidx.lifecycle.MutableLiveData;
 
@@ -16,13 +16,13 @@ import java.util.List;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 
-public class PeopleApi {
+public class PeopleRepo {
 
-    private static PeopleApi instance;
+    private static PeopleRepo instance;
 
-    public static PeopleApi singleton() {
+    public static PeopleRepo singleton() {
         if (instance == null) {
-            instance = new PeopleApi();
+            instance = new PeopleRepo();
         }
         return instance;
     }
@@ -30,7 +30,7 @@ public class PeopleApi {
     private final MutableLiveData<Resource<SortedList<People>>> peopleLive;
 
 
-    public PeopleApi() {
+    public PeopleRepo() {
         peopleLive = new MutableLiveData<>();
     }
 

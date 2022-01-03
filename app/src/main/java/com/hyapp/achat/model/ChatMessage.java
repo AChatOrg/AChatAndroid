@@ -31,7 +31,7 @@ public abstract class ChatMessage extends com.hyapp.achat.model.Message {
         this.bubbleRes = MessageUtils.BUBBLE_RES_SEND_START;
         if (transferType == com.hyapp.achat.model.Message.TRANSFER_TYPE_SEND) {
             delivery = DELIVERY_WAITING;
-            deliveryRes = MessageUtils.WAITING_ICON_RES;
+            deliveryRes = MessageUtils.DELIVERY_WAITING_RES;
         }
         this.uid = uid;
         this.sender = sender;
@@ -43,13 +43,13 @@ public abstract class ChatMessage extends com.hyapp.achat.model.Message {
         this.delivery = delivery;
         switch (delivery) {
             case DELIVERY_WAITING:
-                deliveryRes = MessageUtils.WAITING_ICON_RES;
+                deliveryRes = MessageUtils.DELIVERY_WAITING_RES;
                 break;
             case DELIVERY_UNREAD:
-                deliveryRes = MessageUtils.UNREAD_ICON_RES;
+                deliveryRes = MessageUtils.DELIVERY_UNREAD_RES;
                 break;
             case DELIVERY_READ:
-                deliveryRes = MessageUtils.READ_ICON_RES;
+                deliveryRes = MessageUtils.DELIVERY_READ_RES;
                 break;
         }
     }

@@ -1,4 +1,4 @@
-package com.hyapp.achat.da
+package com.hyapp.achat.da.objectbox
 
 import android.content.Context
 import com.hyapp.achat.model.MyObjectBox

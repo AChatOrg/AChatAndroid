@@ -1,4 +1,4 @@
-package com.hyapp.achat.bl.socket;
+package com.hyapp.achat.da.socket;
 
 import com.google.gson.GsonBuilder;
 import com.hyapp.achat.Config;
@@ -14,11 +14,11 @@ import org.greenrobot.eventbus.EventBus;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 
-public class LoginApi {
+public class LoginRepo {
 
     private final Socket socket;
 
-    public LoginApi(Socket socket) {
+    public LoginRepo(Socket socket) {
         this.socket = socket;
     }
 

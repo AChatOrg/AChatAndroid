@@ -21,7 +21,7 @@ class ChatViewModel : ViewModel() {
         val message = TextMessage(Message.TRANSFER_TYPE_SEND, System.currentTimeMillis(), UUID.randomUUID().toString(), CurrentUserLive.value
                 ?: Contact(), receiverId, text.toString(), textSizeUnit)
         val json = GsonBuilder()
-                .registerTypeAdapter(Message::class.java, InterfaceAdapter<Message>())
+                .registerTypeAdapter(TextMessage::class.java, InterfaceAdapter<TextMessage>())
                 .excludeFieldsWithoutExposeAnnotation()
                 .create()
                 .toJson(message)

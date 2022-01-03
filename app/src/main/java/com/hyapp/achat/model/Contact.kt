@@ -4,9 +4,12 @@ import android.os.Bundle
 import android.view.View
 import com.google.gson.annotations.Expose
 import com.hyapp.achat.bl.utils.TimeUtils
+import com.hyapp.achat.model.utils.MessageUtils
 import com.hyapp.achat.model.utils.PersonUtils
 import io.objectbox.annotation.Entity
 import io.objectbox.annotation.Id
+import io.objectbox.annotation.Index
+import io.objectbox.annotation.Unique
 
 @Entity
 class Contact : People {
@@ -14,6 +17,7 @@ class Contact : People {
     companion object {
         const val EXTRA_TYPE = "type"
         const val EXTRA_ONLINE_TIME = "onlineTime"
+        const val EXTRA_MESSAGE = "message"
         const val EXTRA_MESSAGE_TIME = "messageTime"
         const val EXTRA_MESSAGE_DELIVERY = "messageDelivery"
         const val EXTRA_NOTIF_COUNT = "notifCount"
@@ -35,6 +39,8 @@ class Contact : People {
     @Expose
     var type: Byte = TYPE_SINGLE
 
+    @Index
+    @Unique
     @Expose
     var uid: String = ""
 
@@ -49,17 +55,27 @@ class Contact : People {
 
     @Expose
     var onlineTime: Long = TIME_ONLINE
+
+    var message: String = ""
+    var messageTime: Long = -1
         set(value) {
             field = value
-            setupOnlineTime(ONLINE_TYPE_CONTACT)
+            setupMessageTime()
         }
-    var messageTime: Long = -1
     var messageDelivery: Byte = ChatMessage.DELIVERY_HIDDEN
+        set(value) {
+            field = value
+            setupMessageDelivery()
+        }
     var notifCount: String? = null
     var mediaMessagePath: String? = null
+    var onlineTimeStr: String = ""
 
     @Transient
-    var onlineTimeStr: String = ""
+    var messageTimeStr: String = ""
+
+    @Transient
+    var messageDeliveryRes: Int = MessageUtils.DELIVERY_WAITING_RES
 
     @Transient
     var onlineTimeRes: Int = PersonUtils.LAST_ONLINE_CONTACT_BG_RES_GREY
@@ -76,6 +92,7 @@ class Contact : People {
                 key: Key = Key(),
                 avatars: Array<String?> = emptyArray(),
                 onlineTime: Long = 0,
+                message: String = "",
                 messageTime: Long = 0,
                 messageDelivery: Byte = ChatMessage.DELIVERY_HIDDEN,
                 notifCount: String? = null,
@@ -87,6 +104,7 @@ class Contact : People {
         this.score = key.score
         this.loginTime = key.loginTime
         this.onlineTime = onlineTime
+        this.message = message
         this.messageTime = messageTime
         this.messageDelivery = messageDelivery
         this.notifCount = notifCount
@@ -96,6 +114,8 @@ class Contact : People {
     init {
         setupRank(rank)
         setupOnlineTime(ONLINE_TYPE_CONTACT)
+        setupMessageTime()
+        setupMessageDelivery()
     }
 
     constructor(people: People, onlineTime: Long) : this(
@@ -116,6 +136,7 @@ class Contact : People {
         super.key = null
         type = bundle.getByte(EXTRA_TYPE)
         onlineTime = bundle.getLong(EXTRA_ONLINE_TIME)
+        message = bundle.getString(EXTRA_MESSAGE) ?: ""
         messageTime = bundle.getLong(EXTRA_MESSAGE_TIME)
         messageDelivery = bundle.getByte(EXTRA_MESSAGE_DELIVERY)
         notifCount = bundle.getString(EXTRA_NOTIF_COUNT)
@@ -128,6 +149,7 @@ class Contact : People {
                 putParcelable(EXTRA_KEY, Key(uid, rank, score, loginTime))
                 putByte(EXTRA_TYPE, type)
                 putLong(EXTRA_ONLINE_TIME, onlineTime)
+                putString(EXTRA_MESSAGE, message)
                 putLong(EXTRA_MESSAGE_TIME, messageTime)
                 putByte(EXTRA_MESSAGE_DELIVERY, messageDelivery)
                 putString(EXTRA_NOTIF_COUNT, notifCount)
@@ -150,6 +172,18 @@ class Contact : People {
                 ONLINE_TYPE_CHAT -> onlineTimeRes = PersonUtils.LAST_ONLINE_CHAT_BG_RES_GREY
                 ONLINE_TYPE_PROFILE -> onlineTimeRes = PersonUtils.LAST_ONLINE_PROFILE_BG_RES_GREY
             }
+        }
+    }
+
+    fun setupMessageTime() {
+        messageTimeStr = TimeUtils.millis2DayTime(messageTime)
+    }
+
+    fun setupMessageDelivery() {
+        when (messageDelivery) {
+            ChatMessage.DELIVERY_READ -> messageDeliveryRes = MessageUtils.DELIVERY_READ_RES
+            ChatMessage.DELIVERY_UNREAD -> messageDeliveryRes = MessageUtils.DELIVERY_UNREAD_RES
+            ChatMessage.DELIVERY_WAITING -> messageDeliveryRes = MessageUtils.DELIVERY_WAITING_RES
         }
     }
 }

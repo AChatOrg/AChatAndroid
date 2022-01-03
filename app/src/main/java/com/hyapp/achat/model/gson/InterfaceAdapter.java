@@ -1,5 +1,6 @@
 package com.hyapp.achat.model.gson;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -10,7 +11,15 @@ import com.google.gson.JsonSerializer;
 
 import java.lang.reflect.Type;
 
-final public class InterfaceAdapter<T> implements JsonSerializer<T>, JsonDeserializer<T> {
+public class InterfaceAdapter<T> implements JsonSerializer<T>, JsonDeserializer<T> {
+
+    @Override
+    public JsonElement serialize(T src, Type typeOfSrc, JsonSerializationContext context) {
+        final JsonObject wrapper = new JsonObject();
+        wrapper.addProperty("type", src.getClass().getName());
+        wrapper.add("data", new Gson().toJsonTree(src, typeOfSrc));
+        return wrapper;
+    }
 
     @Override
     public T deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
@@ -19,14 +28,6 @@ final public class InterfaceAdapter<T> implements JsonSerializer<T>, JsonDeseria
         final JsonElement data = get(wrapper, "data");
         final Type actualType = typeForName(typeName);
         return context.deserialize(data, actualType);
-    }
-
-    @Override
-    public JsonElement serialize(T src, Type typeOfSrc, JsonSerializationContext context) {
-        final JsonObject wrapper = new JsonObject();
-        wrapper.addProperty("type", src.getClass().getName());
-        wrapper.add("data", context.serialize(src));
-        return wrapper;
     }
 
     private Type typeForName(final JsonElement typeElem) {

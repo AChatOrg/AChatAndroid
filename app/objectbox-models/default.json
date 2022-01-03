@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "1:7499101650816396696",
-      "lastPropertyId": "15:7805158805110346611",
+      "lastPropertyId": "17:6471763317147967128",
       "name": "Contact",
       "properties": [
         {
@@ -37,7 +37,9 @@
         {
           "id": "6:3010526955655070355",
           "name": "uid",
-          "type": 9
+          "indexId": "1:6287944330159118796",
+          "type": 9,
+          "flags": 2080
         },
         {
           "id": "7:1845830432610862867",
@@ -83,13 +85,23 @@
           "id": "15:7805158805110346611",
           "name": "type",
           "type": 2
+        },
+        {
+          "id": "16:841596017538870154",
+          "name": "message",
+          "type": 9
+        },
+        {
+          "id": "17:6471763317147967128",
+          "name": "onlineTimeStr",
+          "type": 9
         }
       ],
       "relations": []
     }
   ],
   "lastEntityId": "1:7499101650816396696",
-  "lastIndexId": "0:0",
+  "lastIndexId": "1:6287944330159118796",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
   "modelVersion": 5,
