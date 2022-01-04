@@ -6,6 +6,7 @@ import androidx.annotation.Nullable;
 public class Resource<T> {
 
     public static final int INDEX_ALL = -1;
+    public static final int INDEX_NEW = -2;
 
     @NonNull
     public final Status status;

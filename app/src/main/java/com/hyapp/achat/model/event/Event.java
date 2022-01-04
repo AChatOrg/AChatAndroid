@@ -10,7 +10,7 @@ public abstract class Event {
     public static final String MSG_ERROR = "error";
 
     public transient Status status;
-    public transient String message;
+    public transient String msg;
     public transient byte action;
 
     public Event() {
@@ -24,9 +24,9 @@ public abstract class Event {
         this.action = action;
     }
 
-    public Event(Status status, String message) {
+    public Event(Status status, String msg) {
         this.status = status;
-        this.message = message;
+        this.msg = msg;
     }
 
     public Event(Status status, byte action) {
@@ -34,9 +34,9 @@ public abstract class Event {
         this.action = action;
     }
 
-    public Event(Status status, String message, byte action) {
+    public Event(Status status, String msg, byte action) {
         this.status = status;
-        this.message = message;
+        this.msg = msg;
         this.action = action;
     }
 }

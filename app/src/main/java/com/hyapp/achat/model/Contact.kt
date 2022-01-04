@@ -112,7 +112,7 @@ class Contact : People {
     }
 
     init {
-        setupRank(rank)
+        setupRank()
         setupOnlineTime(ONLINE_TYPE_CONTACT)
         setupMessageTime()
         setupMessageDelivery()
@@ -156,6 +156,20 @@ class Contact : People {
                 putString(EXTRA_MEDIA_MESSAGE_PATH, mediaMessagePath)
             }
         }
+
+    fun setupAll() {
+        setupGenderCircleRes()
+        setupRank()
+        setupOnlineTime(ONLINE_TYPE_CONTACT)
+        setupMessageTime()
+        setupMessageDelivery()
+    }
+
+    override fun setupRank() {
+        val pair = PersonUtils.rankInt2rankStrResAndColor(rank)
+        rankStrRes = pair.first
+        rankColor = pair.second
+    }
 
     fun setupOnlineTime(type: Byte) {
         if (onlineTime == TIME_ONLINE) {

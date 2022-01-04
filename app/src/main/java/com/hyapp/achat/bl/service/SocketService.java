@@ -104,7 +104,7 @@ public class SocketService extends Service {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onSendPvMessage(MessageEvent event) {
         if (event.action == MessageEvent.ACTION_SEND) {
-            ChatRepo.INSTANCE.sendPvMessage(ioSocket.getSocket(), event.getJson());
+            ChatRepo.INSTANCE.sendPvMessage(ioSocket.getSocket(), event);
         }
     }
 }

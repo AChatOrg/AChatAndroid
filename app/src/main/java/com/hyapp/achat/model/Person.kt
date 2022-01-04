@@ -16,14 +16,14 @@ abstract class Person {
     var gender: Byte = GENDER_MALE
         set(value) {
             field = value
-            setupGenderCircleRes(field)
+            setupGenderCircleRes()
         }
 
     @Transient
     var genderCircleRes: Int = PersonUtils.GENDER_PEOPLE_CIRCLE_MALE_BG_RES
 
     init {
-        setupGenderCircleRes(gender)
+        setupGenderCircleRes()
     }
 
     constructor(name: String = "", bio: String? = null, gender: Byte = GENDER_MALE) {
@@ -47,7 +47,7 @@ abstract class Person {
             }
         }
 
-    fun setupGenderCircleRes(gender: Byte) {
+    fun setupGenderCircleRes() {
         when (gender) {
             GENDER_MALE -> genderCircleRes = PersonUtils.GENDER_PEOPLE_CIRCLE_MALE_BG_RES
             GENDER_FEMALE -> genderCircleRes = PersonUtils.GENDER_PEOPLE_CIRCLE_FEMALE_BG_RES

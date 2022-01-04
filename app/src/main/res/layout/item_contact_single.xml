@@ -29,9 +29,9 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:placeholderImage="@drawable/avatar_54"
             app:placeholderImageScaleType="centerCrop"
-            app:roundAsCircle="true"
-            tools:placeholderImage="@drawable/avatar_54" />
+            app:roundAsCircle="true" />
 
         <TextView
             android:id="@+id/onlineTime"

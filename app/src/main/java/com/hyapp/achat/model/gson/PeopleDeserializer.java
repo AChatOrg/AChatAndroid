@@ -13,8 +13,8 @@ public class PeopleDeserializer implements JsonDeserializer<People> {
     @Override
     public People deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         People people = new Gson().fromJson(json, typeOfT);
-        people.setupGenderCircleRes(people.getGender());
-        people.setupRank(people.getKey());
+        people.setupGenderCircleRes();
+        people.setupRank();
         return people;
     }
 }

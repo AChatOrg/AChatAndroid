@@ -13,8 +13,9 @@ open class People : Person {
     var key: Key? = null
         set(value) {
             field = value
-            setupRank(field)
+            setupRank()
         }
+
     @Expose
     var avatars: Array<String?> = emptyArray()
 
@@ -35,7 +36,7 @@ open class People : Person {
     }
 
     init {
-        setupRank(key)
+        setupRank()
     }
 
     constructor(bundle: Bundle) : super(bundle) {
@@ -51,16 +52,12 @@ open class People : Person {
             }
         }
 
-    fun setupRank(key: Key?) {
+    open fun setupRank() {
         key?.let {
-            setupRank(it.rank)
+            val pair = PersonUtils.rankInt2rankStrResAndColor(it.rank)
+            rankStrRes = pair.first
+            rankColor = pair.second
         }
-    }
-
-    fun setupRank(rank: Byte) {
-        val pair = PersonUtils.rankInt2rankStrResAndColor(rank)
-        rankStrRes = pair.first
-        rankColor = pair.second
     }
 
     companion object {

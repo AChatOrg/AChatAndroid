@@ -12,6 +12,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.android.material.tabs.TabLayout;
 import com.hyapp.achat.R;
@@ -19,15 +20,21 @@ import com.hyapp.achat.bl.MainViewModel;
 import com.hyapp.achat.bl.permissions.Permissions;
 import com.hyapp.achat.databinding.ActivityMainBinding;
 import com.hyapp.achat.model.ConnLive;
+import com.hyapp.achat.model.Contact;
 import com.hyapp.achat.model.Resource;
+import com.hyapp.achat.ui.adapter.ContactAdapter;
 import com.hyapp.achat.ui.fragment.GroupsFragment;
 import com.hyapp.achat.ui.fragment.PeopleFragment;
 import com.hyapp.achat.ui.model.AbstractTabSelectedListener;
+
+import java.util.List;
 
 public class MainActivity extends EventActivity {
 
     private MainViewModel viewModel;
     private ActivityMainBinding binding;
+
+    private ContactAdapter contactAdapter;
 
     private int peopleSize = 0, groupsSize = 0;
 
@@ -36,6 +43,8 @@ public class MainActivity extends EventActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         init();
+        setupContacts();
+        observeContacts();
         setupPeopleGroups();
         observePeopleGroupsSize();
         observeConnectivity();
@@ -59,6 +68,28 @@ public class MainActivity extends EventActivity {
         viewModel = new ViewModelProvider(this).get(MainViewModel.class);
         viewModel.init();
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+    }
+
+    private void setupContacts() {
+        binding.recyclerView.setHasFixedSize(true);
+        binding.recyclerView.setItemAnimator(null);
+        binding.recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        contactAdapter = new ContactAdapter(this);
+        binding.recyclerView.setAdapter(contactAdapter);
+    }
+
+    private void observeContacts() {
+        viewModel.getContactsLive().observe(this, resource -> {
+            if (resource.status == Resource.Status.SUCCESS) {
+                if (resource.action == Resource.Action.ADD) {
+                    if (resource.index == Resource.INDEX_ALL) {
+                        contactAdapter.resetList(resource.data);
+                    } else {
+                        contactAdapter.putFirst(resource.data, resource.index);
+                    }
+                }
+            }
+        });
     }
 
     private void setupPeopleGroups() {

@@ -1,5 +1,6 @@
 package com.hyapp.achat.ui.adapter
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -13,13 +14,14 @@ import com.facebook.drawee.view.SimpleDraweeView
 import com.hyapp.achat.R
 import com.hyapp.achat.databinding.ItemContactGroupBinding
 import com.hyapp.achat.databinding.ItemContactSingleBinding
-import com.hyapp.achat.model.ChatMessage
-import com.hyapp.achat.model.Contact
+import com.hyapp.achat.model.*
 import java.lang.RuntimeException
 import java.util.*
 
-class ContactAdapter(private val context: Context, private val contacts: LinkedList<Contact>)
+class ContactAdapter(private val context: Context)
     : RecyclerView.Adapter<ContactAdapter.Holder>() {
+
+    private var contacts: List<Contact> = LinkedList()
 
     override fun getItemViewType(position: Int): Int {
         return contacts[position].type.toInt()
@@ -45,6 +47,22 @@ class ContactAdapter(private val context: Context, private val contacts: LinkedL
 
     override fun getItemCount(): Int {
         return contacts.size
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun resetList(list: List<Contact>) {
+        contacts = list
+        notifyDataSetChanged()
+    }
+
+    fun putFirst(list: List<Contact>, oldIndex: Int) {
+        contacts = list
+        if (oldIndex == Resource.INDEX_NEW) {
+            notifyItemInserted(0)
+        } else {
+            notifyItemChanged(oldIndex)
+            notifyItemMoved(oldIndex, 0)
+        }
     }
 
     open class Holder(view: View) : RecyclerView.ViewHolder(view) {

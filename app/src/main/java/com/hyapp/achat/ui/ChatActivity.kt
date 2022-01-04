@@ -5,9 +5,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
-import android.net.Uri
 import android.os.Bundle
-import android.os.Parcelable
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.MotionEvent
@@ -22,7 +20,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.aghajari.rlottie.AXrLottieDrawable
 import com.hyapp.achat.R
 import com.hyapp.achat.bl.ChatViewModel
-import com.hyapp.achat.bl.utils.TimeUtils
 import com.hyapp.achat.databinding.ActivityChatBinding
 import com.hyapp.achat.model.*
 import com.hyapp.achat.model.event.MessageEvent
@@ -81,8 +78,8 @@ class ChatActivity : EventActivity() {
     private fun init() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_chat)
         contact = Contact(intent.extras ?: Bundle())
-        viewModel = ViewModelProvider(this).get(ChatViewModel::class.java)
-        viewModel.init(contact.uid)
+        viewModel = ViewModelProvider(this)[ChatViewModel::class.java]
+        viewModel.init(contact)
     }
 
     private fun setupContact() {
@@ -101,7 +98,7 @@ class ChatActivity : EventActivity() {
         }
         messageAdapter.add(ProfileMessage(contact).apply {
             contact.setupOnlineTime(Contact.ONLINE_TYPE_PROFILE)
-            contact.setupRank(contact.rank)
+            contact.setupRank()
         })
     }
 
@@ -317,7 +314,7 @@ class ChatActivity : EventActivity() {
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onReceiveMessage(event: MessageEvent) {
         if (event.action == MessageEvent.ACTION_RECEIVE) {
-            val message = viewModel.setupAndGetReceiveMessage(event.json)
+            val message = viewModel.setupAndGetReceiveMessage(event.msg)
             messageAdapter.addAndScroll(message, binding.recyclerView)
         }
     }

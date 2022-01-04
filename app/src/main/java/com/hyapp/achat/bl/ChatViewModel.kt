@@ -11,21 +11,16 @@ import java.util.*
 
 class ChatViewModel : ViewModel() {
 
-    private lateinit var receiverId: String
+    private lateinit var receiver: Contact
 
-    fun init(receiverId: String) {
-        this.receiverId = receiverId
+    fun init(receiver: Contact) {
+        this.receiver = receiver
     }
 
     fun sendAndGetPvTextMessage(text: CharSequence, textSizeUnit: Int): Message {
         val message = TextMessage(Message.TRANSFER_TYPE_SEND, System.currentTimeMillis(), UUID.randomUUID().toString(), CurrentUserLive.value
-                ?: Contact(), receiverId, text.toString(), textSizeUnit)
-        val json = GsonBuilder()
-                .registerTypeAdapter(TextMessage::class.java, InterfaceAdapter<TextMessage>())
-                .excludeFieldsWithoutExposeAnnotation()
-                .create()
-                .toJson(message)
-        EventBus.getDefault().post(MessageEvent(json, MessageEvent.ACTION_SEND))
+                ?: Contact(), receiver.uid, text.toString(), textSizeUnit)
+        EventBus.getDefault().post(MessageEvent(message, MessageEvent.ACTION_SEND, receiver))
         return message
     }
 

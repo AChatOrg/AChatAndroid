@@ -36,7 +36,7 @@ public abstract class ChatMessage extends com.hyapp.achat.model.Message {
         this.uid = uid;
         this.sender = sender;
         this.receiverId = receiverId;
-        setTime(timeMillis);
+        setupTime(timeMillis);
     }
 
     public void setDelivery(byte delivery) {
@@ -82,7 +82,7 @@ public abstract class ChatMessage extends com.hyapp.achat.model.Message {
         return time;
     }
 
-    public void setTime(long timeMillis) {
+    public void setupTime(long timeMillis) {
         setTimeMillis(timeMillis);
         this.time = TimeUtils.millis2DayTime(timeMillis);
     }

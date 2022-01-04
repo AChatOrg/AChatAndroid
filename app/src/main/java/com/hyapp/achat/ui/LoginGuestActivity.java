@@ -130,7 +130,7 @@ public class LoginGuestActivity extends EventActivity {
                     onSuccess(event.getPeople());
                     break;
                 case ERROR:
-                    onError(event.message);
+                    onError(event.msg);
                     break;
                 case LOADING:
                     onLoading();

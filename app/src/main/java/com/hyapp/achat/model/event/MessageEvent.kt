@@ -1,7 +1,10 @@
 package com.hyapp.achat.model.event
 
+import com.hyapp.achat.model.Contact
+import com.hyapp.achat.model.Message
 
-class MessageEvent(var json: String, action: Byte) : Event(action) {
+
+class MessageEvent(var message: Message, action: Byte, var receiver: Contact? = null) : Event(action) {
 
     companion object {
         const val ACTION_SEND: Byte = 1

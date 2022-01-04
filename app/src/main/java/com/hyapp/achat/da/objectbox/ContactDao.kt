@@ -26,7 +26,9 @@ object ContactDao {
 
     @JvmStatic
     val all: List<Contact>
-        get() = ObjectBox.store.boxFor(Contact::class.java).all
+        get() = ObjectBox.store.boxFor(Contact::class.java).query()
+                .order(Contact_.messageTime, QueryBuilder.DESCENDING)
+                .build().find()
 
     @JvmStatic
     fun remove(contact: Contact): Boolean {

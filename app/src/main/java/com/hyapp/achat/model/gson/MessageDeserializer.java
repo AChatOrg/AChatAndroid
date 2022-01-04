@@ -18,7 +18,7 @@ public class MessageDeserializer implements JsonDeserializer<Message> {
                 .create()
                 .fromJson(json, typeOfT);
         if (message instanceof ChatMessage) {
-            ((ChatMessage) message).setTime(message.getTimeMillis());
+            ((ChatMessage) message).setupTime(message.getTimeMillis());
         }
         return message;
     }
