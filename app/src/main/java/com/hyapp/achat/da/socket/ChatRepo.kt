@@ -26,7 +26,6 @@ object ChatRepo {
     fun sendPvMessage(socket: Socket, event: MessageEvent) {
         val json = GsonBuilder()
                 .registerTypeAdapter(TextMessage::class.java, InterfaceAdapter<TextMessage>())
-                .excludeFieldsWithoutExposeAnnotation()
                 .create()
                 .toJson(event.message)
 
@@ -47,12 +46,12 @@ object ChatRepo {
                 }
         if (message is ChatMessage) {
             val contact = ContactDao.get(message.sender.uid) ?: message.sender
+            contact.messageDelivery = ChatMessage.DELIVERY_HIDDEN
             setupAndPutContact(contact, message)
         }
     }
 
     private fun setupAndPutContact(contact: Contact, message: ChatMessage) {
-        contact.setupAll()
         contact.messageTime = message.timeMillis
         if (message is TextMessage) {
             contact.message = message.text
@@ -72,12 +71,9 @@ object ChatRepo {
                 break
             }
         }
-        if (oldIndex == Resource.INDEX_NEW) {
-            list.add(0, contact)
-        } else {
-            list[oldIndex] = contact
-            Collections.swap(list, oldIndex, 0)
-        }
+        if (oldIndex != Resource.INDEX_NEW)
+            list.removeAt(oldIndex)
+        list.add(0, contact)
         return oldIndex
     }
 

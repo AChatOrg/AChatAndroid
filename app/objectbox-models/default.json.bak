@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "1:7499101650816396696",
-      "lastPropertyId": "15:7805158805110346611",
+      "lastPropertyId": "17:6471763317147967128",
       "name": "Contact",
       "properties": [
         {
@@ -85,6 +85,16 @@
           "id": "15:7805158805110346611",
           "name": "type",
           "type": 2
+        },
+        {
+          "id": "16:841596017538870154",
+          "name": "message",
+          "type": 9
+        },
+        {
+          "id": "17:6471763317147967128",
+          "name": "onlineTimeStr",
+          "type": 9
         }
       ],
       "relations": []

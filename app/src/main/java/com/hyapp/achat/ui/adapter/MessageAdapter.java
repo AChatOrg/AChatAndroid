@@ -3,6 +3,7 @@ package com.hyapp.achat.ui.adapter;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.text.format.DateUtils;
+import android.util.Pair;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,14 +17,18 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.aghajari.rlottie.AXrLottieImageView;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.hyapp.achat.R;
+import com.hyapp.achat.bl.utils.TimeUtils;
 import com.hyapp.achat.model.ChatMessage;
 import com.hyapp.achat.model.Contact;
 import com.hyapp.achat.model.DetailsMessage;
+import com.hyapp.achat.model.Key;
 import com.hyapp.achat.model.LottieMessage;
 import com.hyapp.achat.model.Message;
+import com.hyapp.achat.model.People;
 import com.hyapp.achat.model.ProfileMessage;
 import com.hyapp.achat.model.TextMessage;
 import com.hyapp.achat.model.utils.MessageUtils;
+import com.hyapp.achat.model.utils.PersonUtils;
 import com.hyapp.achat.ui.emojiview.view.AXEmojiTextView;
 import com.hyapp.achat.ui.model.GroupAvatarView;
 import com.hyapp.achat.ui.utils.UiUtils;
@@ -233,13 +238,13 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.Holder> 
     public static class SingleProfileHolder extends ProfileHolder {
 
         private final GroupAvatarView avatar;
-        private final TextView rank, lastOnline;
+        private final TextView rank, onlineTime;
 
         public SingleProfileHolder(@NonNull View itemView) {
             super(itemView);
             avatar = itemView.findViewById(R.id.avatar);
             rank = itemView.findViewById(R.id.rank);
-            lastOnline = itemView.findViewById(R.id.lastOnline);
+            onlineTime = itemView.findViewById(R.id.lastOnline);
         }
 
         @Override
@@ -250,15 +255,22 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.Holder> 
             if (profileMessage.getContact().getType() == Contact.TYPE_SINGLE) {
                 String[] avatars = contact.getAvatars();
                 avatar.setAvatars(avatars.length > 0 ? avatars[0] : null);
-                lastOnline.setText(contact.getOnlineTimeStr());
-                lastOnline.setBackgroundResource(contact.getOnlineTimeRes());
-                lastOnline.setVisibility(View.VISIBLE);
+                if (contact.getOnlineTime() == Contact.TIME_ONLINE) {
+                    onlineTime.setText("");
+                    onlineTime.setBackgroundResource(R.drawable.last_online_profile_bg_green);
+                } else {
+                    onlineTime.setText(TimeUtils.timeAgoShort(System.currentTimeMillis() - contact.getOnlineTime()));
+                    onlineTime.setBackgroundResource(R.drawable.last_online_profile_bg_grey);
+                }
+                onlineTime.setVisibility(View.VISIBLE);
             } else {
                 avatar.setAvatars(contact.getAvatars());
-                lastOnline.setVisibility(View.GONE);
+                onlineTime.setVisibility(View.GONE);
             }
-            rank.setTextColor(contact.getRankColor());
-            rank.setText(contact.getRankStrRes());
+
+            Pair<Integer, Integer> pair = PersonUtils.rankInt2rankStrResAndColor(contact.getRank());
+            rank.setText(pair.first);
+            rank.setTextColor(pair.second);
         }
     }
 

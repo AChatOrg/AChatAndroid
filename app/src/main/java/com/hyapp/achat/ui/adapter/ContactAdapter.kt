@@ -12,9 +12,12 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.drawee.view.SimpleDraweeView
 import com.hyapp.achat.R
+import com.hyapp.achat.bl.utils.TimeUtils
 import com.hyapp.achat.databinding.ItemContactGroupBinding
 import com.hyapp.achat.databinding.ItemContactSingleBinding
 import com.hyapp.achat.model.*
+import com.hyapp.achat.model.utils.MessageUtils
+import com.hyapp.achat.model.utils.PersonUtils
 import java.lang.RuntimeException
 import java.util.*
 
@@ -57,17 +60,16 @@ class ContactAdapter(private val context: Context)
 
     fun putFirst(list: List<Contact>, oldIndex: Int) {
         contacts = list
-        if (oldIndex == Resource.INDEX_NEW) {
-            notifyItemInserted(0)
-        } else {
-            notifyItemChanged(oldIndex)
-            notifyItemMoved(oldIndex, 0)
+        if (oldIndex != Resource.INDEX_NEW) {
+            notifyItemRemoved(oldIndex)
         }
+        notifyItemInserted(0)
     }
 
     open class Holder(view: View) : RecyclerView.ViewHolder(view) {
         private val media: SimpleDraweeView = view.findViewById(R.id.media)
         private val messageDelivery: ImageView = view.findViewById(R.id.messageDelivery)
+        private val messageTime: TextView = view.findViewById(R.id.time)
         private val notif: TextView = view.findViewById(R.id.notif)
 
         open fun bind(contact: Contact) {
@@ -79,11 +81,17 @@ class ContactAdapter(private val context: Context)
                 media.visibility = View.GONE
             }
 
+            messageTime.text = TimeUtils.millis2DayTime(contact.messageTime)
+
             if (contact.messageDelivery == ChatMessage.DELIVERY_HIDDEN) {
                 messageDelivery.visibility = View.GONE
             } else {
                 messageDelivery.visibility = View.VISIBLE
-                messageDelivery.setImageResource(contact.messageDeliveryRes)
+                when (contact.messageDelivery) {
+                    ChatMessage.DELIVERY_READ -> messageDelivery.setImageResource(R.drawable.msg_read_contact)
+                    ChatMessage.DELIVERY_UNREAD -> messageDelivery.setImageResource(R.drawable.msg_unread_contact)
+                    ChatMessage.DELIVERY_WAITING -> messageDelivery.setImageResource(R.drawable.msg_waiting_contact)
+                }
             }
 
             notif.visibility = if (contact.notifCount == null) View.GONE else View.VISIBLE
@@ -103,7 +111,14 @@ class ContactAdapter(private val context: Context)
             val avatars = contact.avatars
             binding.avatarDraweeView.setImageURI(if (avatars.isNotEmpty()) avatars[0] else null)
 
-            binding.onlineTime.setBackgroundResource(contact.onlineTimeRes)
+
+            if (contact.onlineTime == Contact.TIME_ONLINE) {
+                binding.onlineTime.text = ""
+                binding.onlineTime.setBackgroundResource(R.drawable.last_online_contact_bg_green)
+            } else {
+                binding.onlineTime.text = TimeUtils.timeAgoShort(System.currentTimeMillis() - contact.onlineTime)
+                binding.onlineTime.setBackgroundResource(R.drawable.last_online_contact_bg_grey)
+            }
         }
     }
 

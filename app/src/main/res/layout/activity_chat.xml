@@ -21,7 +21,7 @@
             app:placeholderCircle="@drawable/avatar_group_38" />
 
         <TextView
-            android:id="@+id/lastOnline"
+            android:id="@+id/onlineTime"
             android:layout_width="wrap_content"
             android:layout_height="14dp"
             android:layout_marginEnd="-1dp"

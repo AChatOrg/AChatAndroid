@@ -27,61 +27,25 @@ class Contact : People {
         const val TYPE_GROUP: Byte = 2
 
         const val TIME_ONLINE: Long = 0
-
-        const val ONLINE_TYPE_CONTACT: Byte = 1
-        const val ONLINE_TYPE_CHAT: Byte = 2
-        const val ONLINE_TYPE_PROFILE: Byte = 3
     }
 
     @Id
     var id: Long = 0
-
-    @Expose
     var type: Byte = TYPE_SINGLE
 
     @Index
     @Unique
-    @Expose
     var uid: String = ""
-
-    @Expose
     var rank: Byte = 0
-
-    @Expose
     var score: Int = 0
-
-    @Expose
     var loginTime: Long = 0
 
-    @Expose
     var onlineTime: Long = TIME_ONLINE
-
     var message: String = ""
     var messageTime: Long = -1
-        set(value) {
-            field = value
-            setupMessageTime()
-        }
     var messageDelivery: Byte = ChatMessage.DELIVERY_HIDDEN
-        set(value) {
-            field = value
-            setupMessageDelivery()
-        }
     var notifCount: String? = null
     var mediaMessagePath: String? = null
-    var onlineTimeStr: String = ""
-
-    @Transient
-    var messageTimeStr: String = ""
-
-    @Transient
-    var messageDeliveryRes: Int = MessageUtils.DELIVERY_WAITING_RES
-
-    @Transient
-    var onlineTimeRes: Int = PersonUtils.LAST_ONLINE_CONTACT_BG_RES_GREY
-
-    @Transient
-    var notifRes: Int = PersonUtils.NOTIF_CONTACT_BG_RES_GREY
 
     constructor()
 
@@ -109,13 +73,6 @@ class Contact : People {
         this.messageDelivery = messageDelivery
         this.notifCount = notifCount
         this.mediaMessagePath = mediaMessagePath
-    }
-
-    init {
-        setupRank()
-        setupOnlineTime(ONLINE_TYPE_CONTACT)
-        setupMessageTime()
-        setupMessageDelivery()
     }
 
     constructor(people: People, onlineTime: Long) : this(
@@ -156,48 +113,4 @@ class Contact : People {
                 putString(EXTRA_MEDIA_MESSAGE_PATH, mediaMessagePath)
             }
         }
-
-    fun setupAll() {
-        setupGenderCircleRes()
-        setupRank()
-        setupOnlineTime(ONLINE_TYPE_CONTACT)
-        setupMessageTime()
-        setupMessageDelivery()
-    }
-
-    override fun setupRank() {
-        val pair = PersonUtils.rankInt2rankStrResAndColor(rank)
-        rankStrRes = pair.first
-        rankColor = pair.second
-    }
-
-    fun setupOnlineTime(type: Byte) {
-        if (onlineTime == TIME_ONLINE) {
-            onlineTimeStr = ""
-            when (type) {
-                ONLINE_TYPE_CONTACT -> onlineTimeRes = PersonUtils.LAST_ONLINE_CONTACT_BG_RES_GREEN
-                ONLINE_TYPE_CHAT -> onlineTimeRes = PersonUtils.LAST_ONLINE_CHAT_BG_RES_GREEN
-                ONLINE_TYPE_PROFILE -> onlineTimeRes = PersonUtils.LAST_ONLINE_PROFILE_BG_RES_GREEN
-            }
-        } else {
-            onlineTimeStr = TimeUtils.timeAgoShort(System.currentTimeMillis() - onlineTime)
-            when (type) {
-                ONLINE_TYPE_CONTACT -> onlineTimeRes = PersonUtils.LAST_ONLINE_CONTACT_BG_RES_GREY
-                ONLINE_TYPE_CHAT -> onlineTimeRes = PersonUtils.LAST_ONLINE_CHAT_BG_RES_GREY
-                ONLINE_TYPE_PROFILE -> onlineTimeRes = PersonUtils.LAST_ONLINE_PROFILE_BG_RES_GREY
-            }
-        }
-    }
-
-    fun setupMessageTime() {
-        messageTimeStr = TimeUtils.millis2DayTime(messageTime)
-    }
-
-    fun setupMessageDelivery() {
-        when (messageDelivery) {
-            ChatMessage.DELIVERY_READ -> messageDeliveryRes = MessageUtils.DELIVERY_READ_RES
-            ChatMessage.DELIVERY_UNREAD -> messageDeliveryRes = MessageUtils.DELIVERY_UNREAD_RES
-            ChatMessage.DELIVERY_WAITING -> messageDeliveryRes = MessageUtils.DELIVERY_WAITING_RES
-        }
-    }
 }

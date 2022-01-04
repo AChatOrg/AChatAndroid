@@ -2,6 +2,7 @@ package com.hyapp.achat.ui.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,8 +16,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.hyapp.achat.R;
 import com.hyapp.achat.databinding.ItemPeopleBinding;
 import com.hyapp.achat.model.Contact;
+import com.hyapp.achat.model.Key;
 import com.hyapp.achat.model.People;
+import com.hyapp.achat.model.Person;
 import com.hyapp.achat.model.SortedList;
+import com.hyapp.achat.model.utils.PersonUtils;
 import com.hyapp.achat.ui.ChatActivity;
 
 public class PeopleAdapter extends RecyclerView.Adapter<PeopleAdapter.Holder> {
@@ -85,9 +89,22 @@ public class PeopleAdapter extends RecyclerView.Adapter<PeopleAdapter.Holder> {
             String[] avatars = people.getAvatars();
             binding.avatar.setImageURI(avatars.length > 0 ? avatars[0] : null);
 
-            binding.genderCircle.setBackgroundResource(people.getGenderCircleRes());
-            binding.rank.setText(people.getRankStrRes());
-            binding.rank.setTextColor(people.getRankColor());
+            switch (people.getGender()) {
+                case Person.GENDER_MALE:
+                    binding.genderCircle.setBackgroundResource(R.drawable.gender_circle_people_male_bg);
+                    break;
+                case Person.GENDER_FEMALE:
+                    binding.genderCircle.setBackgroundResource(R.drawable.gender_circle_people_female_bg);
+                    break;
+                case Person.GENDER_MIXED:
+                    binding.genderCircle.setBackgroundResource(R.drawable.gender_circle_people_mixed_bg);
+                    break;
+            }
+
+            Key key = people.getKey();
+            Pair<Integer, Integer> pair = PersonUtils.rankInt2rankStrResAndColor(key != null ? key.getRank() : People.RANK_GUEST);
+            binding.rank.setText(pair.first);
+            binding.rank.setTextColor(pair.second);
         }
 
         @Override

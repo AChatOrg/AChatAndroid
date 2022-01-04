@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.aghajari.rlottie.AXrLottieDrawable
 import com.hyapp.achat.R
 import com.hyapp.achat.bl.ChatViewModel
+import com.hyapp.achat.bl.utils.TimeUtils
 import com.hyapp.achat.databinding.ActivityChatBinding
 import com.hyapp.achat.model.*
 import com.hyapp.achat.model.event.MessageEvent
@@ -88,18 +89,19 @@ class ChatActivity : EventActivity() {
             bio.text = contact.bio
             if (contact.type == Contact.TYPE_SINGLE) {
                 avatar.setAvatars(if (contact.avatars.isNotEmpty()) contact.avatars[0] else null)
-                contact.setupOnlineTime(Contact.ONLINE_TYPE_CHAT)
-                lastOnline.text = contact.onlineTimeStr
-                lastOnline.setBackgroundResource(contact.onlineTimeRes)
+                if (contact.onlineTime == Contact.TIME_ONLINE) {
+                    onlineTime.text = ""
+                    onlineTime.setBackgroundResource(R.drawable.last_online_chat_bg_green)
+                } else {
+                    onlineTime.text = TimeUtils.timeAgoShort(System.currentTimeMillis() - contact.onlineTime)
+                    onlineTime.setBackgroundResource(R.drawable.last_online_chat_bg_grey)
+                }
             } else {
                 avatar.setAvatars(*contact.avatars)
-                lastOnline.visibility = GONE
+                onlineTime.visibility = GONE
             }
         }
-        messageAdapter.add(ProfileMessage(contact).apply {
-            contact.setupOnlineTime(Contact.ONLINE_TYPE_PROFILE)
-            contact.setupRank()
-        })
+        messageAdapter.add(ProfileMessage(contact))
     }
 
     private fun setupRecyclerView() {
