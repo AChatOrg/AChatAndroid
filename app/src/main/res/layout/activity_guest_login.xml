@@ -6,7 +6,7 @@
     <data>
         <variable
             name="viewModel"
-            type="com.hyapp.achat.bl.LoginGuestViewModel" />
+            type="com.hyapp.achat.viewmodel.LoginGuestViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -15,7 +15,7 @@
         android:focusable="true"
         android:focusableInTouchMode="true"
         android:padding="@dimen/padding_page_16"
-        tools:context=".ui.LoginGuestActivity">
+        tools:context=".view.LoginGuestActivity">
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/title"

@@ -1,6 +1,8 @@
 package com.hyapp.achat.model.event
 
-class ActionEvent(action: Byte) : Event(action) {
+import com.hyapp.achat.model.entity.Event
+
+class ActionEvent(action: Byte) : Event(action = action) {
 
     companion object {
         const val ACTION_REQUEST_PEOPLE: Byte = 1

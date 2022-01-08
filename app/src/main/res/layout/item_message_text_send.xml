@@ -16,7 +16,7 @@
         app:srcCompat="@drawable/msg_unread_contact"
         app:tint="@color/black" />
 
-    <com.hyapp.achat.ui.emojiview.view.AXEmojiTextView
+    <com.hyapp.achat.view.component.emojiview.view.AXEmojiTextView
         android:id="@+id/text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -5,8 +5,8 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
-import com.hyapp.achat.model.ChatMessage;
-import com.hyapp.achat.model.Message;
+import com.hyapp.achat.model.entity.ChatMessage;
+import com.hyapp.achat.model.entity.Message;
 
 import java.lang.reflect.Type;
 

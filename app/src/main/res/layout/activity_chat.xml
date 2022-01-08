@@ -6,9 +6,9 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.ChatActivity">
+        tools:context=".view.ChatActivity">
 
-        <com.hyapp.achat.ui.model.GroupAvatarView
+        <com.hyapp.achat.view.component.GroupAvatarView
             android:id="@+id/avatar"
             android:layout_width="38dp"
             android:layout_height="38dp"
@@ -177,7 +177,7 @@
             android:visibility="invisible"
             app:layout_constraintBottom_toBottomOf="@+id/recyclerView" />
 
-        <com.hyapp.achat.ui.emojiview.view.AXEmojiEditText
+        <com.hyapp.achat.view.component.emojiview.view.AXEmojiEditText
             android:id="@+id/messageEditText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -249,7 +249,7 @@
             app:layout_constraintTop_toTopOf="@+id/emoji"
             app:tint="@color/black" />
 
-        <com.hyapp.achat.ui.emojiview.view.AXEmojiPopupLayout
+        <com.hyapp.achat.view.component.emojiview.view.AXEmojiPopupLayout
             android:id="@+id/emojiPopupLayout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

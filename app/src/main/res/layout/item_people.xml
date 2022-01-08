@@ -7,7 +7,7 @@
 
         <variable
             name="people"
-            type="com.hyapp.achat.model.People" />
+            type="com.hyapp.achat.model.entity.People" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

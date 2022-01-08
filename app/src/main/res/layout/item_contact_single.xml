@@ -7,7 +7,7 @@
 
         <variable
             name="contact"
-            type="com.hyapp.achat.model.Contact" />
+            type="com.hyapp.achat.model.entity.Contact" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

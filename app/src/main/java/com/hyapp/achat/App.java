@@ -9,12 +9,12 @@ import androidx.multidex.MultiDexApplication;
 
 import com.aghajari.rlottie.AXrLottie;
 import com.aghajari.rlottie.AXrLottieImageView;
-import com.hyapp.achat.ui.emojiview.iosprovider.AXIOSEmojiProvider;
+import com.hyapp.achat.view.component.emojiview.iosprovider.AXIOSEmojiProvider;
 import com.facebook.drawee.backends.pipeline.Fresco;
-import com.hyapp.achat.da.objectbox.ObjectBox;
-import com.hyapp.achat.ui.emojiview.AXEmojiManager;
-import com.hyapp.achat.ui.emojiview.listener.StickerViewCreatorListener;
-import com.hyapp.achat.ui.emojiview.sticker.StickerCategory;
+import com.hyapp.achat.model.objectbox.ObjectBox;
+import com.hyapp.achat.view.component.emojiview.AXEmojiManager;
+import com.hyapp.achat.view.component.emojiview.listener.StickerViewCreatorListener;
+import com.hyapp.achat.view.component.emojiview.sticker.StickerCategory;
 
 public class App extends MultiDexApplication {
 

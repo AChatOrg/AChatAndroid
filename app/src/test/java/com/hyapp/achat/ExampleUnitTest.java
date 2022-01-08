@@ -1,13 +1,6 @@
 package com.hyapp.achat;
 
-import com.hyapp.achat.model.Key;
-import com.hyapp.achat.model.People;
-import com.hyapp.achat.model.SortedList;
-
 import org.junit.Test;
-
-import java.util.List;
-import java.util.Random;
 
 /**
  * Example local unit test, which will execute on the development machine (host).

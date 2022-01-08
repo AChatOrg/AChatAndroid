@@ -19,25 +19,25 @@
         android:theme="@style/Theme.AChat"
         android:usesCleartextTraffic="true">
         <activity
-            android:name=".ui.ChatActivity"
+            android:name=".view.ChatActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="true"
             android:hardwareAccelerated="true"
             android:launchMode="singleTask"
             android:windowSoftInputMode="adjustResize|adjustNothing" />
         <activity
-            android:name=".ui.MainActivity"
+            android:name=".view.MainActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="true"
             android:launchMode="singleTask" />
         <activity
-            android:name=".ui.LoginGuestActivity"
+            android:name=".view.LoginGuestActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="true"
             android:launchMode="singleTask"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".ui.LauncherActivity"
+            android:name=".view.LauncherActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -47,13 +47,13 @@
         </activity>
 
         <service
-            android:name=".bl.service.SocketService"
+            android:name=".viewmodel.service.SocketService"
             android:enabled="true"
             android:exported="true"
             android:process=":AChat" />
 
         <receiver
-            android:name=".bl.NotifReceiver"
+            android:name=".viewmodel.receiver.NotifReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="ACTION_EXIT" />

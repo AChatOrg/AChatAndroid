@@ -7,7 +7,7 @@
 
         <variable
             name="contact"
-            type="com.hyapp.achat.model.Contact" />
+            type="com.hyapp.achat.model.entity.Contact" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -17,7 +17,7 @@
         android:clickable="true"
         android:focusable="true">
 
-        <com.hyapp.achat.ui.model.GroupAvatarView
+        <com.hyapp.achat.view.component.GroupAvatarView
             android:id="@+id/groupAvatarView"
             android:layout_width="54dp"
             android:layout_height="54dp"
