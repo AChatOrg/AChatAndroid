@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.hyapp.achat.R;
 import com.hyapp.achat.databinding.FragmentPeopleGroupsBinding;
 import com.hyapp.achat.model.entity.People;
+import com.hyapp.achat.model.entity.PeopleList;
 import com.hyapp.achat.model.entity.Resource;
 import com.hyapp.achat.model.entity.SortedList;
 import com.hyapp.achat.model.entity.Event;
@@ -70,7 +71,7 @@ public class PeopleFragment extends Fragment {
         });
     }
 
-    private void onSuccess(Resource<SortedList<People>> resource) {
+    private void onSuccess(Resource<PeopleList> resource) {
         switch (resource.action) {
             case ADD:
                 addPeople(resource);
@@ -84,7 +85,7 @@ public class PeopleFragment extends Fragment {
         }
     }
 
-    public void addPeople(Resource<SortedList<People>> resource) {
+    public void addPeople(Resource<PeopleList> resource) {
         if (resource.index == Resource.INDEX_ALL) {
             binding.progressBar.setVisibility(View.GONE);
             binding.swipeRefreshLayout.setRefreshing(false);

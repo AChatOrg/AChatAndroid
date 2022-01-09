@@ -13,13 +13,11 @@ import androidx.annotation.Nullable;
 
 import com.hyapp.achat.model.ChatRepo;
 import com.hyapp.achat.model.IOSocket;
-import com.hyapp.achat.model.PeopleRepo;
+import com.hyapp.achat.model.entity.ConnLive;
+import com.hyapp.achat.model.event.MessageEvent;
+import com.hyapp.achat.model.preferences.LoginPreferences;
 import com.hyapp.achat.viewmodel.utils.NetUtils;
 import com.hyapp.achat.viewmodel.utils.NotifUtils;
-import com.hyapp.achat.model.preferences.LoginPreferences;
-import com.hyapp.achat.model.entity.ConnLive;
-import com.hyapp.achat.model.event.ActionEvent;
-import com.hyapp.achat.model.event.MessageEvent;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -29,11 +27,12 @@ public class SocketService extends Service {
 
     public static final String EXTRA_LOGIN_EVENT = "LoginEvent";
 
-    private IOSocket ioSocket;
+    @Nullable
+    public static IOSocket ioSocket;
 
-    public static void start(Context context, String loginEventJsonStr) {
+    public static void start(Context context, String loginJson) {
         Intent intent = new Intent(context, SocketService.class);
-        intent.putExtra(SocketService.EXTRA_LOGIN_EVENT, loginEventJsonStr);
+        intent.putExtra(SocketService.EXTRA_LOGIN_EVENT, loginJson);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             context.startForegroundService(intent);
         } else {
@@ -58,9 +57,9 @@ public class SocketService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        String loginEventJsonStr = intent.getStringExtra(EXTRA_LOGIN_EVENT);
-        if (loginEventJsonStr != null && ioSocket == null) {
-            ioSocket = new IOSocket(loginEventJsonStr);
+        String loginJson = intent.getStringExtra(EXTRA_LOGIN_EVENT);
+        if (loginJson != null && ioSocket == null) {
+            ioSocket = new IOSocket(loginJson);
             LoginPreferences.singleton(getApplicationContext()).putLogged(true);
         }
 
@@ -75,7 +74,10 @@ public class SocketService extends Service {
             EventBus.getDefault().unregister(this);
         }
         unregisterReceiver(netReceiver);
-        ioSocket.destroy();
+        if (ioSocket != null) {
+            ioSocket.destroy();
+        }
+        ioSocket = null;
         LoginPreferences.singleton(getApplicationContext()).putLogged(false);
     }
 
@@ -83,7 +85,7 @@ public class SocketService extends Service {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (NetUtils.isNetConnected(context)) {
-                if (ioSocket.getSocket().connected()) {
+                if (ioSocket != null && ioSocket.getSocket().connected()) {
                     ConnLive.singleton().setValue(ConnLive.Status.CONNECTED);
                 } else {
                     ConnLive.singleton().setValue(ConnLive.Status.CONNECTING);
@@ -93,13 +95,6 @@ public class SocketService extends Service {
             }
         }
     };
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onRequestPeople(ActionEvent event) {
-        if (event.getAction() == ActionEvent.ACTION_REQUEST_PEOPLE) {
-            PeopleRepo.singleton().requestPeople(ioSocket.getSocket());
-        }
-    }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onSendPvMessage(MessageEvent event) {

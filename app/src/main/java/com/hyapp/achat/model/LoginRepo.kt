@@ -5,13 +5,14 @@ import com.hyapp.achat.Config
 import com.hyapp.achat.model.entity.People
 import io.socket.client.Socket
 import io.socket.emitter.Emitter
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 
 object LoginRepo {
 
-    private val _loggedFlow = MutableSharedFlow<People>(extraBufferCapacity = 1)
-    val loggedFlow = _loggedFlow.asSharedFlow()
+    private val _loggedState = MutableSharedFlow<People>(extraBufferCapacity = 1)
+    val loggedState = _loggedState.asSharedFlow()
 
     fun listen(socket: Socket) {
         socket.on(Config.ON_LOGGED, onLogged)
@@ -19,6 +20,6 @@ object LoginRepo {
 
     private val onLogged = Emitter.Listener { args ->
         val people = Gson().fromJson(args[0].toString(), People::class.java)
-        _loggedFlow.tryEmit(people)
+        _loggedState.tryEmit(people)
     }
 }

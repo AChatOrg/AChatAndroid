@@ -12,13 +12,14 @@ import io.socket.emitter.Emitter;
 public class IOSocket {
 
     private Socket socket;
+
     public Socket getSocket() {
         return socket;
     }
 
-    public IOSocket(String loginEventJsonStr) {
+    public IOSocket(String loginJson) {
         IO.Options options = IO.Options.builder()
-                .setQuery(Config.SOCKET_QUERY_DATA + "=" + loginEventJsonStr)
+                .setQuery(Config.SOCKET_QUERY_DATA + "=" + loginJson)
                 .build();
         try {
             socket = IO.socket(Config.SERVER_URL, options);
@@ -40,7 +41,7 @@ public class IOSocket {
         socket.on(Config.ON_DISCONNECT, onDisconnect);
         socket.on(Config.ON_CONNECT, onConnect);
         LoginRepo.INSTANCE.listen(socket);
-        PeopleRepo.singleton().listen(socket);
+        PeopleRepo.INSTANCE.listen(socket);
         ChatRepo.INSTANCE.listen(socket);
     }
 

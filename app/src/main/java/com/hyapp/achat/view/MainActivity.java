@@ -59,7 +59,6 @@ public class MainActivity extends EventActivity {
 
     private void init() {
         viewModel = new ViewModelProvider(this).get(MainViewModel.class);
-        viewModel.init();
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
     }
 

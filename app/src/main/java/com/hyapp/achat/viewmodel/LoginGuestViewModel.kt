@@ -27,7 +27,7 @@ class LoginGuestViewModel(application: Application) : AndroidViewModel(applicati
 
     init {
         viewModelScope.launch {
-            LoginRepo.loggedFlow.collect { people ->
+            LoginRepo.loggedState.collect { people ->
                 CurrentUserLive.value = Contact(people, Contact.TIME_ONLINE)
                 _loggedFlow.emit(Event(Event.Status.SUCCESS))
             }
