@@ -17,6 +17,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.aghajari.rlottie.AXrLottieImageView;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.hyapp.achat.R;
+import com.hyapp.achat.model.entity.People;
+import com.hyapp.achat.model.entity.SortedList;
 import com.hyapp.achat.viewmodel.utils.TimeUtils;
 import com.hyapp.achat.model.entity.ChatMessage;
 import com.hyapp.achat.model.entity.Contact;
@@ -43,7 +45,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.Holder> 
     public static final int EMOJI_SIZE_LARGEST_SP = 36;
 
     private final Context context;
-    private final List<Message> messages;
+    private List<Message> messages;
     private final int sp1;
 
     public MessageAdapter(Context context) {
@@ -121,9 +123,14 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.Holder> 
         }
     }
 
-    public void addAndScroll(Message message, RecyclerView recyclerView) {
+    public void addAndScroll(List<Message> list) {
         add(message);
-        recyclerView.smoothScrollToPosition(messages.size() - 1);
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    public void resetList(List<Message> list) {
+        messages = list;
+        notifyDataSetChanged();
     }
 
     private boolean setupMessagesBubble(ChatMessage message) {

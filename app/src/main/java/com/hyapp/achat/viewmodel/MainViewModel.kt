@@ -56,7 +56,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 val resource = _contactsLive.value ?: Resource.success(ContactList())
                 val contactList = resource.data ?: ContactList()
                 val oldIndex = contactList.putFirst(contact)
-                _contactsLive.postValue(Resource.add(contactList, oldIndex))
+                _contactsLive.value = Resource.add(contactList, oldIndex)
             }
         }
     }

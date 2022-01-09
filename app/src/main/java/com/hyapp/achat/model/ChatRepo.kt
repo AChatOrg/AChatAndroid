@@ -11,12 +11,14 @@ import io.socket.client.Socket
 import io.socket.emitter.Emitter
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import java.util.*
 
 object ChatRepo {
 
     private val _contactFlow = MutableSharedFlow<Contact>(extraBufferCapacity = 1)
     val contactFlow = _contactFlow.asSharedFlow()
+
+    private val _receiveMessageFlow = MutableSharedFlow<Message>(extraBufferCapacity = 1)
+    val receiveMessageFlow = _receiveMessageFlow.asSharedFlow()
 
     fun listen(socket: Socket) {
         socket.on(Config.ON_PV_MESSAGE, onPvMessage)
@@ -48,6 +50,7 @@ object ChatRepo {
             contact.messageDelivery = ChatMessage.DELIVERY_HIDDEN
             setupAndPutContact(contact, message)
         }
+        _receiveMessageFlow.tryEmit(message)
     }
 
     private fun setupAndPutContact(contact: Contact, message: ChatMessage) {

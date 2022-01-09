@@ -1,38 +1,51 @@
 package com.hyapp.achat.viewmodel
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.gson.GsonBuilder
-import com.hyapp.achat.model.entity.Contact
-import com.hyapp.achat.model.entity.CurrentUserLive
-import com.hyapp.achat.model.entity.Message
-import com.hyapp.achat.model.entity.TextMessage
-import com.hyapp.achat.model.event.MessageEvent
+import com.hyapp.achat.model.ChatRepo
+import com.hyapp.achat.model.entity.*
 import com.hyapp.achat.model.gson.MessageDeserializer
-import org.greenrobot.eventbus.EventBus
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import java.util.*
 
 class ChatViewModel : ViewModel() {
 
-    private lateinit var receiver: Contact
+    lateinit var receiver: Contact
 
-    fun init(receiver: Contact) {
-        this.receiver = receiver
+    private val _messagesLive = MutableLiveData<Resource<LinkedList<Message>>>()
+    val messagesLive = _messagesLive as LiveData<Resource<LinkedList<Message>>>
+
+    init {
+        observeReceivedMessage()
     }
 
-    fun sendAndGetPvTextMessage(text: CharSequence, textSizeUnit: Int): Message {
+    private fun observeReceivedMessage() {
+        viewModelScope.launch {
+            ChatRepo.receiveMessageFlow.collect { message ->
+                if (message is ChatMessage) {
+                    if (message.sender.uid == receiver.uid) {
+                        addMessage(message)
+                    }
+                }
+            }
+        }
+    }
+
+    fun sendPvTextMessage(text: CharSequence, textSizeUnit: Int) {
         val message = TextMessage(Message.TRANSFER_TYPE_SEND, System.currentTimeMillis(), UUID.randomUUID().toString(), CurrentUserLive.value
                 ?: Contact(), receiver.uid, text.toString(), textSizeUnit)
-        EventBus.getDefault().post(MessageEvent(message, MessageEvent.ACTION_SEND, receiver))
-        return message
+        addMessage(message)
+        ChatRepo.sendPvMessage(message, receiver)
     }
 
-    fun setupAndGetReceiveMessage(json: String): Message {
-        return GsonBuilder()
-                .registerTypeAdapter(Message::class.java, MessageDeserializer())
-                .create()
-                .fromJson(json, Message::class.java)
-                .apply {
-                    transferType = Message.TRANSFER_TYPE_RECEIVE
-                }
+    private fun addMessage(message: Message) {
+        val resource = _messagesLive.value ?: Resource.success(LinkedList<Message>())
+        val messageList = resource.data ?: LinkedList<Message>()
+        messageList.add(message)
+        _messagesLive.value = Resource.add(messageList, 0)
     }
 }

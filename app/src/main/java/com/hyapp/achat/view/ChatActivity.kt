@@ -14,18 +14,17 @@ import android.view.View.*
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.aghajari.rlottie.AXrLottieDrawable
 import com.hyapp.achat.R
-import com.hyapp.achat.viewmodel.ChatViewModel
-import com.hyapp.achat.viewmodel.utils.TimeUtils
 import com.hyapp.achat.databinding.ActivityChatBinding
 import com.hyapp.achat.model.*
 import com.hyapp.achat.model.entity.*
-import com.hyapp.achat.model.event.MessageEvent
 import com.hyapp.achat.view.adapter.MessageAdapter
+import com.hyapp.achat.view.component.SpeedyLinearLayoutManager
 import com.hyapp.achat.view.component.emojiview.listener.OnStickerActions
 import com.hyapp.achat.view.component.emojiview.listener.SimplePopupAdapter
 import com.hyapp.achat.view.component.emojiview.search.AXEmojiSearchView
@@ -33,14 +32,13 @@ import com.hyapp.achat.view.component.emojiview.sticker.Sticker
 import com.hyapp.achat.view.component.emojiview.view.AXEmojiPager
 import com.hyapp.achat.view.component.emojiview.view.AXSingleEmojiView
 import com.hyapp.achat.view.component.emojiview.view.AXStickerView
-import com.hyapp.achat.view.component.SpeedyLinearLayoutManager
 import com.hyapp.achat.view.component.sticker.LottieSticker
 import com.hyapp.achat.view.component.sticker.LottieStickerProvider
 import com.hyapp.achat.view.component.sticker.Utils
 import com.hyapp.achat.view.component.sticker.a18StickerProvider
 import com.hyapp.achat.view.utils.UiUtils
-import org.greenrobot.eventbus.Subscribe
-import org.greenrobot.eventbus.ThreadMode
+import com.hyapp.achat.viewmodel.ChatViewModel
+import com.hyapp.achat.viewmodel.utils.TimeUtils
 import java.util.*
 
 class ChatActivity : EventActivity() {
@@ -70,6 +68,7 @@ class ChatActivity : EventActivity() {
         setupSendButton()
         setupMessageEditText()
         setupEmojis()
+        observeMessages()
     }
 
     override fun onBackPressed() {
@@ -81,7 +80,7 @@ class ChatActivity : EventActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_chat)
         contact = Contact(intent.extras ?: Bundle())
         viewModel = ViewModelProvider(this)[ChatViewModel::class.java]
-        viewModel.init(contact)
+        viewModel.receiver = contact
     }
 
     private fun setupContact() {
@@ -271,26 +270,7 @@ class ChatActivity : EventActivity() {
     }
 
     private fun sendTextMessage(text: CharSequence, textSizeUnit: Int) {
-//        val random = Random()
-//        val message: Message
-//
-//        when (random.nextInt(2)) {
-//            0 -> {
-//                message = TextMessage(
-//                        Message.TRANSFER_TYPE_SEND, System.currentTimeMillis(), "", Contact(), "", text.toString(), textSizeUnit
-//                )
-//                (message as ChatMessage).delivery = random.nextInt(3).toByte()
-//            }
-//            1 -> message = TextMessage(
-//                    Message.TRANSFER_TYPE_RECEIVE, System.currentTimeMillis(), "", Contact(), "", text.toString(), textSizeUnit
-//            )
-//            else -> message = DetailsMessage(
-//                    System.currentTimeMillis() - (random.nextDouble() * 1000).toLong() * 24 * 3600000
-//            )
-//        }
-
-        val message = viewModel.sendAndGetPvTextMessage(text, textSizeUnit)
-        messageAdapter.addAndScroll(message, binding.recyclerView)
+        viewModel.sendPvTextMessage(text, textSizeUnit)
     }
 
     private fun sendLottieMessage(lottieDrawable: AXrLottieDrawable?) {
@@ -313,12 +293,19 @@ class ChatActivity : EventActivity() {
         binding.recyclerView.smoothScrollToPosition(messageAdapter.itemCount - 1)
     }
 
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    fun onReceiveMessage(event: MessageEvent) {
-        if (event.action == MessageEvent.ACTION_RECEIVE) {
-            val message = viewModel.setupAndGetReceiveMessage(event.msg)
-            messageAdapter.addAndScroll(message, binding.recyclerView)
-        }
+    private fun observeMessages() {
+        viewModel.messagesLive.observe(this, { res ->
+            if (res.status == Resource.Status.SUCCESS) {
+                when (res.action) {
+                    Resource.Action.ADD -> {
+                        if (res.index != Resource.INDEX_ALL) {
+                            messageAdapter.addAndScroll(res.data, binding.recyclerView)
+                        } else {
+                            messageAdapter.resetList(res.data)
+                        }
+                    }
+                }
+            }
+        })
     }
 }

@@ -11,17 +11,11 @@ import android.os.IBinder;
 
 import androidx.annotation.Nullable;
 
-import com.hyapp.achat.model.ChatRepo;
 import com.hyapp.achat.model.IOSocket;
 import com.hyapp.achat.model.entity.ConnLive;
-import com.hyapp.achat.model.event.MessageEvent;
 import com.hyapp.achat.model.preferences.LoginPreferences;
 import com.hyapp.achat.viewmodel.utils.NetUtils;
 import com.hyapp.achat.viewmodel.utils.NotifUtils;
-
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
 
 public class SocketService extends Service {
 
