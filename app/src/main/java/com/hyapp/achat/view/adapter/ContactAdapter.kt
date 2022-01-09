@@ -17,6 +17,7 @@ import com.hyapp.achat.databinding.ItemContactGroupBinding
 import com.hyapp.achat.databinding.ItemContactSingleBinding
 import com.hyapp.achat.model.entity.ChatMessage
 import com.hyapp.achat.model.entity.Contact
+import com.hyapp.achat.model.entity.ContactList
 import com.hyapp.achat.model.entity.Resource
 import com.hyapp.achat.view.ChatActivity
 import java.lang.RuntimeException
@@ -25,7 +26,7 @@ import java.util.*
 class ContactAdapter(private val context: Context)
     : RecyclerView.Adapter<ContactAdapter.Holder>() {
 
-    private var contacts: List<Contact> = LinkedList()
+    private var contacts: List<Contact> = ContactList()
 
     override fun getItemViewType(position: Int): Int {
         return contacts[position].type.toInt()

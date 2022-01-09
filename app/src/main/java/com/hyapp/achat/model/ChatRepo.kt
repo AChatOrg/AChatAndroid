@@ -1,42 +1,41 @@
 package com.hyapp.achat.model
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.google.gson.GsonBuilder
 import com.hyapp.achat.Config
 import com.hyapp.achat.model.objectbox.ContactDao
 import com.hyapp.achat.model.entity.*
-import com.hyapp.achat.model.event.MessageEvent
 import com.hyapp.achat.model.gson.InterfaceAdapter
 import com.hyapp.achat.model.gson.MessageDeserializer
+import com.hyapp.achat.viewmodel.service.SocketService
 import io.socket.client.Socket
 import io.socket.emitter.Emitter
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import java.util.*
 
 object ChatRepo {
 
-    private val _contactsLive = MutableLiveData<Resource<MutableList<Contact>>>()
+    private val _contactFlow = MutableSharedFlow<Contact>(extraBufferCapacity = 1)
+    val contactFlow = _contactFlow.asSharedFlow()
 
     fun listen(socket: Socket) {
         socket.on(Config.ON_PV_MESSAGE, onPvMessage)
-        val contacts = ContactDao.all
-        _contactsLive.value = Resource.add(contacts as MutableList<Contact>, Resource.INDEX_ALL)
     }
 
-    fun sendPvMessage(socket: Socket, event: MessageEvent) {
+    fun sendPvMessage(message: ChatMessage, receiver: Contact) {
         val json = GsonBuilder()
                 .registerTypeAdapter(TextMessage::class.java, InterfaceAdapter<TextMessage>())
                 .create()
-                .toJson(event.message)
+                .toJson(message)
 
-        val contact = ContactDao.get(event.receiver!!.uid) ?: event.receiver
-        contact!!.messageDelivery = ChatMessage.DELIVERY_WAITING
-        setupAndPutContact(contact, event.message as ChatMessage)
+        val contact = ContactDao.get(receiver.uid) ?: receiver
+        contact.messageDelivery = ChatMessage.DELIVERY_WAITING
+        setupAndPutContact(contact, message)
 
-        socket.emit(Config.ON_PV_MESSAGE, json)
+        SocketService.ioSocket?.socket?.emit(Config.ON_PV_MESSAGE, json)
     }
 
-    private val onPvMessage = Emitter.Listener { args: Array<Any> ->
+    private val onPvMessage = Emitter.Listener { args ->
         val message = GsonBuilder()
                 .registerTypeAdapter(Message::class.java, MessageDeserializer())
                 .create()
@@ -56,27 +55,7 @@ object ChatRepo {
         if (message is TextMessage) {
             contact.message = message.text
         }
-        val resource = _contactsLive.value ?: Resource.success(LinkedList<Contact>())
-        val contactList = resource.data ?: LinkedList<Contact>()
-        val oldIndex = putAndMove(contactList, contact)
-        _contactsLive.postValue(Resource.add(contactList, oldIndex))
         ContactDao.put(contact)
+        _contactFlow.tryEmit(contact)
     }
-
-    private fun putAndMove(list: MutableList<Contact>, contact: Contact): Int {
-        var oldIndex = Resource.INDEX_NEW
-        for (i in 0 until list.size) {
-            if (list[i].uid == contact.uid) {
-                oldIndex = i
-                break
-            }
-        }
-        if (oldIndex != Resource.INDEX_NEW)
-            list.removeAt(oldIndex)
-        list.add(0, contact)
-        return oldIndex
-    }
-
-    val contactsLive: LiveData<Resource<MutableList<Contact>>>
-        get() = _contactsLive
 }

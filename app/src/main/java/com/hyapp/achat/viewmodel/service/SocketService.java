@@ -48,9 +48,6 @@ public class SocketService extends Service {
 
     @Override
     public void onCreate() {
-        if (!EventBus.getDefault().isRegistered(this)) {
-            EventBus.getDefault().register(this);
-        }
         registerReceiver(netReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
         ConnLive.singleton().setValue(ConnLive.Status.CONNECTING);
     }
@@ -70,9 +67,6 @@ public class SocketService extends Service {
 
     @Override
     public void onDestroy() {
-        if (EventBus.getDefault().isRegistered(this)) {
-            EventBus.getDefault().unregister(this);
-        }
         unregisterReceiver(netReceiver);
         if (ioSocket != null) {
             ioSocket.destroy();
@@ -95,11 +89,4 @@ public class SocketService extends Service {
             }
         }
     };
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onSendPvMessage(MessageEvent event) {
-        if (event.getAction() == MessageEvent.ACTION_SEND) {
-            ChatRepo.INSTANCE.sendPvMessage(ioSocket.getSocket(), event);
-        }
-    }
 }

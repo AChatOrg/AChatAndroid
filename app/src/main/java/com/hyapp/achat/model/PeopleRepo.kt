@@ -39,8 +39,8 @@ object PeopleRepo {
                 peopleList.addAll(people)
                 trySend(peopleList)
             }
-            awaitClose { it.off(Config.ON_PEOPLE) }
         }
+        awaitClose { SocketService.ioSocket?.socket?.off(Config.ON_PEOPLE) }
     }
 
     private val onUserCame = Emitter.Listener { args ->
