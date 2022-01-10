@@ -17,8 +17,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.aghajari.rlottie.AXrLottieImageView;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.hyapp.achat.R;
-import com.hyapp.achat.model.entity.People;
-import com.hyapp.achat.model.entity.SortedList;
 import com.hyapp.achat.viewmodel.utils.TimeUtils;
 import com.hyapp.achat.model.entity.ChatMessage;
 import com.hyapp.achat.model.entity.Contact;
@@ -27,7 +25,6 @@ import com.hyapp.achat.model.entity.LottieMessage;
 import com.hyapp.achat.model.entity.Message;
 import com.hyapp.achat.model.entity.ProfileMessage;
 import com.hyapp.achat.model.entity.TextMessage;
-import com.hyapp.achat.model.entity.utils.MessageUtils;
 import com.hyapp.achat.model.entity.utils.PersonUtils;
 import com.hyapp.achat.view.component.emojiview.view.AXEmojiTextView;
 import com.hyapp.achat.view.component.GroupAvatarView;
@@ -113,7 +110,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.Holder> 
             haveDateSeparatorPrev = setupMessagesBubble((ChatMessage) message);
         }
         if (haveDateSeparatorPrev) {
-            Message detailsMessage = new DetailsMessage(message.getTimeMillis());
+            Message detailsMessage = new DetailsMessage(message.getTime());
             messages.add(detailsMessage);
             messages.add(message);
             notifyItemRangeInserted(messages.size() - 2, 2);
@@ -143,14 +140,14 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.Holder> 
                 Message prev = messages.get(messages.size() - 1);
                 if (prev instanceof ChatMessage
                         && prev.getTransferType() == Message.TRANSFER_TYPE_SEND
-                        && message.getTimeMillis() - prev.getTimeMillis() < 60000
+                        && message.getTime() - prev.getTime() < 60000
                 ) {
                     message.setBubbleRes(MessageUtils.BUBBLE_RES_SEND_END);
                     if (messages.size() >= 3) {
                         Message prevPrev = messages.get(messages.size() - 2);
                         if (prevPrev instanceof ChatMessage
                                 && prevPrev.getTransferType() == Message.TRANSFER_TYPE_SEND
-                                && prev.getTimeMillis() - prevPrev.getTimeMillis() < 60000
+                                && prev.getTime() - prevPrev.getTime() < 60000
                         ) {
                             ((ChatMessage) prev).setBubbleRes(MessageUtils.BUBBLE_RES_SEND_MIDDLE);
                         } else {
@@ -161,7 +158,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.Holder> 
                     }
                     notifyItemChanged(messages.indexOf(prev), PAYLOAD_BUBBLE);
                 } else {
-                    if (!DateUtils.isToday(prev.getTimeMillis())) {
+                    if (!DateUtils.isToday(prev.getTime())) {
                         haveDateSeparatorPrev = true;
                     }
                     message.setBubbleRes(MessageUtils.BUBBLE_RES_SEND_SINGLE);
@@ -175,14 +172,14 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.Holder> 
                 Message prev = messages.get(messages.size() - 1);
                 if (prev instanceof ChatMessage
                         && prev.getTransferType() == Message.TRANSFER_TYPE_RECEIVE
-                        && message.getTimeMillis() - prev.getTimeMillis() < 60000
+                        && message.getTime() - prev.getTime() < 60000
                 ) {
                     message.setBubbleRes(MessageUtils.BUBBLE_RES_RECEIVE_END);
                     if (messages.size() >= 3) {
                         Message prevPrev = messages.get(messages.size() - 2);
                         if (prevPrev instanceof ChatMessage
                                 && prevPrev.getTransferType() == Message.TRANSFER_TYPE_RECEIVE
-                                && prev.getTimeMillis() - prevPrev.getTimeMillis() < 60000
+                                && prev.getTime() - prevPrev.getTime() < 60000
                         ) {
                             ((ChatMessage) prev).setBubbleRes(MessageUtils.BUBBLE_RES_RECEIVE_MIDDLE);
                         } else {
@@ -193,7 +190,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.Holder> 
                     }
                     notifyItemChanged(messages.indexOf(prev), PAYLOAD_BUBBLE);
                 } else {
-                    if (!DateUtils.isToday(prev.getTimeMillis())) {
+                    if (!DateUtils.isToday(prev.getTime())) {
                         haveDateSeparatorPrev = true;
                     }
                     message.setBubbleRes(MessageUtils.BUBBLE_RES_RECEIVE_SINGLE);
@@ -313,7 +310,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.Holder> 
             ChatMessage chatMessage = (ChatMessage) message;
             setBubble(chatMessage);
             setRead(chatMessage);
-            time.setText(chatMessage.getTime());
+            time.setText(chatMessage.getTimeStr());
         }
 
         @Override

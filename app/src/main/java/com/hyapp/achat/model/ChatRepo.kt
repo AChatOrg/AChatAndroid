@@ -54,7 +54,7 @@ object ChatRepo {
     }
 
     private fun setupAndPutContact(contact: Contact, message: ChatMessage) {
-        contact.messageTime = message.timeMillis
+        contact.messageTime = message.time
         if (message is TextMessage) {
             contact.message = message.text
         }
