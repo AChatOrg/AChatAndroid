@@ -55,4 +55,11 @@ open class People : Person {
                 putStringArray(EXTRA_AVATARS, avatars)
             }
         }
+
+    override fun same(person: Person): Boolean {
+        return person is People
+                && ((avatars.isEmpty() && person.avatars.isEmpty()) || (avatars.isNotEmpty() && person.avatars.isNotEmpty() && avatars[0] == person.avatars[0]))
+                && key?.rank == person.key?.rank
+                && super.same(person)
+    }
 }

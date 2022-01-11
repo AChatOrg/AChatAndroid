@@ -43,7 +43,7 @@ object ChatRepo {
                 .create()
                 .fromJson(args[0].toString(), Message::class.java)
                 .apply {
-                    transferType = Message.TRANSFER_TYPE_RECEIVE
+                    transfer = Message.TRANSFER_RECEIVE
                 }
         if (message is ChatMessage) {
             val contact = ContactDao.get(message.sender.uid) ?: message.sender

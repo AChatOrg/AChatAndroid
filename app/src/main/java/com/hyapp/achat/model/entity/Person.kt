@@ -31,4 +31,10 @@ abstract class Person(var name: String = "", var bio: String? = null, var gender
                 putByte(EXTRA_GENDER, gender)
             }
         }
+
+    open fun same(person: Person): Boolean {
+        return name == person.name
+                && bio == person.bio
+                && gender == person.gender
+    }
 }

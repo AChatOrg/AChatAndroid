@@ -1,24 +1,26 @@
 package com.hyapp.achat.viewmodel
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.hyapp.achat.model.ChatRepo
 import com.hyapp.achat.model.entity.*
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.util.*
 
-class ChatViewModel : ViewModel() {
+class ChatViewModel(var receiver: Contact) : ViewModel() {
 
-    lateinit var receiver: Contact
-
-    private val _messagesLive = MutableLiveData<Resource<LinkedList<Message>>>()
-    val messagesLive = _messagesLive as LiveData<Resource<LinkedList<Message>>>
+    private val _messagesLive = MutableLiveData<MessageList>()
+    val messagesLive = _messagesLive as LiveData<MessageList>
 
     init {
+        loadMessages()
         observeReceivedMessage()
+    }
+
+    private fun loadMessages() {
+        val messageList = MessageList()
+        messageList.addFirst(ProfileMessage(receiver))
+        _messagesLive.value = messageList
     }
 
     private fun observeReceivedMessage() {
@@ -34,16 +36,24 @@ class ChatViewModel : ViewModel() {
     }
 
     fun sendPvTextMessage(text: CharSequence, textSizeUnit: Int) {
-        val message = TextMessage(Message.TRANSFER_TYPE_SEND, System.currentTimeMillis(), UUID.randomUUID().toString(), CurrentUserLive.value
+        val message = TextMessage(UUID.randomUUID().toString(), Message.TRANSFER_SEND, System.currentTimeMillis(), CurrentUserLive.value
                 ?: Contact(), receiver.uid, text.toString(), textSizeUnit)
         addMessage(message)
         ChatRepo.sendPvMessage(message, receiver)
     }
 
     private fun addMessage(message: Message) {
-        val resource = _messagesLive.value ?: Resource.success(LinkedList<Message>())
-        val messageList = resource.data ?: LinkedList<Message>()
+        val messageList = _messagesLive.value ?: MessageList()
         messageList.add(message)
-        _messagesLive.value = Resource.add(messageList, 0)
+        _messagesLive.value = messageList
+    }
+
+    class Factory(private var receiver: Contact) : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(ChatViewModel::class.java)) {
+                return ChatViewModel(receiver) as T
+            }
+            throw IllegalArgumentException("Unknown ViewModel class")
+        }
     }
 }

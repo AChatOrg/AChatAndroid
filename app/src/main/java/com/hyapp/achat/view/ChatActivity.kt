@@ -14,7 +14,6 @@ import android.view.View.*
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -79,7 +78,7 @@ class ChatActivity : EventActivity() {
     private fun init() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_chat)
         contact = Contact(intent.extras ?: Bundle())
-        viewModel = ViewModelProvider(this)[ChatViewModel::class.java]
+        viewModel = ViewModelProvider(this, ChatViewModel.Factory(contact))[ChatViewModel::class.java]
         viewModel.receiver = contact
     }
 
@@ -101,7 +100,6 @@ class ChatActivity : EventActivity() {
                 onlineTime.visibility = GONE
             }
         }
-        messageAdapter.add(ProfileMessage(contact))
     }
 
     private fun setupRecyclerView() {
@@ -183,7 +181,7 @@ class ChatActivity : EventActivity() {
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
                 messageEditTextSizeAnimator.addUpdateListener {
-                    val size = MessageAdapter.TEXT_SIZE_SP + messageEditTextSizeAnimator.animatedValue as Int
+                    val size = TextMessage.TEXT_SIZE_SP + messageEditTextSizeAnimator.animatedValue as Int
                     binding.messageEditText.textSize = size.toFloat()
                     binding.messageEditText.setEmojiSize((size + 3) * sp1)
                 }
@@ -193,8 +191,8 @@ class ChatActivity : EventActivity() {
             MotionEvent.ACTION_UP -> {
                 messageEditTextSizeAnimator.removeAllUpdateListeners()
                 messageEditTextSizeAnimator.cancel()
-                binding.messageEditText.textSize = MessageAdapter.TEXT_SIZE_SP.toFloat()
-                binding.messageEditText.setEmojiSize((MessageAdapter.TEXT_SIZE_SP + 3) * sp1)
+                binding.messageEditText.textSize = TextMessage.TEXT_SIZE_SP.toFloat()
+                binding.messageEditText.setEmojiSize((TextMessage.TEXT_SIZE_SP + 3) * sp1)
                 if (UiUtils.isViewInBounds(binding.sendImageSwitcher, event.rawX.toInt(), event.rawY.toInt())) {
                     sendTextMessage(binding.messageEditText.text.toString(), messageEditTextSizeAnimator.animatedValue as Int)
                     binding.messageEditText.setText("")
@@ -274,38 +272,12 @@ class ChatActivity : EventActivity() {
     }
 
     private fun sendLottieMessage(lottieDrawable: AXrLottieDrawable?) {
-        val random = Random()
-        val message: ChatMessage
 
-        when (random.nextInt(2)) {
-            0 -> {
-                message = LottieMessage(
-                        Message.TRANSFER_TYPE_SEND, System.currentTimeMillis(), "", Contact(), "", lottieDrawable
-                )
-                message.delivery = random.nextInt(3).toByte()
-            }
-            else -> message = LottieMessage(
-                    Message.TRANSFER_TYPE_RECEIVE, System.currentTimeMillis(), "", Contact(), "", lottieDrawable
-            )
-        }
-
-        messageAdapter.add(message)
-        binding.recyclerView.smoothScrollToPosition(messageAdapter.itemCount - 1)
     }
 
     private fun observeMessages() {
-        viewModel.messagesLive.observe(this, { res ->
-            if (res.status == Resource.Status.SUCCESS) {
-                when (res.action) {
-                    Resource.Action.ADD -> {
-                        if (res.index != Resource.INDEX_ALL) {
-                            messageAdapter.addAndScroll(res.data, binding.recyclerView)
-                        } else {
-                            messageAdapter.resetList(res.data)
-                        }
-                    }
-                }
-            }
+        viewModel.messagesLive.observe(this, { list ->
+            messageAdapter.submitList(list)
         })
     }
 }

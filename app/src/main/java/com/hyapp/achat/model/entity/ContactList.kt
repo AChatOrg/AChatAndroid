@@ -18,7 +18,7 @@ class ContactList : LinkedList<Contact> {
         }
         if (oldIndex != Resource.INDEX_NEW)
             removeAt(oldIndex)
-        add(0, contact)
+        addFirst(contact)
         return oldIndex
     }
 }

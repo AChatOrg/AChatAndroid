@@ -42,6 +42,19 @@ class Contact : People {
     var notifCount: String? = null
     var mediaMessagePath: String? = null
 
+    override fun same(person: Person): Boolean {
+        return person is Contact
+                && message == person.message
+                && messageTime == person.messageTime
+                && messageDelivery == person.messageDelivery
+                && notifCount == person.notifCount
+                && mediaMessagePath == person.mediaMessagePath
+                && onlineTime == person.onlineTime
+                && rank == person.rank
+                && type == person.type
+                && super.same(person)
+    }
+
     constructor()
 
     constructor(type: Byte = TYPE_SINGLE,

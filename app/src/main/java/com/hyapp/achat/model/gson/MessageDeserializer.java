@@ -17,9 +17,6 @@ public class MessageDeserializer implements JsonDeserializer<Message> {
                 .registerTypeAdapter(Message.class, new InterfaceAdapter<Message>())
                 .create()
                 .fromJson(json, typeOfT);
-        if (message instanceof ChatMessage) {
-            ((ChatMessage) message).setupTime(message.getTime());
-        }
         return message;
     }
 }
