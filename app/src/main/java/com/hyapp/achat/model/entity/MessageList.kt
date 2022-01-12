@@ -16,12 +16,12 @@ class MessageList : LinkedList<Message>() {
         } else {
             val prev = get(size - 1)
             if (prev is ChatMessage
-                    && prev.transfer == Message.TRANSFER_SEND && message.time - prev.time < 60000) {
+                    && prev.transfer == message.transfer && message.time - prev.time < 60000) {
                 message.bubble = ChatMessage.BUBBLE_END
                 if (size >= 3) {
                     val prevPrev = get(size - 2)
                     if (prevPrev is ChatMessage
-                            && prevPrev.transfer == Message.TRANSFER_SEND && prev.time - prevPrev.time < 60000) {
+                            && prevPrev.transfer == message.transfer && prev.time - prevPrev.time < 60000) {
                         prev.bubble = ChatMessage.BUBBLE_MIDDLE
                     } else {
                         prev.bubble = ChatMessage.BUBBLE_START

@@ -153,7 +153,7 @@ class MessageAdapter(val context: Context) : RecyclerView.Adapter<MessageAdapter
     abstract inner class ChatHolder(itemView: View) : Holder(itemView), View.OnClickListener {
         protected val avatar: SimpleDraweeView? = itemView.findViewById(R.id.avatar)
         protected val time: TextView = itemView.findViewById(R.id.time)
-        protected val delivery: AppCompatImageView = itemView.findViewById(R.id.read)
+        protected val delivery: AppCompatImageView? = itemView.findViewById(R.id.read)
         protected val online: View? = itemView.findViewById(R.id.lastOnline)
 
         override fun bind(message: Message) {
@@ -176,9 +176,9 @@ class MessageAdapter(val context: Context) : RecyclerView.Adapter<MessageAdapter
         private fun setRead(chatMessage: ChatMessage) {
             if (chatMessage.transfer == Message.TRANSFER_SEND) {
                 when (chatMessage.delivery) {
-                    ChatMessage.DELIVERY_READ -> delivery.setImageResource(R.drawable.msg_read_contact)
-                    ChatMessage.DELIVERY_UNREAD -> delivery.setImageResource(R.drawable.msg_unread_contact)
-                    ChatMessage.DELIVERY_WAITING -> delivery.setImageResource(R.drawable.msg_waiting_contact)
+                    ChatMessage.DELIVERY_READ -> delivery?.setImageResource(R.drawable.msg_read_contact)
+                    ChatMessage.DELIVERY_UNREAD -> delivery?.setImageResource(R.drawable.msg_unread_contact)
+                    ChatMessage.DELIVERY_WAITING -> delivery?.setImageResource(R.drawable.msg_waiting_contact)
                 }
             }
         }
