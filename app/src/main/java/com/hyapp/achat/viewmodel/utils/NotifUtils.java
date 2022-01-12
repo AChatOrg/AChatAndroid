@@ -31,7 +31,7 @@ public class NotifUtils {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             CharSequence name = context.getString(R.string.app_name);
             String description = context.getString(R.string.start_chatting);
-            int importance = NotificationManager.IMPORTANCE_HIGH;
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
             NotificationChannel channel;
             channel = new NotificationChannel(NotifUtils.CHANNEL_SOCKET, name, importance);
             channel.setDescription(description);

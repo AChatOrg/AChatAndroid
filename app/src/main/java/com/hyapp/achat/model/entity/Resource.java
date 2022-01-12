@@ -17,6 +17,7 @@ public class Resource<T> {
 
     public Action action;
     public int index;
+    public boolean bool;
 
     private Resource(@NonNull Status status, @Nullable T data,
                      @Nullable String message) {
@@ -33,6 +34,11 @@ public class Resource<T> {
     private Resource(@NonNull Status status, @Nullable T data, String message, Action action, int index) {
         this(status, data, message, action);
         this.index = index;
+    }
+
+    public Resource(@NonNull Status status, @Nullable T data, @NonNull String message, Action action, int index, boolean bool) {
+        this(status, data, message, action, index);
+        this.bool = bool;
     }
 
     public static <T> Resource<T> success(@NonNull T data) {
@@ -53,6 +59,10 @@ public class Resource<T> {
 
     public static <T> Resource<T> add(@NonNull T data, int index) {
         return new Resource<>(Status.SUCCESS, data, null, Action.ADD, index);
+    }
+
+    public static <T> Resource<T> add(@NonNull T data, int index, boolean bool) {
+        return new Resource<>(Status.SUCCESS, data, null, Action.ADD, index, bool);
     }
 
     public static <T> Resource<T> remove(@NonNull T data, int index) {

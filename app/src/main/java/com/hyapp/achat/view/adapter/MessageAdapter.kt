@@ -1,5 +1,6 @@
 package com.hyapp.achat.view.adapter
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.TypedValue
 import android.view.LayoutInflater
@@ -7,8 +8,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageView
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.aghajari.rlottie.AXrLottieImageView
 import com.facebook.drawee.view.SimpleDraweeView
@@ -21,13 +20,21 @@ import com.hyapp.achat.view.component.emojiview.view.AXEmojiTextView
 import com.hyapp.achat.view.utils.UiUtils
 import com.hyapp.achat.viewmodel.utils.TimeUtils
 import java.lang.RuntimeException
+import androidx.annotation.NonNull
+import com.hyapp.achat.model.entity.ChatMessage
 
-class MessageAdapter(val context: Context) : ListAdapter<Message, MessageAdapter.Holder>(DiffCallback) {
 
+class MessageAdapter(val context: Context) : RecyclerView.Adapter<MessageAdapter.Holder>() {
+    companion object {
+        const val PAYLOAD_BUBBLE: Byte = 0
+        const val PAYLOAD_READ: Byte = 1
+    }
+
+    var messages = MessageList()
     val sp1: Int = UiUtils.sp2px(context, 1F)
 
     override fun getItemViewType(position: Int): Int {
-        val message = getItem(position)
+        val message = messages[position]
         return message.transfer + message.type
     }
 
@@ -44,7 +51,19 @@ class MessageAdapter(val context: Context) : ListAdapter<Message, MessageAdapter
     }
 
     override fun onBindViewHolder(holder: Holder, position: Int) {
-        holder.bind(getItem(position))
+        holder.bind(messages[position])
+    }
+
+    override fun onBindViewHolder(holder: Holder, position: Int, payloads: List<Any?>) {
+        if (payloads.isEmpty()) {
+            onBindViewHolder(holder, position)
+        } else {
+            holder.bind(messages[position], payloads)
+        }
+    }
+
+    override fun getItemCount(): Int {
+        return messages.size
     }
 
     override fun onViewRecycled(holder: Holder) {
@@ -54,18 +73,24 @@ class MessageAdapter(val context: Context) : ListAdapter<Message, MessageAdapter
         }
     }
 
-    object DiffCallback : DiffUtil.ItemCallback<Message>() {
-        override fun areItemsTheSame(oldItem: Message, newItem: Message): Boolean {
-            return oldItem.uid == newItem.uid
-        }
+    @SuppressLint("NotifyDataSetChanged")
+    fun resetList(list: MessageList) {
+        messages = list
+        notifyDataSetChanged()
+    }
 
-        override fun areContentsTheSame(oldItem: Message, newItem: Message): Boolean {
-            return oldItem.same(newItem)
-        }
+    fun add(list: MessageList, prevChanged: Boolean, addedCount: Int) {
+        messages = list
+        val size = messages.size
+        if (prevChanged)
+            notifyItemChanged(size - 1 - addedCount, PAYLOAD_BUBBLE)
+        notifyItemRangeInserted(size - addedCount, addedCount)
     }
 
     abstract inner class Holder(view: View) : RecyclerView.ViewHolder(view) {
         abstract fun bind(message: Message)
+
+        open fun bind(message: Message, payloads: List<Any?>) {}
     }
 
     @Suppress("LeakingThis")
@@ -133,12 +158,36 @@ class MessageAdapter(val context: Context) : ListAdapter<Message, MessageAdapter
 
         override fun bind(message: Message) {
             val chatMessage = message as ChatMessage
+            setBubble(chatMessage)
+            setRead(chatMessage)
             time.text = TimeUtils.millis2DayTime(chatMessage.time)
+        }
 
+        override fun bind(message: Message, payloads: List<Any?>) {
+            super.bind(message, payloads)
+            for (payload in payloads) {
+                when (payload as Byte) {
+                    PAYLOAD_BUBBLE -> setBubble(message as ChatMessage)
+                    PAYLOAD_READ -> setRead(message as ChatMessage)
+                }
+            }
+        }
+
+        private fun setRead(chatMessage: ChatMessage) {
+            if (chatMessage.transfer == Message.TRANSFER_SEND) {
+                when (chatMessage.delivery) {
+                    ChatMessage.DELIVERY_READ -> delivery.setImageResource(R.drawable.msg_read_contact)
+                    ChatMessage.DELIVERY_UNREAD -> delivery.setImageResource(R.drawable.msg_unread_contact)
+                    ChatMessage.DELIVERY_WAITING -> delivery.setImageResource(R.drawable.msg_waiting_contact)
+                }
+            }
+        }
+
+        private fun setBubble(chatMessage: ChatMessage) {
             val bubble: Byte = chatMessage.bubble
             val bubbleView = bubbleView
             bubbleView?.let {
-                if (message.transfer == Message.TRANSFER_SEND) {
+                if (chatMessage.transfer == Message.TRANSFER_SEND) {
                     when (bubble) {
                         ChatMessage.BUBBLE_END -> it.setBackgroundResource(R.drawable.chat_bubble_send_end)
                         ChatMessage.BUBBLE_MIDDLE -> it.setBackgroundResource(R.drawable.chat_bubble_send_middle)
@@ -149,11 +198,6 @@ class MessageAdapter(val context: Context) : ListAdapter<Message, MessageAdapter
                         time.visibility = View.VISIBLE
                     } else {
                         time.visibility = View.GONE
-                    }
-                    when (chatMessage.delivery) {
-                        ChatMessage.DELIVERY_READ -> delivery.setImageResource(R.drawable.msg_read_contact)
-                        ChatMessage.DELIVERY_UNREAD -> delivery.setImageResource(R.drawable.msg_unread_contact)
-                        ChatMessage.DELIVERY_WAITING -> delivery.setImageResource(R.drawable.msg_waiting_contact)
                     }
                 } else {
                     when (bubble) {
@@ -179,7 +223,7 @@ class MessageAdapter(val context: Context) : ListAdapter<Message, MessageAdapter
         protected abstract val bubbleView: View?
 
         override fun onClick(v: View) {
-            val bubble: Byte = (getItem(adapterPosition) as ChatMessage).bubble
+            val bubble: Byte = (messages[adapterPosition] as ChatMessage).bubble
             if (bubble != ChatMessage.BUBBLE_SINGLE && bubble != ChatMessage.BUBBLE_END && bubble != ChatMessage.BUBBLE_SINGLE && bubble != ChatMessage.BUBBLE_END) {
                 time.visibility = if (time.visibility == View.GONE) View.VISIBLE else View.GONE
             }

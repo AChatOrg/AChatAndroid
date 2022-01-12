@@ -4,6 +4,10 @@ import android.text.format.DateUtils
 import java.util.*
 
 class MessageList : LinkedList<Message>() {
+
+    private var addedCount: Byte = 0
+    private var prevChanged = false
+
     private fun setupBubble(message: ChatMessage): Boolean {
         var haveDateSeparatorPrev = false
         if (size == 1) {
@@ -25,6 +29,7 @@ class MessageList : LinkedList<Message>() {
                 } else {
                     prev.bubble = ChatMessage.BUBBLE_START
                 }
+                prevChanged = true
             } else {
                 if (!DateUtils.isToday(prev.time)) {
                     haveDateSeparatorPrev = true
@@ -35,7 +40,7 @@ class MessageList : LinkedList<Message>() {
         return haveDateSeparatorPrev
     }
 
-    override fun add(element: Message): Boolean {
+    fun addMessage(element: Message): Pair<Boolean, Byte> {
         var haveDateSeparatorPrev = false
         if (element is ChatMessage) {
             haveDateSeparatorPrev = setupBubble(element)
@@ -43,8 +48,13 @@ class MessageList : LinkedList<Message>() {
         if (haveDateSeparatorPrev) {
             val detailsMessage: Message = DetailsMessage(element.time)
             addLast(detailsMessage)
+            addedCount++
         }
         addLast(element)
-        return true
+        addedCount++
+        val pair = Pair(prevChanged, addedCount)
+        prevChanged = false
+        addedCount = 0
+        return pair
     }
 }

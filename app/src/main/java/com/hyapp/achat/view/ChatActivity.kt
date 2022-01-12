@@ -181,7 +181,7 @@ class ChatActivity : EventActivity() {
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
                 messageEditTextSizeAnimator.addUpdateListener {
-                    val size = TextMessage.TEXT_SIZE_SP + messageEditTextSizeAnimator.animatedValue as Int
+                    val size = TextMessage.TEXT_SIZE_SP + it.animatedValue as Int
                     binding.messageEditText.textSize = size.toFloat()
                     binding.messageEditText.setEmojiSize((size + 3) * sp1)
                 }
@@ -276,8 +276,17 @@ class ChatActivity : EventActivity() {
     }
 
     private fun observeMessages() {
-        viewModel.messagesLive.observe(this, { list ->
-            messageAdapter.submitList(list)
+        viewModel.messagesLive.observe(this, { res ->
+            when (res.action) {
+                Resource.Action.ADD -> {
+                    if (res.index == Resource.INDEX_ALL) {
+                        messageAdapter.resetList(res.data!!)
+                    } else {
+                        messageAdapter.add(res.data!!, res.bool, res.index)
+                        binding.recyclerView.smoothScrollToPosition(messageAdapter.itemCount - 1)
+                    }
+                }
+            }
         })
     }
 }

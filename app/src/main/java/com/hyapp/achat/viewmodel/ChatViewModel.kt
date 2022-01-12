@@ -9,8 +9,8 @@ import java.util.*
 
 class ChatViewModel(var receiver: Contact) : ViewModel() {
 
-    private val _messagesLive = MutableLiveData<MessageList>()
-    val messagesLive = _messagesLive as LiveData<MessageList>
+    private val _messagesLive = MutableLiveData<Resource<MessageList>>()
+    val messagesLive = _messagesLive as LiveData<Resource<MessageList>>
 
     init {
         loadMessages()
@@ -20,7 +20,7 @@ class ChatViewModel(var receiver: Contact) : ViewModel() {
     private fun loadMessages() {
         val messageList = MessageList()
         messageList.addFirst(ProfileMessage(receiver))
-        _messagesLive.value = messageList
+        _messagesLive.value = Resource.add(messageList, Resource.INDEX_ALL)
     }
 
     private fun observeReceivedMessage() {
@@ -43,9 +43,10 @@ class ChatViewModel(var receiver: Contact) : ViewModel() {
     }
 
     private fun addMessage(message: Message) {
-        val messageList = _messagesLive.value ?: MessageList()
-        messageList.add(message)
-        _messagesLive.value = messageList
+        val resource = _messagesLive.value ?: Resource.success(MessageList())
+        val messageList = resource.data ?: MessageList()
+        val pair = messageList.addMessage(message)
+        _messagesLive.value = Resource.add(messageList, pair.second.toInt(), pair.first)
     }
 
     class Factory(private var receiver: Contact) : ViewModelProvider.Factory {
