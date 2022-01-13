@@ -8,49 +8,50 @@ class MessageList : LinkedList<Message>() {
     private var addedCount: Byte = 0
     private var prevChanged = false
 
-    private fun setupBubble(message: ChatMessage): Boolean {
+    private fun setupBubble(message: Message): Boolean {
         var haveDateSeparatorPrev = false
         if (size == 1) {
-            message.bubble = ChatMessage.BUBBLE_SINGLE
+            message.bubble = Message.BUBBLE_SINGLE
             haveDateSeparatorPrev = true
         } else {
             val prev = get(size - 1)
-            if (prev is ChatMessage
+            if (prev.isChatMessage
                     && prev.transfer == message.transfer && message.time - prev.time < 60000) {
-                message.bubble = ChatMessage.BUBBLE_END
+                message.bubble = Message.BUBBLE_END
                 if (size >= 3) {
                     val prevPrev = get(size - 2)
-                    if (prevPrev is ChatMessage
+                    if (prevPrev.isChatMessage
                             && prevPrev.transfer == message.transfer && prev.time - prevPrev.time < 60000) {
-                        prev.bubble = ChatMessage.BUBBLE_MIDDLE
+                        prev.bubble = Message.BUBBLE_MIDDLE
                     } else {
-                        prev.bubble = ChatMessage.BUBBLE_START
+                        prev.bubble = Message.BUBBLE_START
                     }
                 } else {
-                    prev.bubble = ChatMessage.BUBBLE_START
+                    prev.bubble = Message.BUBBLE_START
                 }
                 prevChanged = true
             } else {
                 if (!DateUtils.isToday(prev.time)) {
                     haveDateSeparatorPrev = true
                 }
-                message.bubble = ChatMessage.BUBBLE_SINGLE
+                message.bubble = Message.BUBBLE_SINGLE
             }
         }
         return haveDateSeparatorPrev
     }
 
-    fun addMessage(element: Message): Pair<Boolean, Byte> {
+    fun addMessage(message: Message): Pair<Boolean, Byte> {
         var haveDateSeparatorPrev = false
-        if (element is ChatMessage) {
-            haveDateSeparatorPrev = setupBubble(element)
+        if (message.isChatMessage) {
+            haveDateSeparatorPrev = setupBubble(message)
         }
         if (haveDateSeparatorPrev) {
-            val detailsMessage: Message = DetailsMessage(element.time)
+            val details = DateUtils.getRelativeTimeSpanString(message.time, System.currentTimeMillis(), DateUtils.DAY_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE).toString()
+            val detailsMessage = Message(type = Message.TYPE_DETAILS, text = details)
             addLast(detailsMessage)
             addedCount++
         }
-        addLast(element)
+        addLast(message)
         addedCount++
         val pair = Pair(prevChanged, addedCount)
         prevChanged = false

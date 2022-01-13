@@ -12,6 +12,7 @@ import com.hyapp.achat.model.entity.CurrentUserLive
 import com.hyapp.achat.model.entity.Person
 import com.hyapp.achat.model.entity.Event
 import com.hyapp.achat.model.entity.Login
+import com.hyapp.achat.model.objectbox.ContactDao
 import com.hyapp.achat.model.preferences.LoginPreferences
 import com.hyapp.achat.viewmodel.service.SocketService
 import com.hyapp.achat.viewmodel.utils.NetUtils
@@ -28,7 +29,9 @@ class LoginGuestViewModel(application: Application) : AndroidViewModel(applicati
     init {
         viewModelScope.launch {
             LoginRepo.loggedState.collect { people ->
-                CurrentUserLive.value = Contact(people, Contact.TIME_ONLINE)
+                val contact = ContactDao.get(people.key!!.uid)
+                        ?: Contact(people, Contact.TIME_ONLINE)
+                CurrentUserLive.value = contact
                 _loggedFlow.emit(Event(Event.Status.SUCCESS))
             }
         }

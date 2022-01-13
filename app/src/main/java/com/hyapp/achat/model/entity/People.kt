@@ -1,6 +1,7 @@
 package com.hyapp.achat.model.entity
 
 import android.os.Bundle
+import com.google.gson.annotations.Expose
 import io.objectbox.annotation.BaseEntity
 import io.objectbox.annotation.Transient
 
@@ -34,6 +35,7 @@ open class People : Person {
     @Transient
     var key: Key? = null
 
+    @Expose
     var avatars: Array<String?> = emptyArray()
 
     constructor(name: String = "", bio: String? = null, gender: Byte = GENDER_MALE,

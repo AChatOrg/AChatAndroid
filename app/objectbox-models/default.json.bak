@@ -90,11 +90,6 @@
           "id": "16:841596017538870154",
           "name": "message",
           "type": 9
-        },
-        {
-          "id": "17:6471763317147967128",
-          "name": "onlineTimeStr",
-          "type": 9
         }
       ],
       "relations": []
@@ -108,7 +103,9 @@
   "modelVersionParserMinimum": 5,
   "retiredEntityUids": [],
   "retiredIndexUids": [],
-  "retiredPropertyUids": [],
+  "retiredPropertyUids": [
+    6471763317147967128
+  ],
   "retiredRelationUids": [],
   "version": 1
 }

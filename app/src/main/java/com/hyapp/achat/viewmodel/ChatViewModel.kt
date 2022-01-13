@@ -3,6 +3,7 @@ package com.hyapp.achat.viewmodel
 import androidx.lifecycle.*
 import com.hyapp.achat.model.ChatRepo
 import com.hyapp.achat.model.entity.*
+import com.hyapp.achat.model.objectbox.MessageDao
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.util.*
@@ -18,25 +19,27 @@ class ChatViewModel(var receiver: Contact) : ViewModel() {
     }
 
     private fun loadMessages() {
+        val messages = MessageDao.all(receiver.uid, 0, 1000)
         val messageList = MessageList()
-        messageList.addFirst(ProfileMessage(receiver))
+        messageList.addFirst(Message(type = Message.TYPE_PROFILE, sender = receiver))
+        for (message in messages) {
+            messageList.addMessage(message)
+        }
         _messagesLive.value = Resource.add(messageList, Resource.INDEX_ALL)
     }
 
     private fun observeReceivedMessage() {
         viewModelScope.launch {
             ChatRepo.receiveMessageFlow.collect { message ->
-                if (message is ChatMessage) {
-                    if (message.sender.uid == receiver.uid) {
-                        addMessage(message)
-                    }
+                if (message.sender.target.uid == receiver.uid) {
+                    addMessage(message)
                 }
             }
         }
     }
 
     fun sendPvTextMessage(text: CharSequence, textSizeUnit: Int) {
-        val message = TextMessage(UUID.randomUUID().toString(), Message.TRANSFER_SEND, System.currentTimeMillis(), CurrentUserLive.value
+        val message = Message(UUID.randomUUID().toString(), Message.TYPE_TEXT, Message.TRANSFER_SEND, System.currentTimeMillis(), CurrentUserLive.value
                 ?: Contact(), receiver.uid, text.toString(), textSizeUnit)
         addMessage(message)
         ChatRepo.sendPvMessage(message, receiver)

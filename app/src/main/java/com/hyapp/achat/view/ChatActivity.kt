@@ -181,7 +181,7 @@ class ChatActivity : EventActivity() {
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
                 messageEditTextSizeAnimator.addUpdateListener {
-                    val size = TextMessage.TEXT_SIZE_SP + it.animatedValue as Int
+                    val size = Message.TEXT_SIZE_SP + it.animatedValue as Int
                     binding.messageEditText.textSize = size.toFloat()
                     binding.messageEditText.setEmojiSize((size + 3) * sp1)
                 }
@@ -191,8 +191,8 @@ class ChatActivity : EventActivity() {
             MotionEvent.ACTION_UP -> {
                 messageEditTextSizeAnimator.removeAllUpdateListeners()
                 messageEditTextSizeAnimator.cancel()
-                binding.messageEditText.textSize = TextMessage.TEXT_SIZE_SP.toFloat()
-                binding.messageEditText.setEmojiSize((TextMessage.TEXT_SIZE_SP + 3) * sp1)
+                binding.messageEditText.textSize = Message.TEXT_SIZE_SP.toFloat()
+                binding.messageEditText.setEmojiSize((Message.TEXT_SIZE_SP + 3) * sp1)
                 if (UiUtils.isViewInBounds(binding.sendImageSwitcher, event.rawX.toInt(), event.rawY.toInt())) {
                     sendTextMessage(binding.messageEditText.text.toString(), messageEditTextSizeAnimator.animatedValue as Int)
                     binding.messageEditText.setText("")

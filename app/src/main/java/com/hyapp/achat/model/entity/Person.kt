@@ -1,10 +1,11 @@
 package com.hyapp.achat.model.entity
 
 import android.os.Bundle
+import com.google.gson.annotations.Expose
 import io.objectbox.annotation.BaseEntity
 
 @BaseEntity
-abstract class Person(var name: String = "", var bio: String? = null, var gender: Byte = GENDER_MALE) {
+abstract class Person(@Expose var name: String = "", @Expose var bio: String? = null, @Expose var gender: Byte = GENDER_MALE) {
 
     companion object {
         const val EXTRA_NAME = "name"

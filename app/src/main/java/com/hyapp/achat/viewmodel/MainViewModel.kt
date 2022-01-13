@@ -37,7 +37,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun loadContacts() {
-        val contacts = ContactList(ContactDao.all)
+        val contacts = ContactList(ContactDao.all())
         _contactsLive.value = Resource.add(contacts, Resource.INDEX_ALL)
     }
 

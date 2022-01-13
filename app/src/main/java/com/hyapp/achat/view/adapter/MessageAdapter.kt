@@ -12,16 +12,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.aghajari.rlottie.AXrLottieImageView
 import com.facebook.drawee.view.SimpleDraweeView
 import com.hyapp.achat.R
-import com.hyapp.achat.model.entity.*
+import com.hyapp.achat.model.entity.Contact
 import com.hyapp.achat.model.entity.Message
+import com.hyapp.achat.model.entity.MessageList
 import com.hyapp.achat.model.entity.utils.PersonUtils
 import com.hyapp.achat.view.component.GroupAvatarView
 import com.hyapp.achat.view.component.emojiview.view.AXEmojiTextView
 import com.hyapp.achat.view.utils.UiUtils
 import com.hyapp.achat.viewmodel.utils.TimeUtils
-import java.lang.RuntimeException
-import androidx.annotation.NonNull
-import com.hyapp.achat.model.entity.ChatMessage
 
 
 class MessageAdapter(val context: Context) : RecyclerView.Adapter<MessageAdapter.Holder>() {
@@ -99,9 +97,8 @@ class MessageAdapter(val context: Context) : RecyclerView.Adapter<MessageAdapter
         private val description: TextView = itemView.findViewById(R.id.description)
 
         override fun bind(message: Message) {
-            val profileMessage = message as ProfileMessage
-            name.text = profileMessage.contact.name
-            description.text = profileMessage.contact.bio
+            name.text = message.sender.target.name
+            description.text = message.sender.target.bio
         }
 
         override fun onClick(v: View) {
@@ -120,24 +117,23 @@ class MessageAdapter(val context: Context) : RecyclerView.Adapter<MessageAdapter
 
         override fun bind(message: Message) {
             super.bind(message)
-            val profileMessage = message as ProfileMessage
-            val contact = profileMessage.contact
-            if (profileMessage.contact.type == Contact.TYPE_SINGLE) {
-                val avatars = contact.avatars
+            val contact = message.sender
+            if (message.sender.target.type == Contact.TYPE_SINGLE) {
+                val avatars = contact.target.avatars
                 avatar.setAvatars(if (avatars.isNotEmpty()) avatars[0] else null)
-                if (contact.onlineTime == Contact.TIME_ONLINE) {
+                if (contact.target.onlineTime == Contact.TIME_ONLINE) {
                     onlineTime.text = ""
                     onlineTime.setBackgroundResource(R.drawable.last_online_profile_bg_green)
                 } else {
-                    onlineTime.text = TimeUtils.timeAgoShort(System.currentTimeMillis() - contact.onlineTime)
+                    onlineTime.text = TimeUtils.timeAgoShort(System.currentTimeMillis() - contact.target.onlineTime)
                     onlineTime.setBackgroundResource(R.drawable.last_online_profile_bg_grey)
                 }
                 onlineTime.visibility = View.VISIBLE
             } else {
-                avatar.setAvatars(*contact.avatars)
+                avatar.setAvatars(*contact.target.avatars)
                 onlineTime.visibility = View.GONE
             }
-            val pair = PersonUtils.rankInt2rankStrResAndColor(contact.rank)
+            val pair = PersonUtils.rankInt2rankStrResAndColor(contact.target.rank)
             rank.setText(pair.first)
             rank.setTextColor(pair.second)
         }
@@ -145,7 +141,7 @@ class MessageAdapter(val context: Context) : RecyclerView.Adapter<MessageAdapter
 
     inner class DetailsHolder(itemView: View) : Holder(itemView) {
         override fun bind(message: Message) {
-            (itemView as TextView).text = (message as DetailsMessage).details
+            (itemView as TextView).text = message.text
         }
     }
 
@@ -157,61 +153,60 @@ class MessageAdapter(val context: Context) : RecyclerView.Adapter<MessageAdapter
         protected val online: View? = itemView.findViewById(R.id.lastOnline)
 
         override fun bind(message: Message) {
-            val chatMessage = message as ChatMessage
-            setBubble(chatMessage)
-            setRead(chatMessage)
-            time.text = TimeUtils.millis2DayTime(chatMessage.time)
+            setBubble(message)
+            setRead(message)
+            time.text = TimeUtils.millis2DayTime(message.time)
         }
 
         override fun bind(message: Message, payloads: List<Any?>) {
             super.bind(message, payloads)
             for (payload in payloads) {
                 when (payload as Byte) {
-                    PAYLOAD_BUBBLE -> setBubble(message as ChatMessage)
-                    PAYLOAD_READ -> setRead(message as ChatMessage)
+                    PAYLOAD_BUBBLE -> setBubble(message)
+                    PAYLOAD_READ -> setRead(message)
                 }
             }
         }
 
-        private fun setRead(chatMessage: ChatMessage) {
-            if (chatMessage.transfer == Message.TRANSFER_SEND) {
-                when (chatMessage.delivery) {
-                    ChatMessage.DELIVERY_READ -> delivery?.setImageResource(R.drawable.msg_read_contact)
-                    ChatMessage.DELIVERY_UNREAD -> delivery?.setImageResource(R.drawable.msg_unread_contact)
-                    ChatMessage.DELIVERY_WAITING -> delivery?.setImageResource(R.drawable.msg_waiting_contact)
+        private fun setRead(message: Message) {
+            if (message.transfer == Message.TRANSFER_SEND) {
+                when (message.delivery) {
+                    Message.DELIVERY_READ -> delivery?.setImageResource(R.drawable.msg_read_contact)
+                    Message.DELIVERY_UNREAD -> delivery?.setImageResource(R.drawable.msg_unread_contact)
+                    Message.DELIVERY_WAITING -> delivery?.setImageResource(R.drawable.msg_waiting_contact)
                 }
             }
         }
 
-        private fun setBubble(chatMessage: ChatMessage) {
-            val bubble: Byte = chatMessage.bubble
+        private fun setBubble(message: Message) {
+            val bubble: Byte = message.bubble
             val bubbleView = bubbleView
             bubbleView?.let {
-                if (chatMessage.transfer == Message.TRANSFER_SEND) {
+                if (message.transfer == Message.TRANSFER_SEND) {
                     when (bubble) {
-                        ChatMessage.BUBBLE_END -> it.setBackgroundResource(R.drawable.chat_bubble_send_end)
-                        ChatMessage.BUBBLE_MIDDLE -> it.setBackgroundResource(R.drawable.chat_bubble_send_middle)
-                        ChatMessage.BUBBLE_START -> it.setBackgroundResource(R.drawable.chat_bubble_send_start)
-                        ChatMessage.BUBBLE_SINGLE -> it.setBackgroundResource(R.drawable.chat_bubble_send_single)
+                        Message.BUBBLE_END -> it.setBackgroundResource(R.drawable.chat_bubble_send_end)
+                        Message.BUBBLE_MIDDLE -> it.setBackgroundResource(R.drawable.chat_bubble_send_middle)
+                        Message.BUBBLE_START -> it.setBackgroundResource(R.drawable.chat_bubble_send_start)
+                        Message.BUBBLE_SINGLE -> it.setBackgroundResource(R.drawable.chat_bubble_send_single)
                     }
-                    if (bubble == ChatMessage.BUBBLE_SINGLE || bubble == ChatMessage.BUBBLE_END) {
+                    if (bubble == Message.BUBBLE_SINGLE || bubble == Message.BUBBLE_END) {
                         time.visibility = View.VISIBLE
                     } else {
                         time.visibility = View.GONE
                     }
                 } else {
                     when (bubble) {
-                        ChatMessage.BUBBLE_END -> it.setBackgroundResource(R.drawable.chat_bubble_receive_end)
-                        ChatMessage.BUBBLE_MIDDLE -> it.setBackgroundResource(R.drawable.chat_bubble_receive_middle)
-                        ChatMessage.BUBBLE_START -> it.setBackgroundResource(R.drawable.chat_bubble_receive_start)
-                        ChatMessage.BUBBLE_SINGLE -> it.setBackgroundResource(R.drawable.chat_bubble_receive_single)
+                        Message.BUBBLE_END -> it.setBackgroundResource(R.drawable.chat_bubble_receive_end)
+                        Message.BUBBLE_MIDDLE -> it.setBackgroundResource(R.drawable.chat_bubble_receive_middle)
+                        Message.BUBBLE_START -> it.setBackgroundResource(R.drawable.chat_bubble_receive_start)
+                        Message.BUBBLE_SINGLE -> it.setBackgroundResource(R.drawable.chat_bubble_receive_single)
                     }
-                    if (bubble == ChatMessage.BUBBLE_SINGLE || bubble == ChatMessage.BUBBLE_END) {
+                    if (bubble == Message.BUBBLE_SINGLE || bubble == Message.BUBBLE_END) {
                         avatar?.visibility = View.VISIBLE
                         time.visibility = View.VISIBLE
-                        val avatars = chatMessage.sender.avatars
+                        val avatars = message.sender.target.avatars
                         avatar?.setImageURI(if (avatars.isNotEmpty()) avatars[0] else null)
-                        online?.visibility = if (chatMessage.sender.onlineTime == Contact.TIME_ONLINE) View.VISIBLE else View.GONE
+                        online?.visibility = if (message.sender.target.onlineTime == Contact.TIME_ONLINE) View.VISIBLE else View.GONE
                     } else {
                         avatar?.visibility = View.GONE
                         time.visibility = View.GONE
@@ -223,8 +218,8 @@ class MessageAdapter(val context: Context) : RecyclerView.Adapter<MessageAdapter
         protected abstract val bubbleView: View?
 
         override fun onClick(v: View) {
-            val bubble: Byte = (messages[adapterPosition] as ChatMessage).bubble
-            if (bubble != ChatMessage.BUBBLE_SINGLE && bubble != ChatMessage.BUBBLE_END && bubble != ChatMessage.BUBBLE_SINGLE && bubble != ChatMessage.BUBBLE_END) {
+            val bubble: Byte = messages[adapterPosition].bubble
+            if (bubble != Message.BUBBLE_SINGLE && bubble != Message.BUBBLE_END && bubble != Message.BUBBLE_SINGLE && bubble != Message.BUBBLE_END) {
                 time.visibility = if (time.visibility == View.GONE) View.VISIBLE else View.GONE
             }
         }
@@ -238,10 +233,9 @@ class MessageAdapter(val context: Context) : RecyclerView.Adapter<MessageAdapter
         private val textView: AXEmojiTextView = itemView.findViewById(R.id.text)
         override fun bind(message: Message) {
             super.bind(message)
-            val textMessage = message as TextMessage
-            val text = textMessage.text
+            val text = message.text
             textView.text = text
-            val sizes = textMessage.setAndGetTextSizes(sp1)
+            val sizes = message.setAndGetTextSizes(sp1)
             textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, sizes.first)
             textView.setEmojiSize(sizes.second)
         }
@@ -255,12 +249,12 @@ class MessageAdapter(val context: Context) : RecyclerView.Adapter<MessageAdapter
         private val lottieImageView: AXrLottieImageView = itemView.findViewById(R.id.lottieImageView)
         override fun bind(message: Message) {
             super.bind(message)
-            lottieImageView.lottieDrawable = (message as LottieMessage).drawable
-            lottieImageView.playAnimation()
+//            lottieImageView.lottieDrawable = (message as LottieMessage).drawable
+//            lottieImageView.playAnimation()
         }
 
         fun recycle() {
-            lottieImageView.stopAnimation()
+//            lottieImageView.stopAnimation()
         }
 
         override val bubbleView: View?

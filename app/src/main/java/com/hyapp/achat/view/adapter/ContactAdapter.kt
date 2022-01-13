@@ -15,9 +15,9 @@ import com.hyapp.achat.R
 import com.hyapp.achat.viewmodel.utils.TimeUtils
 import com.hyapp.achat.databinding.ItemContactGroupBinding
 import com.hyapp.achat.databinding.ItemContactSingleBinding
-import com.hyapp.achat.model.entity.ChatMessage
 import com.hyapp.achat.model.entity.Contact
 import com.hyapp.achat.model.entity.ContactList
+import com.hyapp.achat.model.entity.Message
 import com.hyapp.achat.model.entity.Resource
 import com.hyapp.achat.view.ChatActivity
 import java.lang.RuntimeException
@@ -90,14 +90,14 @@ class ContactAdapter(private val context: Context)
 
             messageTime.text = TimeUtils.millis2DayTime(contact.messageTime)
 
-            if (contact.messageDelivery == ChatMessage.DELIVERY_HIDDEN) {
+            if (contact.messageDelivery == Message.DELIVERY_HIDDEN) {
                 messageDelivery.visibility = View.GONE
             } else {
                 messageDelivery.visibility = View.VISIBLE
                 when (contact.messageDelivery) {
-                    ChatMessage.DELIVERY_READ -> messageDelivery.setImageResource(R.drawable.msg_read_contact)
-                    ChatMessage.DELIVERY_UNREAD -> messageDelivery.setImageResource(R.drawable.msg_unread_contact)
-                    ChatMessage.DELIVERY_WAITING -> messageDelivery.setImageResource(R.drawable.msg_waiting_contact)
+                    Message.DELIVERY_READ -> messageDelivery.setImageResource(R.drawable.msg_read_contact)
+                    Message.DELIVERY_UNREAD -> messageDelivery.setImageResource(R.drawable.msg_unread_contact)
+                    Message.DELIVERY_WAITING -> messageDelivery.setImageResource(R.drawable.msg_waiting_contact)
                 }
             }
 

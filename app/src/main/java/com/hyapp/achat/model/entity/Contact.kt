@@ -1,6 +1,7 @@
 package com.hyapp.achat.model.entity
 
 import android.os.Bundle
+import com.google.gson.annotations.Expose
 import io.objectbox.annotation.Entity
 import io.objectbox.annotation.Id
 import io.objectbox.annotation.Index
@@ -26,19 +27,25 @@ class Contact : People {
 
     @Id
     var id: Long = 0
+
+    @Expose
     var type: Byte = TYPE_SINGLE
 
     @Index
     @Unique
+    @Expose
     var uid: String = ""
+
+    @Expose
     var rank: Byte = 0
     var score: Int = 0
     var loginTime: Long = 0
 
+    @Expose
     var onlineTime: Long = TIME_ONLINE
     var message: String = ""
     var messageTime: Long = -1
-    var messageDelivery: Byte = ChatMessage.DELIVERY_HIDDEN
+    var messageDelivery: Byte = Message.DELIVERY_HIDDEN
     var notifCount: String? = null
     var mediaMessagePath: String? = null
 
@@ -66,7 +73,7 @@ class Contact : People {
                 onlineTime: Long = 0,
                 message: String = "",
                 messageTime: Long = 0,
-                messageDelivery: Byte = ChatMessage.DELIVERY_HIDDEN,
+                messageDelivery: Byte = Message.DELIVERY_HIDDEN,
                 notifCount: String? = null,
                 mediaMessagePath: String? = null
     ) : super(name, bio, gender, avatars = avatars) {
