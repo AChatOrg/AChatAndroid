@@ -1,7 +1,7 @@
 package com.hyapp.achat;
 
 public interface Config {
-    String SERVER_URL = "http://192.168.43.113:24240";
+    String SERVER_URL = "http://192.168.1.101:24240";
 
     String SOCKET_QUERY_DATA = "data";
 
@@ -16,7 +16,7 @@ public interface Config {
     String ON_USER_LEFT = "userLeft";
 
     /*On People*/
-    String ON_PEOPLE = "people";
+    String ON_USERS = "people";
 
     /*On Chat*/
     String ON_PV_MESSAGE = "pvMessage";

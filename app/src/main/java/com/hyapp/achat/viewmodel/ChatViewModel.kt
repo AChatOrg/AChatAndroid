@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.util.*
 
-class ChatViewModel(var receiver: Contact) : ViewModel() {
+class ChatViewModel(var receiver: User) : ViewModel() {
 
     private val _messagesLive = MutableLiveData<Resource<MessageList>>()
     val messagesLive = _messagesLive as LiveData<Resource<MessageList>>
@@ -21,7 +21,7 @@ class ChatViewModel(var receiver: Contact) : ViewModel() {
     private fun loadMessages() {
         val messages = MessageDao.all(receiver.uid, 0, 1000)
         val messageList = MessageList()
-        messageList.addFirst(Message(type = Message.TYPE_PROFILE, sender = receiver))
+        messageList.addFirst(Message(type = Message.TYPE_PROFILE, user = receiver))
         for (message in messages) {
             messageList.addMessage(message)
         }
@@ -31,7 +31,7 @@ class ChatViewModel(var receiver: Contact) : ViewModel() {
     private fun observeReceivedMessage() {
         viewModelScope.launch {
             ChatRepo.receiveMessageFlow.collect { message ->
-                if (message.sender.target.uid == receiver.uid) {
+                if (message.senderUid == receiver.uid) {
                     addMessage(message)
                 }
             }
@@ -39,8 +39,10 @@ class ChatViewModel(var receiver: Contact) : ViewModel() {
     }
 
     fun sendPvTextMessage(text: CharSequence, textSizeUnit: Int) {
-        val message = Message(UUID.randomUUID().toString(), Message.TYPE_TEXT, Message.TRANSFER_SEND, System.currentTimeMillis(), CurrentUserLive.value
-                ?: Contact(), receiver.uid, text.toString(), textSizeUnit)
+        val message = Message(UUID.randomUUID().toString(), Message.TYPE_TEXT,
+                Message.TRANSFER_SEND, System.currentTimeMillis(), text.toString(), textSizeUnit, "",
+                receiver.uid, UserLive.value ?: User()
+        )
         addMessage(message)
         ChatRepo.sendPvMessage(message, receiver)
     }
@@ -52,7 +54,7 @@ class ChatViewModel(var receiver: Contact) : ViewModel() {
         _messagesLive.value = Resource.add(messageList, pair.second.toInt(), pair.first)
     }
 
-    class Factory(private var receiver: Contact) : ViewModelProvider.Factory {
+    class Factory(private var receiver: User) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(ChatViewModel::class.java)) {
                 return ChatViewModel(receiver) as T

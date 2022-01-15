@@ -3,8 +3,8 @@ package com.hyapp.achat.model.preferences;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.google.gson.Gson;
-import com.hyapp.achat.model.entity.Login;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -93,8 +93,12 @@ public class LoginPreferences {
         writerPrefs.apply();
     }
 
-    public String getLoginEvent() {
-        return preferences.getString(LOGIN_EVENT, new Gson().toJson(new Login()));
+    public String getLoginEvent() throws JSONException {
+        JSONObject json = new JSONObject();
+        json.put("operation", "");
+        json.put("name", "");
+        json.put("bio", "");
+        json.put("gender", "1");
+        return preferences.getString(LOGIN_EVENT, json.toString());
     }
 }
-

@@ -94,7 +94,7 @@ class LoginGuestActivity : EventActivity() {
         progressDialog.getButton(DialogInterface.BUTTON_NEGATIVE).setTextColor(UiUtils.getStyleColor(this, R.attr.colorPrimary))
     }
 
-    fun subscribeLogged() {
+    private fun subscribeLogged() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.loggedFlow.collect { event ->

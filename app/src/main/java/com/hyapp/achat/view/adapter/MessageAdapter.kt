@@ -97,8 +97,8 @@ class MessageAdapter(val context: Context) : RecyclerView.Adapter<MessageAdapter
         private val description: TextView = itemView.findViewById(R.id.description)
 
         override fun bind(message: Message) {
-            name.text = message.sender.target.name
-            description.text = message.sender.target.bio
+            name.text = message.senderName
+            description.text = message.senderBio
         }
 
         override fun onClick(v: View) {
@@ -117,23 +117,23 @@ class MessageAdapter(val context: Context) : RecyclerView.Adapter<MessageAdapter
 
         override fun bind(message: Message) {
             super.bind(message)
-            val contact = message.sender
-            if (message.sender.target.type == Contact.TYPE_SINGLE) {
-                val avatars = contact.target.avatars
-                avatar.setAvatars(if (avatars.isNotEmpty()) avatars[0] else null)
-                if (contact.target.onlineTime == Contact.TIME_ONLINE) {
+            val contact = message.getContact()
+            if (contact.type == Contact.TYPE_SINGLE) {
+                val avatars = contact.avatars
+                avatar.setAvatars(contact.avatars)
+                if (contact.onlineTime == Contact.TIME_ONLINE) {
                     onlineTime.text = ""
                     onlineTime.setBackgroundResource(R.drawable.last_online_profile_bg_green)
                 } else {
-                    onlineTime.text = TimeUtils.timeAgoShort(System.currentTimeMillis() - contact.target.onlineTime)
+                    onlineTime.text = TimeUtils.timeAgoShort(System.currentTimeMillis() - contact.onlineTime)
                     onlineTime.setBackgroundResource(R.drawable.last_online_profile_bg_grey)
                 }
                 onlineTime.visibility = View.VISIBLE
             } else {
-                avatar.setAvatars(*contact.target.avatars)
+                avatar.setAvatars(contact.avatars)
                 onlineTime.visibility = View.GONE
             }
-            val pair = PersonUtils.rankInt2rankStrResAndColor(contact.target.rank)
+            val pair = PersonUtils.rankInt2rankStrResAndColor(contact.rank)
             rank.setText(pair.first)
             rank.setTextColor(pair.second)
         }
@@ -204,9 +204,9 @@ class MessageAdapter(val context: Context) : RecyclerView.Adapter<MessageAdapter
                     if (bubble == Message.BUBBLE_SINGLE || bubble == Message.BUBBLE_END) {
                         avatar?.visibility = View.VISIBLE
                         time.visibility = View.VISIBLE
-                        val avatars = message.sender.target.avatars
+                        val avatars = message.senderAvatars
                         avatar?.setImageURI(if (avatars.isNotEmpty()) avatars[0] else null)
-                        online?.visibility = if (message.sender.target.onlineTime == Contact.TIME_ONLINE) View.VISIBLE else View.GONE
+                        online?.visibility = if (message.senderOnlineTime == Contact.TIME_ONLINE) View.VISIBLE else View.GONE
                     } else {
                         avatar?.visibility = View.GONE
                         time.visibility = View.GONE

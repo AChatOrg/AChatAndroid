@@ -41,7 +41,7 @@ public class IOSocket {
         socket.on(Config.ON_DISCONNECT, onDisconnect);
         socket.on(Config.ON_CONNECT, onConnect);
         LoginRepo.INSTANCE.listen(socket);
-        PeopleRepo.INSTANCE.listen(socket);
+        UsersRepo.INSTANCE.listen(socket);
         ChatRepo.INSTANCE.listen(socket);
     }
 

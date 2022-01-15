@@ -16,12 +16,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.hyapp.achat.R;
 import com.hyapp.achat.databinding.FragmentPeopleGroupsBinding;
-import com.hyapp.achat.model.entity.People;
-import com.hyapp.achat.model.entity.PeopleList;
+import com.hyapp.achat.model.entity.UserList;
 import com.hyapp.achat.model.entity.Resource;
-import com.hyapp.achat.model.entity.SortedList;
 import com.hyapp.achat.model.entity.Event;
-import com.hyapp.achat.view.adapter.PeopleAdapter;
+import com.hyapp.achat.view.adapter.UsersAdapter;
 import com.hyapp.achat.viewmodel.MainViewModel;
 
 public class PeopleFragment extends Fragment {
@@ -29,7 +27,7 @@ public class PeopleFragment extends Fragment {
     private MainViewModel viewModel;
     private FragmentPeopleGroupsBinding binding;
 
-    private PeopleAdapter adapter;
+    private UsersAdapter adapter;
 
     @Nullable
     @Override
@@ -51,12 +49,12 @@ public class PeopleFragment extends Fragment {
     private void setupRecyclerView(Context context, View view) {
         binding.recyclerView.setHasFixedSize(true);
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        adapter = new PeopleAdapter(context);
+        adapter = new UsersAdapter(context);
         binding.recyclerView.setAdapter(adapter);
     }
 
     private void observePeople() {
-        viewModel.getPeopleLive().observe(getViewLifecycleOwner(), listResource -> {
+        viewModel.getUsersLive().observe(getViewLifecycleOwner(), listResource -> {
             switch (listResource.status) {
                 case SUCCESS:
                     onSuccess(listResource);
@@ -71,7 +69,7 @@ public class PeopleFragment extends Fragment {
         });
     }
 
-    private void onSuccess(Resource<PeopleList> resource) {
+    private void onSuccess(Resource<UserList> resource) {
         switch (resource.action) {
             case ADD:
                 addPeople(resource);
@@ -85,7 +83,7 @@ public class PeopleFragment extends Fragment {
         }
     }
 
-    public void addPeople(Resource<PeopleList> resource) {
+    public void addPeople(Resource<UserList> resource) {
         if (resource.index == Resource.INDEX_ALL) {
             binding.progressBar.setVisibility(View.GONE);
             binding.swipeRefreshLayout.setRefreshing(false);

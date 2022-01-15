@@ -3,7 +3,7 @@ package com.hyapp.achat.model.entity.utils;
 import android.util.Pair;
 
 import com.hyapp.achat.R;
-import com.hyapp.achat.model.entity.People;
+import com.hyapp.achat.model.entity.User;
 
 public class PersonUtils {
 
@@ -17,19 +17,19 @@ public class PersonUtils {
 
     public static Pair<Integer, Integer> rankInt2rankStrResAndColor(byte rank) {
         switch (rank) {
-            case People.RANK_GUEST:
+            case User.RANK_GUEST:
                 return new Pair<>(R.string.guest, RANK_COLOR_GUEST);
-            case People.RANK_MEMBER:
+            case User.RANK_MEMBER:
                 return new Pair<>(R.string.member, RANK_COLOR_MEMBER);
-            case People.RANK_SPECIAL:
+            case User.RANK_SPECIAL:
                 return new Pair<>(R.string.special, RANK_COLOR_SPECIAL);
-            case People.RANK_ACTIVE:
+            case User.RANK_ACTIVE:
                 return new Pair<>(R.string.active, RANK_COLOR_ACTIVE);
-            case People.RANK_SENIOR:
+            case User.RANK_SENIOR:
                 return new Pair<>(R.string.senior, RANK_COLOR_SENIOR);
-            case People.RANK_ADMIN:
+            case User.RANK_ADMIN:
                 return new Pair<>(R.string.admin, RANK_COLOR_ADMIN);
-            case People.RANK_MANAGER:
+            case User.RANK_MANAGER:
                 return new Pair<>(R.string.manager, RANK_COLOR_MANAGER);
         }
         return new Pair<>(R.string.guest, RANK_COLOR_GUEST);

@@ -21,7 +21,6 @@ import com.hyapp.achat.model.entity.Message
 import com.hyapp.achat.model.entity.Resource
 import com.hyapp.achat.view.ChatActivity
 import java.lang.RuntimeException
-import java.util.*
 
 class ContactAdapter(private val context: Context)
     : RecyclerView.Adapter<ContactAdapter.Holder>() {
@@ -80,8 +79,8 @@ class ContactAdapter(private val context: Context)
         }
 
         open fun bind(contact: Contact) {
-            val mediaPath = contact.mediaMessagePath
-            if (mediaPath != null) {
+            val mediaPath = contact.mediaPath
+            if (mediaPath != "") {
                 media.visibility = View.VISIBLE
                 media.setImageURI(mediaPath)
             } else {
@@ -101,7 +100,7 @@ class ContactAdapter(private val context: Context)
                 }
             }
 
-            notif.visibility = if (contact.notifCount == null) View.GONE else View.VISIBLE
+            notif.visibility = if (contact.notifCount == "0") View.GONE else View.VISIBLE
         }
 
         override fun onClick(p0: View?) {
@@ -142,7 +141,7 @@ class ContactAdapter(private val context: Context)
             binding.contact = contact
             binding.executePendingBindings()
 
-            binding.groupAvatarView.setAvatars(*contact.avatars)
+            binding.groupAvatarView.setAvatars(contact.avatars)
         }
     }
 }

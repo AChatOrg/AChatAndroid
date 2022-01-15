@@ -7,12 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import com.hyapp.achat.Config
 import com.hyapp.achat.model.LoginRepo
-import com.hyapp.achat.model.entity.Contact
-import com.hyapp.achat.model.entity.CurrentUserLive
-import com.hyapp.achat.model.entity.Person
-import com.hyapp.achat.model.entity.Event
-import com.hyapp.achat.model.entity.Login
-import com.hyapp.achat.model.objectbox.ContactDao
+import com.hyapp.achat.model.entity.*
 import com.hyapp.achat.model.preferences.LoginPreferences
 import com.hyapp.achat.viewmodel.service.SocketService
 import com.hyapp.achat.viewmodel.utils.NetUtils
@@ -20,6 +15,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 
 class LoginGuestViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -28,10 +24,8 @@ class LoginGuestViewModel(application: Application) : AndroidViewModel(applicati
 
     init {
         viewModelScope.launch {
-            LoginRepo.loggedState.collect { people ->
-                val contact = ContactDao.get(people.key!!.uid)
-                        ?: Contact(people, Contact.TIME_ONLINE)
-                CurrentUserLive.value = contact
+            LoginRepo.loggedState.collect { user ->
+                UserLive.value = user
                 _loggedFlow.emit(Event(Event.Status.SUCCESS))
             }
         }
@@ -39,19 +33,31 @@ class LoginGuestViewModel(application: Application) : AndroidViewModel(applicati
 
     fun loginGuest(name: String, bio: String, gender: Boolean) {
         val context = getApplication<Application>().applicationContext
+
         if (name.isEmpty()) {
             _loggedFlow.tryEmit(Event(Event.Status.ERROR, Event.MSG_EMPTY))
+
         } else if (!NetUtils.isNetConnected(context)) {
             _loggedFlow.tryEmit(Event(Event.Status.ERROR, Event.MSG_NET))
+
         } else {
             val nameTrim = name.trim()
             val bioTrim = bio.trim()
-            val genderByte: Byte = if (gender) Person.GENDER_MALE else Person.GENDER_FEMALE
+            val genderByte: Byte = if (gender) UserConsts.GENDER_MALE else UserConsts.GENDER_FEMALE
+
             LoginPreferences.singleton(context).putLoginGuest(nameTrim, bioTrim, genderByte)
+
             _loggedFlow.tryEmit(Event(Event.Status.LOADING))
-            val loginEventJsonStr = Gson().toJson(Login(Config.OPERATION_LOGIN_GUEST, nameTrim, bioTrim, genderByte))
-            SocketService.start(context, loginEventJsonStr)
-            LoginPreferences.singleton(context).putLoginEvent(loginEventJsonStr)
+
+            val json = JSONObject()
+            json.put("operation", Config.OPERATION_LOGIN_GUEST)
+            json.put("name", nameTrim)
+            json.put("bio", bioTrim)
+            json.put("gender", genderByte)
+
+            val jsonStr = json.toString()
+            SocketService.start(context, jsonStr)
+            LoginPreferences.singleton(context).putLoginEvent(jsonStr)
         }
     }
 
@@ -69,7 +75,7 @@ class LoginGuestViewModel(application: Application) : AndroidViewModel(applicati
     val savedGender: Boolean
         get() {
             val gender = LoginPreferences.singleton(getApplication<Application>().applicationContext).gender
-            return gender == Person.GENDER_MALE.toInt()
+            return gender == UserConsts.GENDER_MALE.toInt()
         }
 
     val nameHistory: Array<String>

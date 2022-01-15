@@ -2,7 +2,7 @@ package com.hyapp.achat.model.entity
 
 import java.util.Comparator
 
-class PeopleList : SortedList<People>(Comparator { p1, p2 -> People.compare(p1, p2) }) {
+class UserList : SortedList<User>(Comparator { u1, u2 -> User.compare(u1, u2) }) {
 
     companion object {
         const val INDEX_NOT_FOUND = -1
@@ -12,7 +12,7 @@ class PeopleList : SortedList<People>(Comparator { p1, p2 -> People.compare(p1, 
         var i = 0
         val iterator = iterator()
         while (iterator.hasNext()) {
-            if (iterator.next().key?.uid == uid) {
+            if (iterator.next().uid == uid) {
                 iterator.remove()
                 return i
             }

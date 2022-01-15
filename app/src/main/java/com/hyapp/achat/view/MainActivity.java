@@ -123,7 +123,7 @@ public class MainActivity extends EventActivity {
     }
 
     private void observePeopleGroupsSize() {
-        viewModel.getPeopleLive().observe(this, listResource -> {
+        viewModel.getUsersLive().observe(this, listResource -> {
             if (listResource.status == Resource.Status.SUCCESS) {
                 peopleSize = listResource.data.size();
                 resetPeopleGroupsTitle();

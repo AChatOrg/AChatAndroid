@@ -15,21 +15,22 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.hyapp.achat.R;
 import com.hyapp.achat.databinding.ItemPeopleBinding;
 import com.hyapp.achat.model.entity.Contact;
-import com.hyapp.achat.model.entity.Key;
-import com.hyapp.achat.model.entity.People;
-import com.hyapp.achat.model.entity.Person;
+import com.hyapp.achat.model.entity.User;
 import com.hyapp.achat.model.entity.SortedList;
+import com.hyapp.achat.model.entity.UserConsts;
 import com.hyapp.achat.model.entity.utils.PersonUtils;
 import com.hyapp.achat.view.ChatActivity;
 
-public class PeopleAdapter extends RecyclerView.Adapter<PeopleAdapter.Holder> {
+import java.util.List;
+
+public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.Holder> {
 
     private final Context context;
-    private SortedList<People> people;
+    private SortedList<User> users;
 
-    public PeopleAdapter(Context context) {
+    public UsersAdapter(Context context) {
         this.context = context;
-        this.people = new SortedList<>(People::compare);
+        this.users = new SortedList<>(User::compare);
     }
 
     @NonNull
@@ -41,33 +42,33 @@ public class PeopleAdapter extends RecyclerView.Adapter<PeopleAdapter.Holder> {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull PeopleAdapter.Holder holder, int position) {
-        holder.bind(people.get(position));
+    public void onBindViewHolder(@NonNull UsersAdapter.Holder holder, int position) {
+        holder.bind(users.get(position));
     }
 
     @Override
     public int getItemCount() {
-        return people.size();
+        return users.size();
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    public void resetList(SortedList<People> people) {
-        this.people = people;
+    public void resetList(SortedList<User> people) {
+        this.users = people;
         notifyDataSetChanged();
     }
 
-    public void addAt(SortedList<People> people, int index) {
-        this.people = people;
+    public void addAt(SortedList<User> people, int index) {
+        this.users = people;
         notifyItemInserted(index);
     }
 
-    public void removeAt(SortedList<People> people, int index) {
-        this.people = people;
+    public void removeAt(SortedList<User> people, int index) {
+        this.users = people;
         notifyItemRemoved(index);
     }
 
-    public void updateAt(SortedList<People> people, int index) {
-        this.people = people;
+    public void updateAt(SortedList<User> people, int index) {
+        this.users = people;
         notifyItemChanged(index);
     }
 
@@ -81,36 +82,31 @@ public class PeopleAdapter extends RecyclerView.Adapter<PeopleAdapter.Holder> {
             itemView.setOnClickListener(this);
         }
 
-        public void bind(People people) {
-            binding.setPeople(people);
+        public void bind(User user) {
+            binding.setPeople(user);
             binding.executePendingBindings();
 
-            String[] avatars = people.getAvatars();
-            binding.avatar.setImageURI(avatars.length > 0 ? avatars[0] : null);
+            List<String> avatars = user.getAvatars();
+            binding.avatar.setImageURI(avatars.size() > 0 ? avatars.get(0) : null);
 
-            switch (people.getGender()) {
-                case Person.GENDER_MALE:
+            switch (user.getGender()) {
+                case UserConsts.GENDER_MALE:
                     binding.genderCircle.setBackgroundResource(R.drawable.gender_circle_people_male_bg);
                     break;
-                case Person.GENDER_FEMALE:
+                case UserConsts.GENDER_FEMALE:
                     binding.genderCircle.setBackgroundResource(R.drawable.gender_circle_people_female_bg);
-                    break;
-                case Person.GENDER_MIXED:
-                    binding.genderCircle.setBackgroundResource(R.drawable.gender_circle_people_mixed_bg);
                     break;
             }
 
-            Key key = people.getKey();
-            Pair<Integer, Integer> pair = PersonUtils.rankInt2rankStrResAndColor(key != null ? key.getRank() : People.RANK_GUEST);
+            Pair<Integer, Integer> pair = PersonUtils.rankInt2rankStrResAndColor(user.getRank());
             binding.rank.setText(pair.first);
             binding.rank.setTextColor(pair.second);
         }
 
         @Override
         public void onClick(View v) {
-            People p = people.get(getAdapterPosition());
-            Contact contact = new Contact(p, Contact.TIME_ONLINE);
-            ChatActivity.start(context, contact);
+            User user = users.get(getAdapterPosition());
+            ChatActivity.start(context, new Contact(user));
         }
     }
 }

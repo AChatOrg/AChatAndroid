@@ -1,69 +1,57 @@
 package com.hyapp.achat.model.entity
 
 import android.util.Pair
-import com.google.gson.annotations.Expose
 import io.objectbox.annotation.Entity
 import io.objectbox.annotation.Id
 import io.objectbox.annotation.Index
 import io.objectbox.annotation.Unique
-import io.objectbox.relation.ToOne
 
 @Entity
 data class Message(
         @Index
         @Unique
-        @Expose
         var uid: String = "",
-        @Expose
         var type: Byte = TYPE_TEXT,
         var transfer: Byte = TRANSFER_RECEIVE,
-        @Expose
         var time: Long = 0,
-        @Expose
+        var text: String = "",
+        var extraTextSize: Int = 0,
+        var mediaPath: String = "",
+
+        @Index
         var receiverUid: String = "",
 
-        @Expose
-        var text: String = "",
-        @Expose
-        var extraTextSize: Int = 0,
+        @Index
+        var senderUid: String = "",
+        var senderRank: Byte = 0,
+        var senderScore: Int = 0,
+        var senderLoginTime: Long = 0,
+        var senderName: String = "",
+        var senderBio: String = "",
+        var senderGender: Byte = UserConsts.GENDER_MALE,
+        var senderAvatars: MutableList<String> = mutableListOf(),
+        var senderOnlineTime: Long = UserConsts.TIME_ONLINE,
 
         var delivery: Byte = DELIVERY_WAITING,
         var bubble: Byte = BUBBLE_SINGLE,
 
         @Id
-        var id: Long = 0,
+        var id: Long = 0
 ) {
 
-    var sender: ToOne<Contact> = ToOne(this, Message_.sender)
+    constructor(uid: String = "",
+                type: Byte = TYPE_TEXT,
+                transfer: Byte = TRANSFER_RECEIVE,
+                time: Long = 0,
+                text: String = "",
+                extraTextSize: Int = 0,
+                mediaPath: String = "",
+                receiverUid: String = "",
+                user: User
+    ) : this(uid, type, transfer, time, text, extraTextSize, mediaPath, receiverUid,
+            user.uid, user.rank, user.score, user.loginTime, user.name, user.bio, user.gender,
+            user.avatars, user.onlineTime)
 
-    constructor(
-            uid: String = "",
-            type: Byte = TYPE_TEXT,
-            transfer: Byte = TRANSFER_RECEIVE,
-            time: Long = 0,
-            senderId: Long,
-            receiverUid: String = "",
-            text: String = "",
-            extraTextSize: Int = 0,
-            delivery: Byte = DELIVERY_WAITING,
-            bubble: Byte = BUBBLE_SINGLE,
-            id: Long = 0,
-    ) : this(uid, type, transfer, time, receiverUid, text, extraTextSize, delivery, bubble, id) {
-        this.sender.targetId = senderId
-    }
-
-    constructor(
-            uid: String = "",
-            type: Byte = TYPE_TEXT,
-            transfer: Byte = TRANSFER_RECEIVE,
-            time: Long = 0,
-            sender: Contact = Contact(),
-            receiverUid: String = "",
-            text: String = "",
-            extraTextSize: Int = 0
-    ) : this(uid, type, transfer, time, receiverUid, text, extraTextSize) {
-        this.sender.target = sender
-    }
 
     companion object {
         const val TRANSFER_SEND: Byte = 1
@@ -118,5 +106,12 @@ data class Message(
             textSize = emojiSize * 0.8f
         }
         return Pair(textSize, emojiSize.toInt())
+    }
+
+    fun getContact(): Contact {
+        return Contact(Contact.TYPE_SINGLE,
+                senderName, senderBio, senderGender, senderAvatars, senderOnlineTime,
+                senderUid, senderRank, senderScore, senderLoginTime,
+                text, time, mediaPath)
     }
 }

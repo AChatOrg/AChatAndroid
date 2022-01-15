@@ -1,12 +1,14 @@
 package com.hyapp.achat.model
 
+import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.hyapp.achat.Config
 import com.hyapp.achat.model.entity.Contact
 import com.hyapp.achat.model.entity.Message
+import com.hyapp.achat.model.entity.User
 import com.hyapp.achat.model.objectbox.ContactDao
-import com.hyapp.achat.model.gson.MessageAdapter
 import com.hyapp.achat.model.objectbox.MessageDao
+import com.hyapp.achat.view.adapter.MessageAdapter
 import com.hyapp.achat.viewmodel.service.SocketService
 import io.socket.client.Socket
 import io.socket.emitter.Emitter
@@ -25,13 +27,10 @@ object ChatRepo {
         socket.on(Config.ON_PV_MESSAGE, onPvMessage)
     }
 
-    fun sendPvMessage(message: Message, receiver: Contact) {
-        val json = GsonBuilder()
-                .registerTypeAdapter(Message::class.java, MessageAdapter())
-                .create()
-                .toJson(message)
+    fun sendPvMessage(message: Message, receiver: User) {
+        val json = Gson().toJson(message)
 
-        val contact = ContactDao.get(receiver.uid) ?: receiver
+        val contact = ContactDao.get(receiver.uid) ?: Contact(receiver)
         contact.messageDelivery = Message.DELIVERY_WAITING
         setupAndPutContact(contact, message)
         MessageDao.put(message)
@@ -40,17 +39,12 @@ object ChatRepo {
     }
 
     private val onPvMessage = Emitter.Listener { args ->
-        val message = GsonBuilder()
-                .registerTypeAdapter(Message::class.java, MessageAdapter())
-                .create()
-                .fromJson(args[0].toString(), Message::class.java)
-                .apply {
-                    transfer = Message.TRANSFER_RECEIVE
-                }
-        val contact = ContactDao.get(message.sender.target.uid) ?: message.sender.target
+        val message = Gson().fromJson(args[0].toString(), Message::class.java).apply {
+            transfer = Message.TRANSFER_RECEIVE
+        }
+        val contact = ContactDao.get(message.senderUid) ?: message.getContact()
         contact.messageDelivery = Message.DELIVERY_HIDDEN
         setupAndPutContact(contact, message)
-        message.sender.target = contact
         MessageDao.put(message)
 
         _receiveMessageFlow.tryEmit(message)

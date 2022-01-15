@@ -6,7 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.hyapp.achat.model.ChatRepo
-import com.hyapp.achat.model.PeopleRepo
+import com.hyapp.achat.model.UsersRepo
 import com.hyapp.achat.model.entity.*
 import com.hyapp.achat.model.objectbox.ContactDao
 import com.hyapp.achat.model.preferences.LoginPreferences
@@ -14,8 +14,6 @@ import com.hyapp.achat.viewmodel.service.SocketService
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import java.util.*
-import kotlin.collections.ArrayList
 
 @ExperimentalCoroutinesApi
 class MainViewModel(application: Application) : AndroidViewModel(application) {
@@ -23,8 +21,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _contactsLive = MutableLiveData<Resource<ContactList>>()
     val contactsLive = _contactsLive as LiveData<Resource<ContactList>>
 
-    private val _peopleLive = MutableLiveData<Resource<PeopleList>>()
-    val peopleLive = _peopleLive as LiveData<Resource<PeopleList>>
+    private val _usersLive = MutableLiveData<Resource<UserList>>()
+    val usersLive = _usersLive as LiveData<Resource<UserList>>
 
 
     init {
@@ -42,10 +40,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun reloadPeople() {
-        _peopleLive.value = Resource.loading(null)
+        _usersLive.value = Resource.loading(null)
         viewModelScope.launch {
-            PeopleRepo.requestPeople().collect { peopleList ->
-                _peopleLive.value = Resource.add(peopleList, Resource.INDEX_ALL)
+            UsersRepo.requestUsers().collect { peopleList ->
+                _usersLive.value = Resource.add(peopleList, Resource.INDEX_ALL)
             }
         }
     }
@@ -64,30 +62,30 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private fun observePeople() {
         viewModelScope.launch {
             launch {
-                PeopleRepo.userCameFlow.collect { people ->
+                UsersRepo.userCameFlow.collect { people ->
                     onUserCame(people)
                 }
             }
             launch {
-                PeopleRepo.userLeftFlow.collect { uid ->
+                UsersRepo.userLeftFlow.collect { uid ->
                     onUserLeft(uid)
                 }
             }
         }
     }
 
-    private fun onUserCame(people: People) {
-        peopleLive.value?.data?.let {
-            it.add(people)
-            _peopleLive.value = Resource.add(it, it.indexOf(people))
+    private fun onUserCame(user: User) {
+        usersLive.value?.data?.let {
+            it.add(user)
+            _usersLive.value = Resource.add(it, it.indexOf(user))
         }
     }
 
     private fun onUserLeft(uid: String) {
-        peopleLive.value?.data?.let {
+        usersLive.value?.data?.let {
             val index = it.remove(uid)
-            if (index != PeopleList.INDEX_NOT_FOUND) {
-                _peopleLive.value = Resource.remove(it, index)
+            if (index != UserList.INDEX_NOT_FOUND) {
+                _usersLive.value = Resource.remove(it, index)
             }
         }
     }

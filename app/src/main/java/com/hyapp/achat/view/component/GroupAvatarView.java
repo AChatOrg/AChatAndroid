@@ -16,6 +16,8 @@ import com.facebook.drawee.generic.RoundingParams;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.hyapp.achat.R;
 
+import java.util.List;
+
 public class GroupAvatarView extends ConstraintLayout {
 
     private SimpleDraweeView[] draweeViews;
@@ -165,30 +167,30 @@ public class GroupAvatarView extends ConstraintLayout {
         hierarchy.setRoundingParams(circleParams);
     }
 
-    public void setAvatars(String... avatars) {
-        int length = Math.min(draweeViews.length, avatars.length);
+    public void setAvatars(List<String> avatars) {
+        int length = Math.min(draweeViews.length, avatars.size());
 
         switch (length) {
             case 4:
                 setTo4part();
                 for (int i = 0; i < length; i++) {
-                    draweeViews[i].setImageURI(avatars[i]);
+                    draweeViews[i].setImageURI(avatars.get(i));
                 }
                 return;
             case 3:
                 setTo3part();
-                draweeViews[0].setImageURI(avatars[0]);
-                draweeViews[2].setImageURI(avatars[1]);
-                draweeViews[3].setImageURI(avatars[2]);
+                draweeViews[0].setImageURI(avatars.get(0));
+                draweeViews[2].setImageURI(avatars.get(1));
+                draweeViews[3].setImageURI(avatars.get(2));
                 return;
             case 2:
                 setTo2part();
-                draweeViews[0].setImageURI(avatars[0]);
-                draweeViews[2].setImageURI(avatars[1]);
+                draweeViews[0].setImageURI(avatars.get(0));
+                draweeViews[2].setImageURI(avatars.get(1));
                 return;
             case 1:
                 setToCircle();
-                draweeViews[0].setImageURI(avatars[0]);
+                draweeViews[0].setImageURI(avatars.get(0));
                 return;
             case 0:
                 setToCircle();

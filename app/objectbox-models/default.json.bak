@@ -93,10 +93,79 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "2:7262915003648557870",
+      "lastPropertyId": "11:2745598514976428246",
+      "name": "Message",
+      "properties": [
+        {
+          "id": "1:8563885409780453117",
+          "name": "uid",
+          "indexId": "2:1581955708816697579",
+          "type": 9,
+          "flags": 2080
+        },
+        {
+          "id": "2:1084579148323620666",
+          "name": "type",
+          "type": 2
+        },
+        {
+          "id": "3:5007201011252270712",
+          "name": "transfer",
+          "type": 2
+        },
+        {
+          "id": "4:389097857989349936",
+          "name": "time",
+          "type": 6
+        },
+        {
+          "id": "5:612420413029127593",
+          "name": "receiverUid",
+          "type": 9
+        },
+        {
+          "id": "6:1776056819941456678",
+          "name": "text",
+          "type": 9
+        },
+        {
+          "id": "7:2554850214378356329",
+          "name": "extraTextSize",
+          "type": 5
+        },
+        {
+          "id": "8:4055220413583007029",
+          "name": "delivery",
+          "type": 2
+        },
+        {
+          "id": "9:3327319941560320558",
+          "name": "bubble",
+          "type": 2
+        },
+        {
+          "id": "10:4566093744585765401",
+          "name": "id",
+          "type": 6,
+          "flags": 1
+        },
+        {
+          "id": "11:2745598514976428246",
+          "name": "senderId",
+          "indexId": "3:1181881966450175885",
+          "type": 11,
+          "flags": 520,
+          "relationTarget": "Contact"
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "1:7499101650816396696",
-  "lastIndexId": "1:6287944330159118796",
+  "lastEntityId": "2:7262915003648557870",
+  "lastIndexId": "3:1181881966450175885",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
   "modelVersion": 5,

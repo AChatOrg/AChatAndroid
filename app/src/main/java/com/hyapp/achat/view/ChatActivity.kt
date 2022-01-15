@@ -43,10 +43,12 @@ import java.util.*
 class ChatActivity : EventActivity() {
 
     companion object {
+        private const val EXTRA_CONTACT = "contact"
+
         @JvmStatic
         fun start(context: Context, contact: Contact) {
             val intent = Intent(context, ChatActivity::class.java)
-            intent.putExtras(contact.bundle)
+            intent.putExtra(EXTRA_CONTACT, contact)
             context.startActivity(intent)
         }
     }
@@ -77,9 +79,8 @@ class ChatActivity : EventActivity() {
 
     private fun init() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_chat)
-        contact = Contact(intent.extras ?: Bundle())
-        viewModel = ViewModelProvider(this, ChatViewModel.Factory(contact))[ChatViewModel::class.java]
-        viewModel.receiver = contact
+        contact = intent.getParcelableExtra(EXTRA_CONTACT) ?: Contact()
+        viewModel = ViewModelProvider(this, ChatViewModel.Factory(contact.getUser()))[ChatViewModel::class.java]
     }
 
     private fun setupContact() {
@@ -87,7 +88,7 @@ class ChatActivity : EventActivity() {
             name.text = contact.name
             bio.text = contact.bio
             if (contact.type == Contact.TYPE_SINGLE) {
-                avatar.setAvatars(if (contact.avatars.isNotEmpty()) contact.avatars[0] else null)
+                avatar.setAvatars(contact.avatars)
                 if (contact.onlineTime == Contact.TIME_ONLINE) {
                     onlineTime.text = ""
                     onlineTime.setBackgroundResource(R.drawable.last_online_chat_bg_green)
@@ -96,7 +97,7 @@ class ChatActivity : EventActivity() {
                     onlineTime.setBackgroundResource(R.drawable.last_online_chat_bg_grey)
                 }
             } else {
-                avatar.setAvatars(*contact.avatars)
+                avatar.setAvatars(contact.avatars)
                 onlineTime.visibility = GONE
             }
         }
