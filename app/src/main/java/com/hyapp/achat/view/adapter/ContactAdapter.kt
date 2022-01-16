@@ -1,6 +1,5 @@
 package com.hyapp.achat.view.adapter
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -9,26 +8,40 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.LifecycleOwner
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.drawee.view.SimpleDraweeView
 import com.hyapp.achat.R
-import com.hyapp.achat.viewmodel.utils.TimeUtils
 import com.hyapp.achat.databinding.ItemContactGroupBinding
 import com.hyapp.achat.databinding.ItemContactSingleBinding
 import com.hyapp.achat.model.entity.Contact
-import com.hyapp.achat.model.entity.ContactList
 import com.hyapp.achat.model.entity.Message
-import com.hyapp.achat.model.entity.Resource
 import com.hyapp.achat.view.ChatActivity
-import java.lang.RuntimeException
+import com.hyapp.achat.viewmodel.utils.TimeUtils
 
-class ContactAdapter(private val context: Context)
-    : RecyclerView.Adapter<ContactAdapter.Holder>() {
+class ContactAdapter(private val context: Context) : ListAdapter<Contact, ContactAdapter.Holder>(DIFF_CALLBACK) {
 
-    private var contacts: List<Contact> = ContactList()
+    companion object {
+        val DIFF_CALLBACK: DiffUtil.ItemCallback<Contact> = object : DiffUtil.ItemCallback<Contact>() {
+            override fun areItemsTheSame(oldItem: Contact, newItem: Contact): Boolean {
+                return oldItem.uid == newItem.uid
+            }
+
+            override fun areContentsTheSame(oldItem: Contact, newItem: Contact): Boolean {
+                return oldItem == newItem
+            }
+        }
+    }
+
+    override fun submitList(list: MutableList<Contact>?) {
+        if (list != null) {
+            super.submitList(ArrayList(list))
+        }
+    }
 
     override fun getItemViewType(position: Int): Int {
-        return contacts[position].type.toInt()
+        return getItem(position).type.toInt()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
@@ -46,25 +59,7 @@ class ContactAdapter(private val context: Context)
     }
 
     override fun onBindViewHolder(holder: Holder, position: Int) {
-        holder.bind(contacts[position])
-    }
-
-    override fun getItemCount(): Int {
-        return contacts.size
-    }
-
-    @SuppressLint("NotifyDataSetChanged")
-    fun resetList(list: List<Contact>) {
-        contacts = list
-        notifyDataSetChanged()
-    }
-
-    fun putFirst(list: List<Contact>, oldIndex: Int) {
-        contacts = list
-        if (oldIndex != Resource.INDEX_NEW) {
-            notifyItemRemoved(oldIndex)
-        }
-        notifyItemInserted(0)
+        holder.bind(getItem(position))
     }
 
     @Suppress("LeakingThis")
@@ -104,7 +99,7 @@ class ContactAdapter(private val context: Context)
         }
 
         override fun onClick(p0: View?) {
-            ChatActivity.start(context, contacts[adapterPosition])
+            ChatActivity.start(context, getItem(adapterPosition))
         }
 
     }

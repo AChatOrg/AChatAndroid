@@ -16,13 +16,15 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.hyapp.achat.R;
 import com.hyapp.achat.databinding.FragmentPeopleGroupsBinding;
-import com.hyapp.achat.model.entity.UserList;
-import com.hyapp.achat.model.entity.Resource;
 import com.hyapp.achat.model.entity.Event;
+import com.hyapp.achat.model.entity.SortedList;
+import com.hyapp.achat.model.entity.User;
 import com.hyapp.achat.view.adapter.UsersAdapter;
 import com.hyapp.achat.viewmodel.MainViewModel;
 
-public class PeopleFragment extends Fragment {
+import java.util.List;
+
+public class UsersFragment extends Fragment {
 
     private MainViewModel viewModel;
     private FragmentPeopleGroupsBinding binding;
@@ -41,7 +43,7 @@ public class PeopleFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         viewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
         binding.setLifecycleOwner(getViewLifecycleOwner());
-        binding.swipeRefreshLayout.setOnRefreshListener(() -> viewModel.reloadPeople());
+        binding.swipeRefreshLayout.setOnRefreshListener(() -> viewModel.reloadUsers());
         setupRecyclerView(requireContext(), view);
         observePeople();
     }
@@ -54,13 +56,13 @@ public class PeopleFragment extends Fragment {
     }
 
     private void observePeople() {
-        viewModel.getUsersLive().observe(getViewLifecycleOwner(), listResource -> {
-            switch (listResource.status) {
+        viewModel.getUsersLive().observe(getViewLifecycleOwner(), res -> {
+            switch (res.status) {
                 case SUCCESS:
-                    onSuccess(listResource);
+                    onSuccess(res.data);
                     break;
                 case ERROR:
-                    onError(listResource.message);
+                    onError(res.message);
                     break;
                 case LOADING:
                     onLoading();
@@ -69,28 +71,10 @@ public class PeopleFragment extends Fragment {
         });
     }
 
-    private void onSuccess(Resource<UserList> resource) {
-        switch (resource.action) {
-            case ADD:
-                addPeople(resource);
-                break;
-            case REMOVE:
-                adapter.removeAt(resource.data, resource.index);
-                break;
-            case UPDATE:
-                adapter.updateAt(resource.data, resource.index);
-                break;
-        }
-    }
-
-    public void addPeople(Resource<UserList> resource) {
-        if (resource.index == Resource.INDEX_ALL) {
-            binding.progressBar.setVisibility(View.GONE);
-            binding.swipeRefreshLayout.setRefreshing(false);
-            adapter.resetList(resource.data);
-        } else {
-            adapter.addAt(resource.data, resource.index);
-        }
+    private void onSuccess(SortedList<User> list) {
+        binding.swipeRefreshLayout.setRefreshing(false);
+        binding.progressBar.setVisibility(View.GONE);
+        adapter.submitList(list);
     }
 
     private void onError(String message) {

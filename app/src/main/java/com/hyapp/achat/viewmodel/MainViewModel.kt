@@ -18,32 +18,31 @@ import kotlinx.coroutines.launch
 @ExperimentalCoroutinesApi
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val _contactsLive = MutableLiveData<Resource<ContactList>>()
-    val contactsLive = _contactsLive as LiveData<Resource<ContactList>>
+    private val _contactsLive = MutableLiveData<ContactList>()
+    val contactsLive = _contactsLive as LiveData<ContactList>
 
-    private val _usersLive = MutableLiveData<Resource<UserList>>()
-    val usersLive = _usersLive as LiveData<Resource<UserList>>
+    private val _usersLive = MutableLiveData<Resource<SortedList<User>>>()
+    val usersLive = _usersLive as LiveData<Resource<SortedList<User>>>
 
 
     init {
         val context = getApplication<Application>().applicationContext
         SocketService.start(context, Preferences.instance().loginInfo)
         loadContacts()
-        reloadPeople()
+        reloadUsers()
         observeContacts()
-        observePeople()
+        observeUsers()
     }
 
     private fun loadContacts() {
-        val contacts = ContactList(ContactDao.all())
-        _contactsLive.value = Resource.add(contacts, Resource.INDEX_ALL)
+        _contactsLive.value = ContactList(ContactDao.all())
     }
 
-    fun reloadPeople() {
+    fun reloadUsers() {
         _usersLive.value = Resource.loading(null)
         viewModelScope.launch {
-            UsersRepo.requestUsers().collect { peopleList ->
-                _usersLive.value = Resource.add(peopleList, Resource.INDEX_ALL)
+            UsersRepo.requestUsers().collect { userList ->
+                _usersLive.value = Resource.success(userList)
             }
         }
     }
@@ -51,41 +50,30 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private fun observeContacts() {
         viewModelScope.launch {
             ChatRepo.contactFlow.collect { contact ->
-                val resource = _contactsLive.value ?: Resource.success(ContactList())
-                val contactList = resource.data ?: ContactList()
-                val oldIndex = contactList.putFirst(contact)
-                _contactsLive.value = Resource.add(contactList, oldIndex)
+                val contactList = _contactsLive.value ?: ContactList()
+                contactList.putFirst(contact)
+                _contactsLive.value = contactList
             }
         }
     }
 
-    private fun observePeople() {
+    private fun observeUsers() {
         viewModelScope.launch {
             launch {
-                UsersRepo.userCameFlow.collect { people ->
-                    onUserCame(people)
+                UsersRepo.userCameFlow.collect { user ->
+                    usersLive.value?.data?.let {
+                        it.add(user)
+                        _usersLive.value = Resource.success(it)
+                    }
                 }
             }
             launch {
-                UsersRepo.userLeftFlow.collect { uid ->
-                    onUserLeft(uid)
+                UsersRepo.userLeftFlow.collect { user ->
+                    usersLive.value?.data?.let {
+                        it.remove(user)
+                        _usersLive.value = Resource.success(it)
+                    }
                 }
-            }
-        }
-    }
-
-    private fun onUserCame(user: User) {
-        usersLive.value?.data?.let {
-            it.add(user)
-            _usersLive.value = Resource.add(it, it.indexOf(user))
-        }
-    }
-
-    private fun onUserLeft(uid: String) {
-        usersLive.value?.data?.let {
-            val index = it.remove(uid)
-            if (index != UserList.INDEX_NOT_FOUND) {
-                _usersLive.value = Resource.remove(it, index)
             }
         }
     }

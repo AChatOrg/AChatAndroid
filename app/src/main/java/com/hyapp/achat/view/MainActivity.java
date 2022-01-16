@@ -19,7 +19,7 @@ import com.hyapp.achat.model.entity.ConnLive;
 import com.hyapp.achat.model.entity.Resource;
 import com.hyapp.achat.view.adapter.ContactAdapter;
 import com.hyapp.achat.view.fragment.GroupsFragment;
-import com.hyapp.achat.view.fragment.PeopleFragment;
+import com.hyapp.achat.view.fragment.UsersFragment;
 import com.hyapp.achat.view.component.AbstractTabSelectedListener;
 
 public class MainActivity extends EventActivity {
@@ -71,21 +71,11 @@ public class MainActivity extends EventActivity {
     }
 
     private void observeContacts() {
-        viewModel.getContactsLive().observe(this, resource -> {
-            if (resource.status == Resource.Status.SUCCESS) {
-                if (resource.action == Resource.Action.ADD) {
-                    if (resource.index == Resource.INDEX_ALL) {
-                        contactAdapter.resetList(resource.data);
-                    } else {
-                        contactAdapter.putFirst(resource.data, resource.index);
-                    }
-                }
-            }
-        });
+        viewModel.getContactsLive().observe(this, contactList -> contactAdapter.submitList(contactList));
     }
 
     private void setupPeopleGroups() {
-        final PeopleFragment peopleFragment = new PeopleFragment();
+        final UsersFragment usersFragment = new UsersFragment();
         final GroupsFragment groupsFragment = new GroupsFragment();
 
         binding.peopleGroups.peopleGroupsTitle.setText(String.format(getString(R.string.onile_s), peopleSize));
@@ -96,9 +86,9 @@ public class MainActivity extends EventActivity {
             transaction.remove(fragment);
         }
         transaction
-                .add(R.id.fragment, peopleFragment)
+                .add(R.id.fragment, usersFragment)
                 .add(R.id.fragment, groupsFragment)
-                .show(peopleFragment)
+                .show(usersFragment)
                 .hide(groupsFragment)
                 .commit();
 
@@ -108,11 +98,11 @@ public class MainActivity extends EventActivity {
                 final FragmentTransaction transaction = manager.beginTransaction();
                 switch (tab.getPosition()) {
                     case 0:
-                        transaction.show(peopleFragment);
+                        transaction.show(usersFragment);
                         transaction.hide(groupsFragment);
                         break;
                     case 1:
-                        transaction.hide(peopleFragment);
+                        transaction.hide(usersFragment);
                         transaction.show(groupsFragment);
                         break;
                 }

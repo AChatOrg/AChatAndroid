@@ -3,8 +3,8 @@ package com.hyapp.achat.model
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import com.hyapp.achat.Config
+import com.hyapp.achat.model.entity.SortedList
 import com.hyapp.achat.model.entity.User
-import com.hyapp.achat.model.entity.UserList
 import com.hyapp.achat.model.gson.UserDeserializer
 import com.hyapp.achat.viewmodel.service.SocketService
 import io.socket.client.Socket
@@ -21,7 +21,7 @@ object UsersRepo {
     private val _userCameFlow = MutableSharedFlow<User>(extraBufferCapacity = 1)
     val userCameFlow = _userCameFlow.asSharedFlow()
 
-    private val _userLeftFlow = MutableSharedFlow<String>(extraBufferCapacity = 1)
+    private val _userLeftFlow = MutableSharedFlow<User>(extraBufferCapacity = 1)
     val userLeftFlow = _userLeftFlow.asSharedFlow()
 
     fun listen(socket: Socket) {
@@ -30,15 +30,16 @@ object UsersRepo {
     }
 
     @ExperimentalCoroutinesApi
-    fun requestUsers(): Flow<UserList> = callbackFlow {
+    fun requestUsers(): Flow<SortedList<User>> = callbackFlow {
         SocketService.ioSocket?.socket?.let {
             it.emit(Config.ON_USERS)
             it.on(Config.ON_USERS) { args ->
+                it.off(Config.ON_USERS)
                 val users = GsonBuilder()
                         .registerTypeAdapter(User::class.java, UserDeserializer())
                         .create()
                         .fromJson<List<User>>(args[0].toString(), object : TypeToken<List<User?>?>() {}.type)
-                val userList = UserList()
+                val userList = SortedList<User> { u1, u2 -> User.compare(u1, u2) }
                 userList.addAll(users)
                 trySend(userList)
             }
@@ -55,7 +56,10 @@ object UsersRepo {
     }
 
     private val onUserLeft = Emitter.Listener { args ->
-        val uid = args[0].toString()
-        _userLeftFlow.tryEmit(uid)
+        val user = GsonBuilder()
+                .registerTypeAdapter(User::class.java, UserDeserializer())
+                .create()
+                .fromJson(args[0].toString(), User::class.java)
+        _userLeftFlow.tryEmit(user)
     }
 }
