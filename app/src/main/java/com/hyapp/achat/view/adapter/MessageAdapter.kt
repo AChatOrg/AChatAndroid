@@ -22,7 +22,7 @@ import com.hyapp.achat.view.utils.UiUtils
 import com.hyapp.achat.viewmodel.utils.TimeUtils
 
 
-class MessageAdapter(val context: Context) : RecyclerView.Adapter<MessageAdapter.Holder>() {
+class MessageAdapter(val context: Context, val recyclerView: RecyclerView) : RecyclerView.Adapter<MessageAdapter.Holder>() {
     companion object {
         const val PAYLOAD_BUBBLE: Byte = 0
         const val PAYLOAD_READ: Byte = 1
@@ -30,6 +30,9 @@ class MessageAdapter(val context: Context) : RecyclerView.Adapter<MessageAdapter
 
     var messages = MessageList()
     val sp1: Int = UiUtils.sp2px(context, 1F)
+
+    var isLoadingMore = false
+    lateinit var onLoadMore: () -> Unit
 
     override fun getItemViewType(position: Int): Int {
         val message = messages[position]
@@ -50,6 +53,12 @@ class MessageAdapter(val context: Context) : RecyclerView.Adapter<MessageAdapter
 
     override fun onBindViewHolder(holder: Holder, position: Int) {
         holder.bind(messages[position])
+        if (position <= 0 && !isLoadingMore && messages.size > 2) {
+            isLoadingMore = true
+            if (::onLoadMore.isInitialized) {
+                recyclerView.post { onLoadMore() }
+            }
+        }
     }
 
     override fun onBindViewHolder(holder: Holder, position: Int, payloads: List<Any?>) {
@@ -71,18 +80,19 @@ class MessageAdapter(val context: Context) : RecyclerView.Adapter<MessageAdapter
         }
     }
 
-    @SuppressLint("NotifyDataSetChanged")
-    fun resetList(list: MessageList) {
-        messages = list
-        notifyDataSetChanged()
-    }
-
     fun add(list: MessageList, prevChanged: Boolean, addedCount: Int) {
         messages = list
         val size = messages.size
         if (prevChanged)
             notifyItemChanged(size - 1 - addedCount, PAYLOAD_BUBBLE)
         notifyItemRangeInserted(size - addedCount, addedCount)
+    }
+
+    fun addPaging(list: MessageList, addedCount: Int, firstChanged: Boolean) {
+        messages = list
+        if (firstChanged)
+            notifyItemChanged(0, PAYLOAD_BUBBLE)
+        notifyItemRangeInserted(0, addedCount)
     }
 
     abstract inner class Holder(view: View) : RecyclerView.ViewHolder(view) {

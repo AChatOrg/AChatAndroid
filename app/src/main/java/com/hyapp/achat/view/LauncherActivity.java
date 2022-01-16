@@ -5,7 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.hyapp.achat.model.preferences.LoginPreferences;
+import com.hyapp.achat.model.Preferences;
 
 public class LauncherActivity extends AppCompatActivity {
 
@@ -21,7 +21,7 @@ public class LauncherActivity extends AppCompatActivity {
             return;
         }
 
-        if (LoginPreferences.singleton(getApplicationContext()).getLogged()) {
+        if (Preferences.instance().getLogged()) {
             startActivity(new Intent(this, MainActivity.class));
         } else {
             startActivity(new Intent(this, LoginGuestActivity.class));

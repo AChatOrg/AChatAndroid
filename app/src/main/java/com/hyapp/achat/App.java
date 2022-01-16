@@ -9,6 +9,7 @@ import androidx.multidex.MultiDexApplication;
 
 import com.aghajari.rlottie.AXrLottie;
 import com.aghajari.rlottie.AXrLottieImageView;
+import com.hyapp.achat.model.Preferences;
 import com.hyapp.achat.view.component.emojiview.iosprovider.AXIOSEmojiProvider;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.hyapp.achat.model.objectbox.ObjectBox;
@@ -21,6 +22,7 @@ public class App extends MultiDexApplication {
     @Override
     public void onCreate() {
         super.onCreate();
+        Preferences.init(this);
         Fresco.initialize(this);
         ObjectBox.init(this);
         AXrLottie.init(this);

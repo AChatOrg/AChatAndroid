@@ -9,7 +9,7 @@ import com.hyapp.achat.model.ChatRepo
 import com.hyapp.achat.model.UsersRepo
 import com.hyapp.achat.model.entity.*
 import com.hyapp.achat.model.objectbox.ContactDao
-import com.hyapp.achat.model.preferences.LoginPreferences
+import com.hyapp.achat.model.Preferences
 import com.hyapp.achat.viewmodel.service.SocketService
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
@@ -27,7 +27,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     init {
         val context = getApplication<Application>().applicationContext
-        SocketService.start(context, LoginPreferences.singleton(context).loginEvent)
+        SocketService.start(context, Preferences.instance().loginInfo)
         loadContacts()
         reloadPeople()
         observeContacts()

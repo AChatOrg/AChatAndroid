@@ -106,7 +106,8 @@ class ChatActivity : EventActivity() {
     private fun setupRecyclerView() {
         val layoutManager: LinearLayoutManager = SpeedyLinearLayoutManager(this, 100)
         binding.recyclerView.layoutManager = layoutManager
-        messageAdapter = MessageAdapter(this)
+        messageAdapter = MessageAdapter(this, binding.recyclerView)
+        messageAdapter.onLoadMore = { viewModel.loadPagedMessages() }
         binding.recyclerView.adapter = messageAdapter
         binding.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -280,12 +281,14 @@ class ChatActivity : EventActivity() {
         viewModel.messagesLive.observe(this, { res ->
             when (res.action) {
                 Resource.Action.ADD -> {
-                    if (res.index == Resource.INDEX_ALL) {
-                        messageAdapter.resetList(res.data!!)
-                    } else {
-                        messageAdapter.add(res.data!!, res.bool, res.index)
-                        binding.recyclerView.smoothScrollToPosition(messageAdapter.itemCount - 1)
-                    }
+                    messageAdapter.add(res.data!!, res.bool, res.index)
+                    binding.recyclerView.smoothScrollToPosition(messageAdapter.itemCount - 1)
+                }
+                Resource.Action.ADD_PAGING -> {
+                    messageAdapter.isLoadingMore = !res.bool2
+                    messageAdapter.addPaging(res.data!!, res.index, res.bool)
+                    if (res.bool3)
+                        binding.recyclerView.scrollToPosition(messageAdapter.itemCount - 1)
                 }
             }
         })

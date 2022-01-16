@@ -13,7 +13,7 @@ import androidx.annotation.Nullable;
 
 import com.hyapp.achat.model.IOSocket;
 import com.hyapp.achat.model.entity.ConnLive;
-import com.hyapp.achat.model.preferences.LoginPreferences;
+import com.hyapp.achat.model.Preferences;
 import com.hyapp.achat.viewmodel.utils.NetUtils;
 import com.hyapp.achat.viewmodel.utils.NotifUtils;
 
@@ -51,7 +51,7 @@ public class SocketService extends Service {
         String loginJson = intent.getStringExtra(EXTRA_LOGIN_EVENT);
         if (loginJson != null && ioSocket == null) {
             ioSocket = new IOSocket(loginJson);
-            LoginPreferences.singleton(getApplicationContext()).putLogged(true);
+            Preferences.instance().putLogged(true);
         }
 
         NotifUtils.createSocketChannel(this);
@@ -66,7 +66,7 @@ public class SocketService extends Service {
             ioSocket.destroy();
         }
         ioSocket = null;
-        LoginPreferences.singleton(getApplicationContext()).putLogged(false);
+        Preferences.instance().putLogged(false);
     }
 
     private final BroadcastReceiver netReceiver = new BroadcastReceiver() {

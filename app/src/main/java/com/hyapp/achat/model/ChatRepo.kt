@@ -1,14 +1,12 @@
 package com.hyapp.achat.model
 
 import com.google.gson.Gson
-import com.google.gson.GsonBuilder
 import com.hyapp.achat.Config
 import com.hyapp.achat.model.entity.Contact
 import com.hyapp.achat.model.entity.Message
 import com.hyapp.achat.model.entity.User
 import com.hyapp.achat.model.objectbox.ContactDao
 import com.hyapp.achat.model.objectbox.MessageDao
-import com.hyapp.achat.view.adapter.MessageAdapter
 import com.hyapp.achat.viewmodel.service.SocketService
 import io.socket.client.Socket
 import io.socket.emitter.Emitter
@@ -34,6 +32,7 @@ object ChatRepo {
         contact.messageDelivery = Message.DELIVERY_WAITING
         setupAndPutContact(contact, message)
         MessageDao.put(message)
+        Preferences.instance().incrementContactMessagesCount(contact.uid)
 
         SocketService.ioSocket?.socket?.emit(Config.ON_PV_MESSAGE, json)
     }
@@ -46,6 +45,7 @@ object ChatRepo {
         contact.messageDelivery = Message.DELIVERY_HIDDEN
         setupAndPutContact(contact, message)
         MessageDao.put(message)
+        Preferences.instance().incrementContactMessagesCount(contact.uid)
 
         _receiveMessageFlow.tryEmit(message)
     }

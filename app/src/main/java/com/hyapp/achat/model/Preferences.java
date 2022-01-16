@@ -1,4 +1,4 @@
-package com.hyapp.achat.model.preferences;
+package com.hyapp.achat.model;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -9,7 +9,7 @@ import org.json.JSONObject;
 import java.util.HashSet;
 import java.util.Set;
 
-public class LoginPreferences {
+public class Preferences {
 
     private static final String DEFAULT_NAME = "login";
 
@@ -22,27 +22,32 @@ public class LoginPreferences {
     public static final String NAME_SET = "nameSet";
     public static final String BIO_SET = "bioSet";
 
-    public static final String LOGIN_EVENT = "logginEvent";
+    public static final String LOGIN_INFO = "loginEvent";
 
-    private static LoginPreferences instance;
+    public static final String CONTACT_MESSAGES_COUNT = "CMC";
+
+    private static Preferences instance;
 
     private final SharedPreferences preferences;
 
-    public LoginPreferences(Context context) {
+    public Preferences(Context context) {
         preferences = context.getSharedPreferences(DEFAULT_NAME, Context.MODE_PRIVATE);
     }
 
-    public static LoginPreferences singleton(Context context) {
+    public static void init(Context context) {
         if (instance == null) {
-            instance = new LoginPreferences(context);
+            instance = new Preferences(context);
         }
+    }
+
+    public static Preferences instance() {
         return instance;
     }
 
     public void putLogged(boolean logged) {
-        SharedPreferences.Editor writerPrefs = preferences.edit();
-        writerPrefs.putBoolean(LOGGED, logged);
-        writerPrefs.apply();
+        SharedPreferences.Editor writer = preferences.edit();
+        writer.putBoolean(LOGGED, logged);
+        writer.apply();
     }
 
     public boolean getLogged() {
@@ -50,55 +55,66 @@ public class LoginPreferences {
     }
 
     public void putLoginGuest(String name, String bio, byte gender) {
-        SharedPreferences.Editor writerPrefs = preferences.edit();
-        writerPrefs.putString(NAME, name);
-        writerPrefs.putString(BIO, bio);
-        writerPrefs.putInt(GENDER, gender);
+        SharedPreferences.Editor writer = preferences.edit();
+        writer.putString(NAME, name);
+        writer.putString(BIO, bio);
+        writer.putInt(GENDER, gender);
         if (!name.isEmpty()) {
             Set<String> nameSet = new HashSet<>(preferences.getStringSet(NAME_SET, new HashSet<>()));
             nameSet.add(name);
-            writerPrefs.putStringSet(NAME_SET, nameSet);
+            writer.putStringSet(NAME_SET, nameSet);
         }
         if (!bio.isEmpty()) {
             Set<String> bioSet = new HashSet<>(preferences.getStringSet(BIO_SET, new HashSet<>()));
             bioSet.add(bio);
-            writerPrefs.putStringSet(BIO_SET, bioSet);
+            writer.putStringSet(BIO_SET, bioSet);
         }
-        writerPrefs.apply();
+        writer.apply();
     }
 
-    public String getName() {
+    public String getLoginName() {
         return preferences.getString(NAME, "");
     }
 
-    public String getBio() {
+    public String getLoginBio() {
         return preferences.getString(BIO, "");
     }
 
-    public int getGender() {
+    public int getLoginGender() {
         return preferences.getInt(GENDER, 1);
     }
 
-    public Set<String> getNameSet() {
+    public Set<String> getLoginNameSet() {
         return new HashSet<>(preferences.getStringSet(NAME_SET, new HashSet<>()));
     }
 
-    public Set<String> getBioSet() {
+    public Set<String> getLoginBioSet() {
         return new HashSet<>(preferences.getStringSet(BIO_SET, new HashSet<>()));
     }
 
-    public void putLoginEvent(String loginEventStr) {
-        SharedPreferences.Editor writerPrefs = preferences.edit();
-        writerPrefs.putString(LOGIN_EVENT, loginEventStr);
-        writerPrefs.apply();
+    public void putLoginInfo(String loginEventStr) {
+        SharedPreferences.Editor writer = preferences.edit();
+        writer.putString(LOGIN_INFO, loginEventStr);
+        writer.apply();
     }
 
-    public String getLoginEvent() throws JSONException {
+    public String getLoginInfo() throws JSONException {
         JSONObject json = new JSONObject();
         json.put("operation", "");
         json.put("name", "");
         json.put("bio", "");
         json.put("gender", "1");
-        return preferences.getString(LOGIN_EVENT, json.toString());
+        return preferences.getString(LOGIN_INFO, json.toString());
+    }
+
+    public void incrementContactMessagesCount(String contactUid) {
+        long count = preferences.getLong(CONTACT_MESSAGES_COUNT + contactUid, 0);
+        SharedPreferences.Editor writer = preferences.edit();
+        writer.putLong(CONTACT_MESSAGES_COUNT + contactUid, count + 1);
+        writer.apply();
+    }
+
+    public long getContactMessagesCount(String contactUid) {
+        return preferences.getLong(CONTACT_MESSAGES_COUNT + contactUid, 0);
     }
 }

@@ -19,4 +19,9 @@ object MessageDao {
                 .build()
                 .find(offset, limit)
     }
+
+    @JvmStatic
+    fun count(): Long {
+        return ObjectBox.store.boxFor(Message::class.java).count()
+    }
 }

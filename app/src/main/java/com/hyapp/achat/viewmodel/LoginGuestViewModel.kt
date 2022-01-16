@@ -4,11 +4,10 @@ import android.app.Application
 import android.content.Intent
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.gson.Gson
 import com.hyapp.achat.Config
 import com.hyapp.achat.model.LoginRepo
 import com.hyapp.achat.model.entity.*
-import com.hyapp.achat.model.preferences.LoginPreferences
+import com.hyapp.achat.model.Preferences
 import com.hyapp.achat.viewmodel.service.SocketService
 import com.hyapp.achat.viewmodel.utils.NetUtils
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -45,7 +44,7 @@ class LoginGuestViewModel(application: Application) : AndroidViewModel(applicati
             val bioTrim = bio.trim()
             val genderByte: Byte = if (gender) UserConsts.GENDER_MALE else UserConsts.GENDER_FEMALE
 
-            LoginPreferences.singleton(context).putLoginGuest(nameTrim, bioTrim, genderByte)
+            Preferences.instance().putLoginGuest(nameTrim, bioTrim, genderByte)
 
             _loggedFlow.tryEmit(Event(Event.Status.LOADING))
 
@@ -57,7 +56,7 @@ class LoginGuestViewModel(application: Application) : AndroidViewModel(applicati
 
             val jsonStr = json.toString()
             SocketService.start(context, jsonStr)
-            LoginPreferences.singleton(context).putLoginEvent(jsonStr)
+            Preferences.instance().putLoginInfo(jsonStr)
         }
     }
 
@@ -67,26 +66,26 @@ class LoginGuestViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     val savedName: String
-        get() = LoginPreferences.singleton(getApplication<Application>().applicationContext).name
+        get() = Preferences.instance().loginName
 
     val savedBio: String
-        get() = LoginPreferences.singleton(getApplication<Application>().applicationContext).bio
+        get() = Preferences.instance().loginBio
 
     val savedGender: Boolean
         get() {
-            val gender = LoginPreferences.singleton(getApplication<Application>().applicationContext).gender
+            val gender = Preferences.instance().loginGender
             return gender == UserConsts.GENDER_MALE.toInt()
         }
 
     val nameHistory: Array<String>
         get() {
-            val set = LoginPreferences.singleton(getApplication<Application>().applicationContext).nameSet
+            val set = Preferences.instance().loginNameSet
             return set.toTypedArray()
         }
 
     val bioHistory: Array<String>
         get() {
-            val set = LoginPreferences.singleton(getApplication<Application>().applicationContext).bioSet
+            val set = Preferences.instance().loginBioSet
             return set.toTypedArray()
         }
 }

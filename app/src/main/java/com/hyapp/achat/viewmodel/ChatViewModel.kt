@@ -1,31 +1,63 @@
 package com.hyapp.achat.viewmodel
 
+import android.text.format.DateUtils
 import androidx.lifecycle.*
 import com.hyapp.achat.model.ChatRepo
+import com.hyapp.achat.model.Preferences
 import com.hyapp.achat.model.entity.*
 import com.hyapp.achat.model.objectbox.MessageDao
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.util.*
+import kotlin.math.max
+import kotlin.math.min
 
 class ChatViewModel(var receiver: User) : ViewModel() {
+
+    companion object {
+        const val PAGING_LIMIT: Long = 50
+    }
 
     private val _messagesLive = MutableLiveData<Resource<MessageList>>()
     val messagesLive = _messagesLive as LiveData<Resource<MessageList>>
 
+    private val initCount = Preferences.instance().getContactMessagesCount(receiver.uid)
+    private var pagedCount = 0
+
     init {
-        loadMessages()
+        loadPagedMessages()
         observeReceivedMessage()
     }
 
-    private fun loadMessages() {
-        val messages = MessageDao.all(receiver.uid, 0, 1000)
-        val messageList = MessageList()
-        messageList.addFirst(Message(type = Message.TYPE_PROFILE, user = receiver))
-        for (message in messages) {
-            messageList.addMessage(message)
+    fun loadPagedMessages() {
+        val resource = _messagesLive.value ?: Resource.success(MessageList())
+        val messageList = resource.data ?: MessageList()
+
+        if (initCount <= 0) {
+            messageList.addFirst(Message(type = Message.TYPE_PROFILE, user = receiver))
+            _messagesLive.value = Resource.addPaging(messageList, 1, false, false, false)
+            return
         }
-        _messagesLive.value = Resource.add(messageList, Resource.INDEX_ALL)
+        val remaining = initCount - ++pagedCount * PAGING_LIMIT
+        val hasNext = remaining > 0
+        val offset = max(remaining, 0)
+        val limit = min(remaining + PAGING_LIMIT, PAGING_LIMIT)
+        val messages = MessageDao.all(receiver.uid, offset, limit)
+
+        val oldSize = messageList.size
+        val prevChanged = messageList.addMessageFirst(messages[messages.size - 1]).first
+
+        for (i in messages.size - 2 downTo 0) {
+            messageList.addMessageFirst(messages[i])
+        }
+        if (!hasNext) {
+            val details = DateUtils.getRelativeTimeSpanString(messages[0].time, System.currentTimeMillis(), DateUtils.DAY_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE).toString()
+            val detailsMessage = Message(type = Message.TYPE_DETAILS, time = messages[0].time, text = details)
+            messageList.addFirst(detailsMessage)
+            messageList.addFirst(Message(type = Message.TYPE_PROFILE, user = receiver))
+        }
+
+        _messagesLive.value = Resource.addPaging(messageList, messageList.size - oldSize, prevChanged, hasNext, pagedCount == 1)
     }
 
     private fun observeReceivedMessage() {
@@ -50,7 +82,7 @@ class ChatViewModel(var receiver: User) : ViewModel() {
     private fun addMessage(message: Message) {
         val resource = _messagesLive.value ?: Resource.success(MessageList())
         val messageList = resource.data ?: MessageList()
-        val pair = messageList.addMessage(message)
+        val pair = messageList.addMessageLast(message)
         _messagesLive.value = Resource.add(messageList, pair.second.toInt(), pair.first)
     }
 

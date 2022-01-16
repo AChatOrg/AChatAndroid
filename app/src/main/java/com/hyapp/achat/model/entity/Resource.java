@@ -8,6 +8,10 @@ public class Resource<T> {
     public static final int INDEX_ALL = -1;
     public static final int INDEX_NEW = -2;
 
+    public enum Status {SUCCESS, ERROR, LOADING}
+
+    public enum Action {ADD, REMOVE, UPDATE, ADD_PAGING}
+
     @NonNull
     public final Status status;
     @Nullable
@@ -18,58 +22,50 @@ public class Resource<T> {
     public Action action;
     public int index;
     public boolean bool;
+    public boolean bool2;
+    public boolean bool3;
 
-    private Resource(@NonNull Status status, @Nullable T data,
-                     @Nullable String message) {
+    private Resource(@NonNull Status status, @Nullable T data, @Nullable String message, Action action, int index, boolean bool, boolean bool2, boolean bool3) {
         this.status = status;
         this.data = data;
         this.message = message == null ? "" : message;
-    }
-
-    private Resource(@NonNull Status status, @Nullable T data, String message, Action action) {
-        this(status, data, message);
         this.action = action;
-    }
-
-    private Resource(@NonNull Status status, @Nullable T data, String message, Action action, int index) {
-        this(status, data, message, action);
         this.index = index;
-    }
-
-    public Resource(@NonNull Status status, @Nullable T data, @NonNull String message, Action action, int index, boolean bool) {
-        this(status, data, message, action, index);
         this.bool = bool;
+        this.bool2 = bool2;
+        this.bool3 = bool3;
     }
 
     public static <T> Resource<T> success(@NonNull T data) {
-        return new Resource<>(Status.SUCCESS, data, null);
+        return new Resource<>(Status.SUCCESS, data, null, null, 0, false, false, false);
     }
 
     public static <T> Resource<T> error(@Nullable String msg, @Nullable T data) {
-        return new Resource<>(Status.ERROR, data, msg, null);
+        return new Resource<>(Status.ERROR, data, msg, null, 0, false, false, false);
     }
 
     public static <T> Resource<T> loading(@Nullable T data) {
-        return new Resource<>(Status.LOADING, data, null, null);
+        return new Resource<>(Status.LOADING, data, null, null, 0, false, false, false);
     }
 
-    public enum Status {SUCCESS, ERROR, LOADING}
-
-    public enum Action {ADD, REMOVE, UPDATE}
-
     public static <T> Resource<T> add(@NonNull T data, int index) {
-        return new Resource<>(Status.SUCCESS, data, null, Action.ADD, index);
+        return new Resource<>(Status.SUCCESS, data, null, Action.ADD, index, false, false, false);
     }
 
     public static <T> Resource<T> add(@NonNull T data, int index, boolean bool) {
-        return new Resource<>(Status.SUCCESS, data, null, Action.ADD, index, bool);
+        return new Resource<>(Status.SUCCESS, data, null, Action.ADD, index, bool, false, false);
+    }
+
+    public static <T> Resource<T> addPaging(@NonNull T data, int index, boolean bool, boolean bool2, boolean bool3) {
+        return new Resource<>(Status.SUCCESS, data, null, Action.ADD_PAGING, index, bool, bool2, bool3);
     }
 
     public static <T> Resource<T> remove(@NonNull T data, int index) {
-        return new Resource<>(Status.SUCCESS, data, null, Action.REMOVE, index);
+        return new Resource<>(Status.SUCCESS, data, null, Action.REMOVE, index, false, false, false);
     }
 
     public static <T> Resource<T> update(@NonNull T data, int index) {
-        return new Resource<>(Status.SUCCESS, data, null, Action.UPDATE, index);
+        return new Resource<>(Status.SUCCESS, data, null, Action.UPDATE, index, false, false, false);
+
     }
 }
