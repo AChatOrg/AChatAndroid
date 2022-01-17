@@ -1,14 +1,24 @@
 package com.hyapp.achat.viewmodel.utils;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 public class TimeUtils {
 
+    public static boolean isSameDay(long time1, long time2) {
+        Calendar cal1 = Calendar.getInstance();
+        Calendar cal2 = Calendar.getInstance();
+        cal1.setTime(new Date(time1));
+        cal2.setTime(new Date(time2));
+        return cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR) &&
+                cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR);
+    }
+
     public static String millis2DayTime(long millis) {
-        return new SimpleDateFormat("h:mm", Locale.getDefault()).format(new Date(millis));
+        return new SimpleDateFormat("H:mm", Locale.getDefault()).format(new Date(millis));
     }
 
     public static String timeAgoShort(long duration) {

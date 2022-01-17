@@ -1,12 +1,13 @@
 package com.hyapp.achat.model.entity
 
 import android.text.format.DateUtils
+import com.hyapp.achat.viewmodel.utils.TimeUtils
+import java.time.Instant
+import java.time.ZoneId
+import java.time.temporal.ChronoUnit
 import java.util.*
 
 class MessageList : LinkedList<Message>() {
-
-    private var addedCount: Byte = 0
-    private var prevChanged = false
 
     private fun setupBubbleAddingLast(message: Message): Boolean {
         var haveDateSeparatorPrev = false
@@ -15,13 +16,11 @@ class MessageList : LinkedList<Message>() {
             haveDateSeparatorPrev = true
         } else {
             val prev = get(size - 1)
-            if (prev.isChatMessage
-                    && prev.transfer == message.transfer && message.time - prev.time < 60000) {
+            if (prev.isChatMessage && prev.transfer == message.transfer && message.time - prev.time < 60000) {
                 message.bubble = Message.BUBBLE_END
                 if (size >= 3) {
                     val prevPrev = get(size - 2)
-                    if (prevPrev.isChatMessage
-                            && prevPrev.transfer == message.transfer && prev.time - prevPrev.time < 60000) {
+                    if (prevPrev.isChatMessage && prevPrev.transfer == message.transfer && prev.time - prevPrev.time < 60000) {
                         prev.bubble = Message.BUBBLE_MIDDLE
                     } else {
                         prev.bubble = Message.BUBBLE_START
@@ -29,12 +28,16 @@ class MessageList : LinkedList<Message>() {
                 } else {
                     prev.bubble = Message.BUBBLE_START
                 }
-                prevChanged = true
+                set(size - 1, prev.copy(id = 0))
+                //prevChanged
             } else {
-                if (!DateUtils.isToday(prev.time)) {
-                    haveDateSeparatorPrev = true
-                }
                 message.bubble = Message.BUBBLE_SINGLE
+            }
+            if (!DateUtils.isToday(prev.time)) {
+                haveDateSeparatorPrev = true
+                prev.bubble = Message.BUBBLE_END
+                set(size - 1, prev.copy(id = 0))
+                //prevChanged
             }
         }
         return haveDateSeparatorPrev
@@ -46,13 +49,11 @@ class MessageList : LinkedList<Message>() {
             message.bubble = Message.BUBBLE_SINGLE
         } else {
             val prev = get(0)
-            if (prev.isChatMessage
-                    && prev.transfer == message.transfer && prev.time - message.time < 60000) {
+            if (prev.isChatMessage && prev.transfer == message.transfer && prev.time - message.time < 60000) {
                 message.bubble = Message.BUBBLE_START
                 if (size >= 2) {
                     val prevPrev = get(1)
-                    if (prevPrev.isChatMessage
-                            && prevPrev.transfer == message.transfer && prevPrev.time - prev.time < 60000) {
+                    if (prevPrev.isChatMessage && prevPrev.transfer == message.transfer && prevPrev.time - prev.time < 60000) {
                         prev.bubble = Message.BUBBLE_MIDDLE
                     } else {
                         prev.bubble = Message.BUBBLE_END
@@ -60,52 +61,63 @@ class MessageList : LinkedList<Message>() {
                 } else {
                     prev.bubble = Message.BUBBLE_END
                 }
-                prevChanged = true
+                // prevChanged = true
             } else {
-                if (!DateUtils.isToday(prev.time)) {
-                    haveDateSeparatorPrev = true
-                }
                 message.bubble = Message.BUBBLE_SINGLE
+            }
+            //if two time is not for one day
+            if (!TimeUtils.isSameDay(prev.time, message.time)) {
+                haveDateSeparatorPrev = true
+                prev.bubble = Message.BUBBLE_START
+                //prevChanged = true
             }
         }
         return haveDateSeparatorPrev
     }
 
-    fun addMessageLast(message: Message): Pair<Boolean, Byte> {
+    fun addMessageLast(message: Message) {
         var haveDateSeparatorPrev = false
         if (message.isChatMessage) {
             haveDateSeparatorPrev = setupBubbleAddingLast(message)
         }
         if (haveDateSeparatorPrev) {
-            val details = DateUtils.getRelativeTimeSpanString(message.time, System.currentTimeMillis(), DateUtils.DAY_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE).toString()
-            val detailsMessage = Message(type = Message.TYPE_DETAILS, time = message.time, text = details)
+            val details = DateUtils.getRelativeTimeSpanString(
+                message.time,
+                System.currentTimeMillis(),
+                DateUtils.DAY_IN_MILLIS,
+                DateUtils.FORMAT_ABBREV_RELATIVE
+            ).toString()
+            val detailsMessage = Message(
+                uid = UUID.randomUUID().toString(),
+                type = Message.TYPE_DETAILS,
+                time = message.time,
+                text = details
+            )
             addLast(detailsMessage)
-            addedCount++
         }
         addLast(message)
-        addedCount++
-        val pair = Pair(prevChanged, addedCount)
-        prevChanged = false
-        addedCount = 0
-        return pair
     }
 
-    fun addMessageFirst(message: Message): Pair<Boolean, Byte> {
+    fun addMessageFirst(message: Message) {
         var haveDateSeparatorPrev = false
         if (message.isChatMessage) {
             haveDateSeparatorPrev = setupBubbleAddingFirst(message)
         }
-        addFirst(message)
-        addedCount++
         if (haveDateSeparatorPrev) {
-            val details = DateUtils.getRelativeTimeSpanString(message.time, System.currentTimeMillis(), DateUtils.DAY_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE).toString()
-            val detailsMessage = Message(type = Message.TYPE_DETAILS, time = message.time, text = details)
+            val details = DateUtils.getRelativeTimeSpanString(
+                message.time,
+                System.currentTimeMillis(),
+                DateUtils.DAY_IN_MILLIS,
+                DateUtils.FORMAT_ABBREV_RELATIVE
+            ).toString()
+            val detailsMessage = Message(
+                uid = UUID.randomUUID().toString(),
+                type = Message.TYPE_DETAILS,
+                time = message.time,
+                text = details
+            )
             addFirst(detailsMessage)
-            addedCount++
         }
-        val pair = Pair(prevChanged, addedCount)
-        prevChanged = false
-        addedCount = 0
-        return pair
+        addFirst(message)
     }
 }

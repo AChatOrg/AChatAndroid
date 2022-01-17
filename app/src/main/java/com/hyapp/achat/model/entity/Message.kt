@@ -38,7 +38,6 @@ data class Message(
         @Id
         var id: Long = 0
 ) {
-
     constructor(uid: String = "",
                 type: Byte = TYPE_TEXT,
                 transfer: Byte = TRANSFER_RECEIVE,
@@ -51,7 +50,6 @@ data class Message(
     ) : this(uid, type, transfer, time, text, extraTextSize, mediaPath, receiverUid,
             user.uid, user.rank, user.score, user.loginTime, user.name, user.bio, user.gender,
             user.avatars, user.onlineTime)
-
 
     companion object {
         const val TRANSFER_SEND: Byte = 1
@@ -87,6 +85,10 @@ data class Message(
     fun setAndGetTextSizes(sp1: Int): Pair<Float, Int> {
         var textSize: Float = ((TEXT_SIZE_SP + extraTextSize) * sp1).toFloat()
         var emojiSize: Float = ((TEXT_SIZE_SP + 3 + extraTextSize) * sp1).toFloat()
+
+        if (extraTextSize == 0)
+            return Pair(textSize, emojiSize.toInt())
+
         var hasText = false
         for (element in text) {
             if (element.code < 2000) {

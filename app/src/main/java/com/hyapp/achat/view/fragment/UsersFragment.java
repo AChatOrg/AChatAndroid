@@ -50,6 +50,7 @@ public class UsersFragment extends Fragment {
 
     private void setupRecyclerView(Context context, View view) {
         binding.recyclerView.setHasFixedSize(true);
+        binding.recyclerView.setItemAnimator(null);
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(context));
         adapter = new UsersAdapter(context);
         binding.recyclerView.setAdapter(adapter);

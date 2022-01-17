@@ -16,6 +16,7 @@ class ChatViewModel(var receiver: User) : ViewModel() {
 
     companion object {
         const val PAGING_LIMIT: Long = 50
+        const val PROFILE_MESSAGE_UID = "profile"
     }
 
     private val _messagesLive = MutableLiveData<Resource<MessageList>>()
@@ -34,8 +35,14 @@ class ChatViewModel(var receiver: User) : ViewModel() {
         val messageList = resource.data ?: MessageList()
 
         if (initCount <= 0) {
-            messageList.addFirst(Message(type = Message.TYPE_PROFILE, user = receiver))
-            _messagesLive.value = Resource.addPaging(messageList, 1, false, false, false)
+            messageList.addFirst(
+                Message(
+                    uid = PROFILE_MESSAGE_UID,
+                    type = Message.TYPE_PROFILE,
+                    user = receiver
+                )
+            )
+            _messagesLive.value = Resource.addPaging(messageList, 1, false, false)
             return
         }
         val remaining = initCount - ++pagedCount * PAGING_LIMIT
@@ -45,19 +52,36 @@ class ChatViewModel(var receiver: User) : ViewModel() {
         val messages = MessageDao.all(receiver.uid, offset, limit)
 
         val oldSize = messageList.size
-        val prevChanged = messageList.addMessageFirst(messages[messages.size - 1]).first
+        messageList.addMessageFirst(messages[messages.size - 1])
 
         for (i in messages.size - 2 downTo 0) {
             messageList.addMessageFirst(messages[i])
         }
         if (!hasNext) {
-            val details = DateUtils.getRelativeTimeSpanString(messages[0].time, System.currentTimeMillis(), DateUtils.DAY_IN_MILLIS, DateUtils.FORMAT_ABBREV_RELATIVE).toString()
-            val detailsMessage = Message(type = Message.TYPE_DETAILS, time = messages[0].time, text = details)
+            val details = DateUtils.getRelativeTimeSpanString(
+                messages[0].time,
+                System.currentTimeMillis(),
+                DateUtils.DAY_IN_MILLIS,
+                DateUtils.FORMAT_ABBREV_RELATIVE
+            ).toString()
+            val detailsMessage = Message(
+                uid = UUID.randomUUID().toString(),
+                type = Message.TYPE_DETAILS,
+                time = messages[0].time,
+                text = details
+            )
             messageList.addFirst(detailsMessage)
-            messageList.addFirst(Message(type = Message.TYPE_PROFILE, user = receiver))
+            messageList.addFirst(
+                Message(
+                    uid = PROFILE_MESSAGE_UID,
+                    type = Message.TYPE_PROFILE,
+                    user = receiver
+                )
+            )
         }
 
-        _messagesLive.value = Resource.addPaging(messageList, messageList.size - oldSize, prevChanged, hasNext, pagedCount == 1)
+        _messagesLive.value =
+            Resource.addPaging(messageList, messageList.size - oldSize, hasNext, pagedCount == 1)
     }
 
     private fun observeReceivedMessage() {
@@ -71,9 +95,10 @@ class ChatViewModel(var receiver: User) : ViewModel() {
     }
 
     fun sendPvTextMessage(text: CharSequence, textSizeUnit: Int) {
-        val message = Message(UUID.randomUUID().toString(), Message.TYPE_TEXT,
-                Message.TRANSFER_SEND, System.currentTimeMillis(), text.toString(), textSizeUnit, "",
-                receiver.uid, UserLive.value ?: User()
+        val message = Message(
+            UUID.randomUUID().toString(), Message.TYPE_TEXT,
+            Message.TRANSFER_SEND, System.currentTimeMillis(), text.toString(), textSizeUnit, "",
+            receiver.uid, UserLive.value ?: User()
         )
         addMessage(message)
         ChatRepo.sendPvMessage(message, receiver)
@@ -82,8 +107,8 @@ class ChatViewModel(var receiver: User) : ViewModel() {
     private fun addMessage(message: Message) {
         val resource = _messagesLive.value ?: Resource.success(MessageList())
         val messageList = resource.data ?: MessageList()
-        val pair = messageList.addMessageLast(message)
-        _messagesLive.value = Resource.add(messageList, pair.second.toInt(), pair.first)
+        messageList.addMessageLast(message)
+        _messagesLive.value = Resource.add(messageList, 0)
     }
 
     class Factory(private var receiver: User) : ViewModelProvider.Factory {

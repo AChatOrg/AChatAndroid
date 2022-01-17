@@ -80,7 +80,10 @@ class ChatActivity : EventActivity() {
     private fun init() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_chat)
         contact = intent.getParcelableExtra(EXTRA_CONTACT) ?: Contact()
-        viewModel = ViewModelProvider(this, ChatViewModel.Factory(contact.getUser()))[ChatViewModel::class.java]
+        viewModel = ViewModelProvider(
+            this,
+            ChatViewModel.Factory(contact.getUser())
+        )[ChatViewModel::class.java]
     }
 
     private fun setupContact() {
@@ -93,7 +96,8 @@ class ChatActivity : EventActivity() {
                     onlineTime.text = ""
                     onlineTime.setBackgroundResource(R.drawable.last_online_chat_bg_green)
                 } else {
-                    onlineTime.text = TimeUtils.timeAgoShort(System.currentTimeMillis() - contact.onlineTime)
+                    onlineTime.text =
+                        TimeUtils.timeAgoShort(System.currentTimeMillis() - contact.onlineTime)
                     onlineTime.setBackgroundResource(R.drawable.last_online_chat_bg_grey)
                 }
             } else {
@@ -106,6 +110,7 @@ class ChatActivity : EventActivity() {
     private fun setupRecyclerView() {
         val layoutManager: LinearLayoutManager = SpeedyLinearLayoutManager(this, 100)
         binding.recyclerView.layoutManager = layoutManager
+        binding.recyclerView.setHasFixedSize(true)
         messageAdapter = MessageAdapter(this, binding.recyclerView)
         messageAdapter.onLoadMore = { viewModel.loadPagedMessages() }
         binding.recyclerView.adapter = messageAdapter
@@ -159,15 +164,15 @@ class ChatActivity : EventActivity() {
                     binding.sendImageSwitcher.setOnTouchListener(sendButtonTouchListener)
                     binding.sendImageSwitcher.setImageResource(R.drawable.ic_action_send)
                     binding.attach.animate().alpha(0F).translationX(dp46.toFloat()).setDuration(100)
-                            .withStartAction { binding.attach.setBackgroundResource(0) }
-                            .withEndAction { binding.attach.visibility = INVISIBLE }
+                        .withStartAction { binding.attach.setBackgroundResource(0) }
+                        .withEndAction { binding.attach.visibility = INVISIBLE }
                     isEditTextEmpty = false
                 } else if (p0!!.isEmpty()) {
                     binding.sendImageSwitcher.setOnTouchListener(null)
                     binding.sendImageSwitcher.setImageResource(R.drawable.ic_action_mic)
                     binding.attach.animate().alpha(1F).translationX(0F).setDuration(100)
-                            .withStartAction { binding.attach.visibility = VISIBLE }
-                            .withEndAction { binding.attach.setBackgroundResource(R.drawable.chat_inputs_ripple_bg_circle) }
+                        .withStartAction { binding.attach.visibility = VISIBLE }
+                        .withEndAction { binding.attach.setBackgroundResource(R.drawable.chat_inputs_ripple_bg_circle) }
                     isEditTextEmpty = true
                 }
             }
@@ -195,8 +200,16 @@ class ChatActivity : EventActivity() {
                 messageEditTextSizeAnimator.cancel()
                 binding.messageEditText.textSize = Message.TEXT_SIZE_SP.toFloat()
                 binding.messageEditText.setEmojiSize((Message.TEXT_SIZE_SP + 3) * sp1)
-                if (UiUtils.isViewInBounds(binding.sendImageSwitcher, event.rawX.toInt(), event.rawY.toInt())) {
-                    sendTextMessage(binding.messageEditText.text.toString(), messageEditTextSizeAnimator.animatedValue as Int)
+                if (UiUtils.isViewInBounds(
+                        binding.sendImageSwitcher,
+                        event.rawX.toInt(),
+                        event.rawY.toInt()
+                    )
+                ) {
+                    sendTextMessage(
+                        binding.messageEditText.text.toString(),
+                        messageEditTextSizeAnimator.animatedValue as Int
+                    )
                     binding.messageEditText.setText("")
                 }
                 true
@@ -259,11 +272,21 @@ class ChatActivity : EventActivity() {
         lottieStickerView.setOnStickerActionsListener(object : OnStickerActions {
             override fun onClick(view: View?, sticker: Sticker<*>?, fromRecent: Boolean) {
                 if (sticker is LottieSticker) {
-                    sendLottieMessage(Utils.createFromSticker(this@ChatActivity, sticker, lottieViewSize))
+                    sendLottieMessage(
+                        Utils.createFromSticker(
+                            this@ChatActivity,
+                            sticker,
+                            lottieViewSize
+                        )
+                    )
                 }
             }
 
-            override fun onLongClick(view: View?, sticker: Sticker<*>?, fromRecent: Boolean): Boolean {
+            override fun onLongClick(
+                view: View?,
+                sticker: Sticker<*>?,
+                fromRecent: Boolean
+            ): Boolean {
                 return false
             }
         })
@@ -281,14 +304,21 @@ class ChatActivity : EventActivity() {
         viewModel.messagesLive.observe(this, { res ->
             when (res.action) {
                 Resource.Action.ADD -> {
-                    messageAdapter.add(res.data!!, res.bool, res.index)
-                    binding.recyclerView.smoothScrollToPosition(messageAdapter.itemCount - 1)
+                    messageAdapter.onListChanged = {
+                        binding.recyclerView.smoothScrollToPosition(messageAdapter.itemCount - 1)
+                        messageAdapter.onListChanged = null
+                    }
+                    messageAdapter.submitList(res.data)
                 }
                 Resource.Action.ADD_PAGING -> {
-                    messageAdapter.isLoadingMore = !res.bool2
-                    messageAdapter.addPaging(res.data!!, res.index, res.bool)
-                    if (res.bool3)
-                        binding.recyclerView.scrollToPosition(messageAdapter.itemCount - 1)
+                    messageAdapter.isLoadingMore = !res.bool
+                    if (res.bool2) {
+                        messageAdapter.onListChanged = {
+                            binding.recyclerView.scrollToPosition(messageAdapter.itemCount - 1)
+                            messageAdapter.onListChanged = null
+                        }
+                    }
+                    messageAdapter.submitList(res.data)
                 }
             }
         })

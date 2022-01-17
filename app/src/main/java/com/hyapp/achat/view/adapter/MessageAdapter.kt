@@ -1,6 +1,5 @@
 package com.hyapp.achat.view.adapter
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.util.TypedValue
 import android.view.LayoutInflater
@@ -8,13 +7,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageView
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.aghajari.rlottie.AXrLottieImageView
 import com.facebook.drawee.view.SimpleDraweeView
 import com.hyapp.achat.R
 import com.hyapp.achat.model.entity.Contact
 import com.hyapp.achat.model.entity.Message
-import com.hyapp.achat.model.entity.MessageList
 import com.hyapp.achat.model.entity.utils.PersonUtils
 import com.hyapp.achat.view.component.GroupAvatarView
 import com.hyapp.achat.view.component.emojiview.view.AXEmojiTextView
@@ -22,38 +22,95 @@ import com.hyapp.achat.view.utils.UiUtils
 import com.hyapp.achat.viewmodel.utils.TimeUtils
 
 
-class MessageAdapter(val context: Context, val recyclerView: RecyclerView) : RecyclerView.Adapter<MessageAdapter.Holder>() {
+class MessageAdapter(val context: Context, val recyclerView: RecyclerView) :
+    ListAdapter<Message, MessageAdapter.Holder>(DIFF_CALLBACK) {
+
+    var onListChanged: (() -> Unit)? = null
+
     companion object {
         const val PAYLOAD_BUBBLE: Byte = 0
-        const val PAYLOAD_READ: Byte = 1
+        const val PAYLOAD_DELIVERY: Byte = 1
+
+        val DIFF_CALLBACK: DiffUtil.ItemCallback<Message> =
+            object : DiffUtil.ItemCallback<Message>() {
+                override fun areItemsTheSame(oldItem: Message, newItem: Message): Boolean {
+                    return oldItem.uid == newItem.uid
+                }
+
+                override fun areContentsTheSame(oldItem: Message, newItem: Message): Boolean {
+                    return oldItem == newItem
+                }
+
+                override fun getChangePayload(oldItem: Message, newItem: Message): Any? {
+                    return when {
+                        oldItem.id != newItem.id -> PAYLOAD_BUBBLE
+                        oldItem.delivery != newItem.delivery -> PAYLOAD_DELIVERY
+                        else -> null
+                    }
+                }
+            }
     }
 
-    var messages = MessageList()
+    override fun submitList(list: MutableList<Message>?) {
+        if (list != null) {
+            super.submitList(ArrayList(list))
+        }
+    }
+
+    override fun onCurrentListChanged(
+        previousList: MutableList<Message>,
+        currentList: MutableList<Message>
+    ) {
+        onListChanged?.invoke()
+    }
+
     val sp1: Int = UiUtils.sp2px(context, 1F)
 
     var isLoadingMore = false
     lateinit var onLoadMore: () -> Unit
 
     override fun getItemViewType(position: Int): Int {
-        val message = messages[position]
+        val message = getItem(position)
         return message.transfer + message.type
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
         when (viewType) {
-            Message.TRANSFER_SEND + Message.TYPE_TEXT -> return TextHolder(LayoutInflater.from(context).inflate(R.layout.item_message_text_send, parent, false))
-            Message.TRANSFER_RECEIVE + Message.TYPE_TEXT -> return TextHolder(LayoutInflater.from(context).inflate(R.layout.item_message_text_receive, parent, false))
-            Message.TRANSFER_SEND + Message.TYPE_LOTTIE -> return LottieHolder(LayoutInflater.from(context).inflate(R.layout.item_message_lottie_send, parent, false))
-            Message.TRANSFER_RECEIVE + Message.TYPE_LOTTIE -> return LottieHolder(LayoutInflater.from(context).inflate(R.layout.item_message_lottie_receive, parent, false))
-            Message.TRANSFER_RECEIVE + Message.TYPE_DETAILS -> return DetailsHolder(LayoutInflater.from(context).inflate(R.layout.item_message_details, parent, false))
-            Message.TRANSFER_RECEIVE + Message.TYPE_PROFILE -> return SingleProfileHolder(LayoutInflater.from(context).inflate(R.layout.item_message_profile, parent, false))
+            Message.TRANSFER_SEND + Message.TYPE_TEXT -> return TextHolder(
+                LayoutInflater.from(
+                    context
+                ).inflate(R.layout.item_message_text_send, parent, false)
+            )
+            Message.TRANSFER_RECEIVE + Message.TYPE_TEXT -> return TextHolder(
+                LayoutInflater.from(
+                    context
+                ).inflate(R.layout.item_message_text_receive, parent, false)
+            )
+            Message.TRANSFER_SEND + Message.TYPE_LOTTIE -> return LottieHolder(
+                LayoutInflater.from(
+                    context
+                ).inflate(R.layout.item_message_lottie_send, parent, false)
+            )
+            Message.TRANSFER_RECEIVE + Message.TYPE_LOTTIE -> return LottieHolder(
+                LayoutInflater.from(
+                    context
+                ).inflate(R.layout.item_message_lottie_receive, parent, false)
+            )
+            Message.TRANSFER_RECEIVE + Message.TYPE_DETAILS -> return DetailsHolder(
+                LayoutInflater.from(
+                    context
+                ).inflate(R.layout.item_message_details, parent, false)
+            )
+            Message.TRANSFER_RECEIVE + Message.TYPE_PROFILE -> return SingleProfileHolder(
+                LayoutInflater.from(context).inflate(R.layout.item_message_profile, parent, false)
+            )
         }
         throw RuntimeException("incorrect view type :" + javaClass.name)
     }
 
     override fun onBindViewHolder(holder: Holder, position: Int) {
-        holder.bind(messages[position])
-        if (position <= 0 && !isLoadingMore && messages.size > 2) {
+        holder.bind(getItem(position))
+        if (position <= 0 && !isLoadingMore && itemCount > 2) {
             isLoadingMore = true
             if (::onLoadMore.isInitialized) {
                 recyclerView.post { onLoadMore() }
@@ -65,12 +122,8 @@ class MessageAdapter(val context: Context, val recyclerView: RecyclerView) : Rec
         if (payloads.isEmpty()) {
             onBindViewHolder(holder, position)
         } else {
-            holder.bind(messages[position], payloads)
+            holder.bind(getItem(position), payloads)
         }
-    }
-
-    override fun getItemCount(): Int {
-        return messages.size
     }
 
     override fun onViewRecycled(holder: Holder) {
@@ -80,20 +133,20 @@ class MessageAdapter(val context: Context, val recyclerView: RecyclerView) : Rec
         }
     }
 
-    fun add(list: MessageList, prevChanged: Boolean, addedCount: Int) {
-        messages = list
-        val size = messages.size
-        if (prevChanged)
-            notifyItemChanged(size - 1 - addedCount, PAYLOAD_BUBBLE)
-        notifyItemRangeInserted(size - addedCount, addedCount)
-    }
-
-    fun addPaging(list: MessageList, addedCount: Int, firstChanged: Boolean) {
-        messages = list
-        if (firstChanged)
-            notifyItemChanged(0, PAYLOAD_BUBBLE)
-        notifyItemRangeInserted(0, addedCount)
-    }
+//    fun add(list: MessageList, prevChanged: Boolean, addedCount: Int) {
+//        messages = list
+//        val size = messages.size
+//        if (prevChanged)
+//            notifyItemChanged(size - 1 - addedCount, PAYLOAD_BUBBLE)
+//        notifyItemRangeInserted(size - addedCount, addedCount)
+//    }
+//
+//    fun addPaging(list: MessageList, addedCount: Int, firstChanged: Boolean) {
+//        messages = list
+//        if (firstChanged)
+//            notifyItemChanged(0, PAYLOAD_BUBBLE)
+//        notifyItemRangeInserted(0, addedCount)
+//    }
 
     abstract inner class Holder(view: View) : RecyclerView.ViewHolder(view) {
         abstract fun bind(message: Message)
@@ -135,7 +188,8 @@ class MessageAdapter(val context: Context, val recyclerView: RecyclerView) : Rec
                     onlineTime.text = ""
                     onlineTime.setBackgroundResource(R.drawable.last_online_profile_bg_green)
                 } else {
-                    onlineTime.text = TimeUtils.timeAgoShort(System.currentTimeMillis() - contact.onlineTime)
+                    onlineTime.text =
+                        TimeUtils.timeAgoShort(System.currentTimeMillis() - contact.onlineTime)
                     onlineTime.setBackgroundResource(R.drawable.last_online_profile_bg_grey)
                 }
                 onlineTime.visibility = View.VISIBLE
@@ -164,7 +218,7 @@ class MessageAdapter(val context: Context, val recyclerView: RecyclerView) : Rec
 
         override fun bind(message: Message) {
             setBubble(message)
-            setRead(message)
+            setDelivery(message)
             time.text = TimeUtils.millis2DayTime(message.time)
         }
 
@@ -173,12 +227,12 @@ class MessageAdapter(val context: Context, val recyclerView: RecyclerView) : Rec
             for (payload in payloads) {
                 when (payload as Byte) {
                     PAYLOAD_BUBBLE -> setBubble(message)
-                    PAYLOAD_READ -> setRead(message)
+                    PAYLOAD_DELIVERY -> setDelivery(message)
                 }
             }
         }
 
-        private fun setRead(message: Message) {
+        private fun setDelivery(message: Message) {
             if (message.transfer == Message.TRANSFER_SEND) {
                 when (message.delivery) {
                     Message.DELIVERY_READ -> delivery?.setImageResource(R.drawable.msg_read_contact)
@@ -216,7 +270,8 @@ class MessageAdapter(val context: Context, val recyclerView: RecyclerView) : Rec
                         time.visibility = View.VISIBLE
                         val avatars = message.senderAvatars
                         avatar?.setImageURI(if (avatars.isNotEmpty()) avatars[0] else null)
-                        online?.visibility = if (message.senderOnlineTime == Contact.TIME_ONLINE) View.VISIBLE else View.GONE
+                        online?.visibility =
+                            if (message.senderOnlineTime == Contact.TIME_ONLINE) View.VISIBLE else View.GONE
                     } else {
                         avatar?.visibility = View.GONE
                         time.visibility = View.GONE
@@ -228,7 +283,7 @@ class MessageAdapter(val context: Context, val recyclerView: RecyclerView) : Rec
         protected abstract val bubbleView: View?
 
         override fun onClick(v: View) {
-            val bubble: Byte = messages[adapterPosition].bubble
+            val bubble: Byte = getItem(adapterPosition).bubble
             if (bubble != Message.BUBBLE_SINGLE && bubble != Message.BUBBLE_END && bubble != Message.BUBBLE_SINGLE && bubble != Message.BUBBLE_END) {
                 time.visibility = if (time.visibility == View.GONE) View.VISIBLE else View.GONE
             }
@@ -250,13 +305,15 @@ class MessageAdapter(val context: Context, val recyclerView: RecyclerView) : Rec
             textView.setEmojiSize(sizes.second)
         }
 
-        override val bubbleView: View?
+        override val bubbleView: View
             get() = textView
 
     }
 
     inner class LottieHolder(itemView: View) : ChatHolder(itemView) {
-        private val lottieImageView: AXrLottieImageView = itemView.findViewById(R.id.lottieImageView)
+        private val lottieImageView: AXrLottieImageView =
+            itemView.findViewById(R.id.lottieImageView)
+
         override fun bind(message: Message) {
             super.bind(message)
 //            lottieImageView.lottieDrawable = (message as LottieMessage).drawable
