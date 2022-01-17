@@ -14,6 +14,7 @@ import androidx.annotation.Nullable;
 import com.hyapp.achat.model.IOSocket;
 import com.hyapp.achat.model.entity.ConnLive;
 import com.hyapp.achat.model.Preferences;
+import com.hyapp.achat.model.entity.User;
 import com.hyapp.achat.viewmodel.utils.NetUtils;
 import com.hyapp.achat.viewmodel.utils.NotifUtils;
 
@@ -44,6 +45,7 @@ public class SocketService extends Service {
     public void onCreate() {
         registerReceiver(netReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
         ConnLive.singleton().setValue(ConnLive.Status.CONNECTING);
+        NotifUtils.createSocketChannel(this);
     }
 
     @Override
@@ -54,7 +56,6 @@ public class SocketService extends Service {
             Preferences.instance().putLogged(true);
         }
 
-        NotifUtils.createSocketChannel(this);
         startForeground(NotifUtils.ID_SOCKET, NotifUtils.getSocketNotif(this));
         return START_STICKY;
     }

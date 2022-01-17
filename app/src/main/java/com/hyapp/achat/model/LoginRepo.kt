@@ -20,9 +20,9 @@ object LoginRepo {
 
     private val onLogged = Emitter.Listener { args ->
         val user = GsonBuilder()
-                .registerTypeAdapter(User::class.java, UserDeserializer())
-                .create()
-                .fromJson(args[0].toString(), User::class.java)
+            .registerTypeAdapter(User::class.java, UserDeserializer())
+            .create()
+            .fromJson(args[0].toString(), User::class.java)
         _loggedState.tryEmit(user)
     }
 }

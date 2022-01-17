@@ -6,6 +6,7 @@ import com.hyapp.achat.model.ChatRepo
 import com.hyapp.achat.model.Preferences
 import com.hyapp.achat.model.entity.*
 import com.hyapp.achat.model.objectbox.MessageDao
+import com.hyapp.achat.model.objectbox.UserDao
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import java.util.*
@@ -26,6 +27,7 @@ class ChatViewModel(var receiver: User) : ViewModel() {
     private var pagedCount = 0
 
     init {
+        UserLive.value = UserDao.get(User.CURRENT_USER_ID)
         loadPagedMessages()
         observeMessage()
     }

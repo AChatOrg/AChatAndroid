@@ -1,5 +1,7 @@
 package com.hyapp.achat.model;
 
+import android.util.Log;
+
 import com.hyapp.achat.Config;
 import com.hyapp.achat.model.entity.ConnLive;
 

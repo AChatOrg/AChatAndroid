@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "1:7499101650816396696",
-      "lastPropertyId": "17:6471763317147967128",
+      "lastPropertyId": "18:3602773898531311475",
       "name": "Contact",
       "properties": [
         {
@@ -77,11 +77,6 @@
           "type": 9
         },
         {
-          "id": "14:5785374247205098261",
-          "name": "mediaMessagePath",
-          "type": 9
-        },
-        {
           "id": "15:7805158805110346611",
           "name": "type",
           "type": 2
@@ -90,13 +85,18 @@
           "id": "16:841596017538870154",
           "name": "message",
           "type": 9
+        },
+        {
+          "id": "18:3602773898531311475",
+          "name": "mediaPath",
+          "type": 9
         }
       ],
       "relations": []
     },
     {
       "id": "2:7262915003648557870",
-      "lastPropertyId": "11:2745598514976428246",
+      "lastPropertyId": "21:8595874104176518939",
       "name": "Message",
       "properties": [
         {
@@ -124,7 +124,9 @@
         {
           "id": "5:612420413029127593",
           "name": "receiverUid",
-          "type": 9
+          "indexId": "4:1392764380474574583",
+          "type": 9,
+          "flags": 2048
         },
         {
           "id": "6:1776056819941456678",
@@ -153,27 +155,136 @@
           "flags": 1
         },
         {
-          "id": "11:2745598514976428246",
-          "name": "senderId",
-          "indexId": "3:1181881966450175885",
-          "type": 11,
-          "flags": 520,
-          "relationTarget": "Contact"
+          "id": "12:543580989666739745",
+          "name": "mediaPath",
+          "type": 9
+        },
+        {
+          "id": "13:3393408121559003825",
+          "name": "senderUid",
+          "indexId": "5:3325833792708775266",
+          "type": 9,
+          "flags": 2048
+        },
+        {
+          "id": "14:4832545436817044579",
+          "name": "senderRank",
+          "type": 2
+        },
+        {
+          "id": "15:4023310981163723300",
+          "name": "senderScore",
+          "type": 5
+        },
+        {
+          "id": "16:7954866535877437000",
+          "name": "senderLoginTime",
+          "type": 6
+        },
+        {
+          "id": "17:2158056177180834410",
+          "name": "senderName",
+          "type": 9
+        },
+        {
+          "id": "18:2796792736656969397",
+          "name": "senderBio",
+          "type": 9
+        },
+        {
+          "id": "19:6545623782028606740",
+          "name": "senderGender",
+          "type": 2
+        },
+        {
+          "id": "20:4837017412818988820",
+          "name": "senderAvatars",
+          "type": 30
+        },
+        {
+          "id": "21:8595874104176518939",
+          "name": "senderOnlineTime",
+          "type": 6
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "3:5127457045923489447",
+      "lastPropertyId": "10:4911287811215167773",
+      "name": "User",
+      "properties": [
+        {
+          "id": "1:5399212687663440411",
+          "name": "name",
+          "type": 9
+        },
+        {
+          "id": "2:8599878458190603577",
+          "name": "bio",
+          "type": 9
+        },
+        {
+          "id": "3:5819202670249884223",
+          "name": "gender",
+          "type": 2
+        },
+        {
+          "id": "4:3994420566736756824",
+          "name": "avatars",
+          "type": 30
+        },
+        {
+          "id": "5:8292352770069981120",
+          "name": "onlineTime",
+          "type": 6
+        },
+        {
+          "id": "6:1488940459906613904",
+          "name": "uid",
+          "indexId": "6:5585427405349409539",
+          "type": 9,
+          "flags": 2080
+        },
+        {
+          "id": "7:2863335102075074594",
+          "name": "rank",
+          "type": 2
+        },
+        {
+          "id": "8:910438471255339480",
+          "name": "score",
+          "type": 5
+        },
+        {
+          "id": "9:6148596564476641186",
+          "name": "loginTime",
+          "type": 6
+        },
+        {
+          "id": "10:4911287811215167773",
+          "name": "id",
+          "type": 6,
+          "flags": 1
         }
       ],
       "relations": []
     }
   ],
-  "lastEntityId": "2:7262915003648557870",
-  "lastIndexId": "3:1181881966450175885",
+  "lastEntityId": "3:5127457045923489447",
+  "lastIndexId": "6:5585427405349409539",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
   "modelVersion": 5,
   "modelVersionParserMinimum": 5,
   "retiredEntityUids": [],
-  "retiredIndexUids": [],
+  "retiredIndexUids": [
+    1181881966450175885
+  ],
   "retiredPropertyUids": [
-    6471763317147967128
+    6471763317147967128,
+    2745598514976428246,
+    5785374247205098261
   ],
   "retiredRelationUids": [],
   "version": 1

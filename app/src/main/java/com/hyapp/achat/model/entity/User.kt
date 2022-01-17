@@ -1,24 +1,37 @@
 package com.hyapp.achat.model.entity
 
 import android.os.Parcelable
+import io.objectbox.annotation.Entity
+import io.objectbox.annotation.Id
+import io.objectbox.annotation.Index
+import io.objectbox.annotation.Unique
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
+@Entity
 data class User(
-        var name: String = "",
-        var bio: String = "",
-        var gender: Byte = GENDER_MALE,
-        var avatars: MutableList<String> = mutableListOf(),
-        var onlineTime: Long = TIME_ONLINE,
+    var name: String = "",
+    var bio: String = "",
+    var gender: Byte = GENDER_MALE,
+    var avatars: MutableList<String> = mutableListOf(),
+    var onlineTime: Long = TIME_ONLINE,
 
-        var uid: String = "",
-        var rank: Byte = RANK_GUEST,
-        var score: Int = 0,
-        var loginTime: Long = 0
+    @Index
+    @Unique
+    var uid: String = "",
+    var rank: Byte = RANK_GUEST,
+    var score: Int = 0,
+    var loginTime: Long = 0,
+
+    @Id(assignable = true)
+    var id: Long = 0
 
 ) : UserConsts(), Parcelable {
 
     companion object {
+
+        const val CURRENT_USER_ID: Long = 1
+
         @JvmStatic
         fun compare(u1: User, u2: User): Int {
             if (u1.uid == u2.uid) return 0

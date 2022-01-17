@@ -8,6 +8,7 @@ import com.hyapp.achat.Config
 import com.hyapp.achat.model.LoginRepo
 import com.hyapp.achat.model.entity.*
 import com.hyapp.achat.model.Preferences
+import com.hyapp.achat.model.objectbox.UserDao
 import com.hyapp.achat.viewmodel.service.SocketService
 import com.hyapp.achat.viewmodel.utils.NetUtils
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -24,6 +25,7 @@ class LoginGuestViewModel(application: Application) : AndroidViewModel(applicati
     init {
         viewModelScope.launch {
             LoginRepo.loggedState.collect { user ->
+                UserDao.put(user.apply { id = User.CURRENT_USER_ID })
                 UserLive.value = user
                 _loggedFlow.emit(Event(Event.Status.SUCCESS))
             }
