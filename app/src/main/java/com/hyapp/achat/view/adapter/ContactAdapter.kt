@@ -90,7 +90,7 @@ class ContactAdapter(private val context: Context) : ListAdapter<Contact, Contac
                 messageDelivery.visibility = View.VISIBLE
                 when (contact.messageDelivery) {
                     Message.DELIVERY_READ -> messageDelivery.setImageResource(R.drawable.msg_read_contact)
-                    Message.DELIVERY_UNREAD -> messageDelivery.setImageResource(R.drawable.msg_unread_contact)
+                    Message.DELIVERY_SENT -> messageDelivery.setImageResource(R.drawable.msg_unread_contact)
                     Message.DELIVERY_WAITING -> messageDelivery.setImageResource(R.drawable.msg_waiting_contact)
                 }
             }

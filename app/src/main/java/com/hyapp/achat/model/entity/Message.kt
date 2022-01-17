@@ -67,7 +67,7 @@ data class Message(
 
         const val DELIVERY_HIDDEN: Byte = 1
         const val DELIVERY_WAITING: Byte = 2
-        const val DELIVERY_UNREAD: Byte = 3
+        const val DELIVERY_SENT: Byte = 3
         const val DELIVERY_READ: Byte = 4
 
         const val BUBBLE_START: Byte = 1

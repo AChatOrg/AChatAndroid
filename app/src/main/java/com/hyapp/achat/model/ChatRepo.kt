@@ -21,8 +21,12 @@ object ChatRepo {
     private val _receiveMessageFlow = MutableSharedFlow<Message>(extraBufferCapacity = 1)
     val receiveMessageFlow = _receiveMessageFlow.asSharedFlow()
 
+    private val _sentMessageFlow = MutableSharedFlow<Message>(extraBufferCapacity = 1)
+    val sentMessageFlow = _sentMessageFlow.asSharedFlow()
+
     fun listen(socket: Socket) {
         socket.on(Config.ON_PV_MESSAGE, onPvMessage)
+        socket.on(Config.ON_MESSAGE_SENT, onMessageSent)
     }
 
     fun sendPvMessage(message: Message, receiver: User) {
@@ -48,6 +52,13 @@ object ChatRepo {
         Preferences.instance().incrementContactMessagesCount(contact.uid)
 
         _receiveMessageFlow.tryEmit(message)
+    }
+
+    private val onMessageSent = Emitter.Listener { args ->
+        val message = Gson().fromJson(args[0].toString(), Message::class.java)
+        message.delivery = Message.DELIVERY_SENT
+        MessageDao.update(message)
+        _sentMessageFlow.tryEmit(message)
     }
 
     private fun setupAndPutContact(contact: Contact, message: Message) {

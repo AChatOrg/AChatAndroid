@@ -43,9 +43,15 @@ class MessageAdapter(val context: Context, val recyclerView: RecyclerView) :
 
                 override fun getChangePayload(oldItem: Message, newItem: Message): Any? {
                     return when {
-                        oldItem.id != newItem.id -> PAYLOAD_BUBBLE
-                        oldItem.delivery != newItem.delivery -> PAYLOAD_DELIVERY
-                        else -> null
+                        oldItem.id != newItem.id -> {
+                            PAYLOAD_BUBBLE
+                        }
+                        oldItem.delivery != newItem.delivery -> {
+                            PAYLOAD_DELIVERY
+                        }
+                        else -> {
+                            null
+                        }
                     }
                 }
             }
@@ -236,7 +242,7 @@ class MessageAdapter(val context: Context, val recyclerView: RecyclerView) :
             if (message.transfer == Message.TRANSFER_SEND) {
                 when (message.delivery) {
                     Message.DELIVERY_READ -> delivery?.setImageResource(R.drawable.msg_read_contact)
-                    Message.DELIVERY_UNREAD -> delivery?.setImageResource(R.drawable.msg_unread_contact)
+                    Message.DELIVERY_SENT -> delivery?.setImageResource(R.drawable.msg_unread_contact)
                     Message.DELIVERY_WAITING -> delivery?.setImageResource(R.drawable.msg_waiting_contact)
                 }
             }

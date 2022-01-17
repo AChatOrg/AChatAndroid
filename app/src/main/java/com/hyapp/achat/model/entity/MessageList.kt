@@ -120,4 +120,14 @@ class MessageList : LinkedList<Message>() {
         }
         addFirst(message)
     }
+
+    fun updateMessage(message: Message): Boolean {
+        for (i in size - 1 downTo 0) {
+            if (get(i).uid == message.uid) {
+                set(i, message)
+                return true
+            }
+        }
+        return false
+    }
 }

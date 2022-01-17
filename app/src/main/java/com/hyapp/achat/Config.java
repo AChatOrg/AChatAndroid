@@ -20,4 +20,6 @@ public interface Config {
 
     /*On Chat*/
     String ON_PV_MESSAGE = "pvMessage";
+    String ON_MESSAGE_SENT = "msgSent";
+
 }

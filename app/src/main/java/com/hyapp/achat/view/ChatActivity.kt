@@ -320,6 +320,7 @@ class ChatActivity : EventActivity() {
                     }
                     messageAdapter.submitList(res.data)
                 }
+                Resource.Action.UPDATE -> messageAdapter.submitList(res.data)
             }
         })
     }

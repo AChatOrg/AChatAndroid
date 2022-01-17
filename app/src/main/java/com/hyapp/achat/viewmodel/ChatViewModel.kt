@@ -28,6 +28,7 @@ class ChatViewModel(var receiver: User) : ViewModel() {
     init {
         loadPagedMessages()
         observeReceivedMessage()
+        observeSentMessage()
     }
 
     fun loadPagedMessages() {
@@ -94,6 +95,16 @@ class ChatViewModel(var receiver: User) : ViewModel() {
         }
     }
 
+    private fun observeSentMessage() {
+        viewModelScope.launch {
+            ChatRepo.sentMessageFlow.collect { message ->
+                if (message.receiverUid == receiver.uid) {
+                    updateMessage(message)
+                }
+            }
+        }
+    }
+
     fun sendPvTextMessage(text: CharSequence, textSizeUnit: Int) {
         val message = Message(
             UUID.randomUUID().toString(), Message.TYPE_TEXT,
@@ -109,6 +120,15 @@ class ChatViewModel(var receiver: User) : ViewModel() {
         val messageList = resource.data ?: MessageList()
         messageList.addMessageLast(message)
         _messagesLive.value = Resource.add(messageList, 0)
+    }
+
+    private fun updateMessage(message: Message) {
+        val resource = _messagesLive.value ?: Resource.success(MessageList())
+        val messageList = resource.data ?: MessageList()
+        val updated = messageList.updateMessage(message)
+        if (updated) {
+            _messagesLive.value = Resource.update(messageList, 0)
+        }
     }
 
     class Factory(private var receiver: User) : ViewModelProvider.Factory {
