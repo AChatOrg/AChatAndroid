@@ -27,8 +27,7 @@ class ChatViewModel(var receiver: User) : ViewModel() {
 
     init {
         loadPagedMessages()
-        observeReceivedMessage()
-        observeSentMessage()
+        observeMessage()
     }
 
     fun loadPagedMessages() {
@@ -85,21 +84,20 @@ class ChatViewModel(var receiver: User) : ViewModel() {
             Resource.addPaging(messageList, messageList.size - oldSize, hasNext, pagedCount == 1)
     }
 
-    private fun observeReceivedMessage() {
+    private fun observeMessage() {
         viewModelScope.launch {
-            ChatRepo.receiveMessageFlow.collect { message ->
-                if (message.senderUid == receiver.uid) {
-                    addMessage(message)
-                }
-            }
-        }
-    }
-
-    private fun observeSentMessage() {
-        viewModelScope.launch {
-            ChatRepo.sentMessageFlow.collect { message ->
-                if (message.receiverUid == receiver.uid) {
-                    updateMessage(message)
+            ChatRepo.messageFlow.collect { pair ->
+                when (pair.first) {
+                    ChatRepo.MESSAGE_RECEIVE -> {
+                        if (pair.second.senderUid == receiver.uid) {
+                            addMessage(pair.second)
+                        }
+                    }
+                    ChatRepo.MESSAGE_SENT -> {
+                        if (pair.second.receiverUid == receiver.uid) {
+                            updateMessageTimeAndDelivery(pair.second)
+                        }
+                    }
                 }
             }
         }
@@ -122,10 +120,10 @@ class ChatViewModel(var receiver: User) : ViewModel() {
         _messagesLive.value = Resource.add(messageList, 0)
     }
 
-    private fun updateMessage(message: Message) {
+    private fun updateMessageTimeAndDelivery(message: Message) {
         val resource = _messagesLive.value ?: Resource.success(MessageList())
         val messageList = resource.data ?: MessageList()
-        val updated = messageList.updateMessage(message)
+        val updated = messageList.updateMessageTimeAndDelivery(message)
         if (updated) {
             _messagesLive.value = Resource.update(messageList, 0)
         }

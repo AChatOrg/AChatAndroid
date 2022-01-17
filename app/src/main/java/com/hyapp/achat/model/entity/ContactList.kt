@@ -30,4 +30,14 @@ class ContactList : LinkedList<Contact> {
         }
         return oldIndex
     }
+
+    fun update(contact: Contact): Boolean {
+        for (i in 0 until size) {
+            if (get(i).uid == contact.uid) {
+                set(i, contact)
+                return true
+            }
+        }
+        return false
+    }
 }

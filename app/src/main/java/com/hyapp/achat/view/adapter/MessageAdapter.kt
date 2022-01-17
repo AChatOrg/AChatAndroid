@@ -43,11 +43,11 @@ class MessageAdapter(val context: Context, val recyclerView: RecyclerView) :
 
                 override fun getChangePayload(oldItem: Message, newItem: Message): Any? {
                     return when {
-                        oldItem.id != newItem.id -> {
-                            PAYLOAD_BUBBLE
-                        }
                         oldItem.delivery != newItem.delivery -> {
                             PAYLOAD_DELIVERY
+                        }
+                        oldItem.id != newItem.id -> {
+                            PAYLOAD_BUBBLE
                         }
                         else -> {
                             null

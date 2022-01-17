@@ -121,10 +121,11 @@ class MessageList : LinkedList<Message>() {
         addFirst(message)
     }
 
-    fun updateMessage(message: Message): Boolean {
+    fun updateMessageTimeAndDelivery(message: Message): Boolean {
         for (i in size - 1 downTo 0) {
-            if (get(i).uid == message.uid) {
-                set(i, message)
+            val msg = get(i)
+            if (msg.uid == message.uid) {
+                set(i, msg.copy(time = message.time, delivery = message.delivery))
                 return true
             }
         }

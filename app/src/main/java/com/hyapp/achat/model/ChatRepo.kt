@@ -15,14 +15,20 @@ import kotlinx.coroutines.flow.asSharedFlow
 
 object ChatRepo {
 
-    private val _contactFlow = MutableSharedFlow<Contact>(extraBufferCapacity = 1)
+    const val CONTACT_PUT: Byte = 1
+    const val CONTACT_UPDATE: Byte = 2
+
+    const val MESSAGE_RECEIVE: Byte = 1
+    const val MESSAGE_SENT: Byte = 2
+
+    private val _contactFlow =
+        MutableSharedFlow<Pair<Byte, Contact>>(extraBufferCapacity = Int.MAX_VALUE)
     val contactFlow = _contactFlow.asSharedFlow()
 
-    private val _receiveMessageFlow = MutableSharedFlow<Message>(extraBufferCapacity = 1)
-    val receiveMessageFlow = _receiveMessageFlow.asSharedFlow()
+    private val _messageFlow =
+        MutableSharedFlow<Pair<Byte, Message>>(extraBufferCapacity = Int.MAX_VALUE)
+    val messageFlow = _messageFlow.asSharedFlow()
 
-    private val _sentMessageFlow = MutableSharedFlow<Message>(extraBufferCapacity = 1)
-    val sentMessageFlow = _sentMessageFlow.asSharedFlow()
 
     fun listen(socket: Socket) {
         socket.on(Config.ON_PV_MESSAGE, onPvMessage)
@@ -51,14 +57,20 @@ object ChatRepo {
         MessageDao.put(message)
         Preferences.instance().incrementContactMessagesCount(contact.uid)
 
-        _receiveMessageFlow.tryEmit(message)
+        _messageFlow.tryEmit(Pair(MESSAGE_RECEIVE, message))
     }
 
     private val onMessageSent = Emitter.Listener { args ->
         val message = Gson().fromJson(args[0].toString(), Message::class.java)
         message.delivery = Message.DELIVERY_SENT
+        ContactDao.get(message.receiverUid)?.let {
+            it.messageTime = message.time
+            it.messageDelivery = message.delivery
+            ContactDao.put(it)
+            _contactFlow.tryEmit(Pair(CONTACT_UPDATE, it))
+        }
         MessageDao.update(message)
-        _sentMessageFlow.tryEmit(message)
+        _messageFlow.tryEmit(Pair(MESSAGE_SENT, message))
     }
 
     private fun setupAndPutContact(contact: Contact, message: Message) {
@@ -67,6 +79,6 @@ object ChatRepo {
             contact.message = message.text
         }
         ContactDao.put(contact)
-        _contactFlow.tryEmit(contact)
+        _contactFlow.tryEmit(Pair(CONTACT_PUT, contact))
     }
 }

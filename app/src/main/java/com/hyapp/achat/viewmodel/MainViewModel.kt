@@ -49,10 +49,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun observeContacts() {
         viewModelScope.launch {
-            ChatRepo.contactFlow.collect { contact ->
-                val contactList = _contactsLive.value ?: ContactList()
-                contactList.putFirst(contact)
-                _contactsLive.value = contactList
+            ChatRepo.contactFlow.collect { pair ->
+                when (pair.first) {
+                    ChatRepo.CONTACT_PUT -> putContact(pair.second)
+                    ChatRepo.CONTACT_UPDATE -> updateContact(pair.second)
+                }
             }
         }
     }
@@ -75,6 +76,20 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     }
                 }
             }
+        }
+    }
+
+    private fun putContact(contact: Contact) {
+        val contactList = _contactsLive.value ?: ContactList()
+        contactList.putFirst(contact)
+        _contactsLive.value = contactList
+    }
+
+    private fun updateContact(contact: Contact) {
+        val contactList = _contactsLive.value ?: ContactList()
+        val updated = contactList.update(contact)
+        if (updated) {
+            _contactsLive.value = contactList
         }
     }
 }
