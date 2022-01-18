@@ -25,6 +25,9 @@ import com.hyapp.achat.viewmodel.utils.TimeUtils
 class MessageAdapter(val context: Context, val recyclerView: RecyclerView) :
     ListAdapter<Message, MessageAdapter.Holder>(DIFF_CALLBACK) {
 
+    val sp1: Int = UiUtils.sp2px(context, 1F)
+    var isLoadingMore = false
+    lateinit var onLoadMore: () -> Unit
     var onListChanged: (() -> Unit)? = null
 
     companion object {
@@ -63,17 +66,16 @@ class MessageAdapter(val context: Context, val recyclerView: RecyclerView) :
         }
     }
 
+    fun getMessage(position: Int): Message {
+        return getItem(position)
+    }
+
     override fun onCurrentListChanged(
         previousList: MutableList<Message>,
         currentList: MutableList<Message>
     ) {
         onListChanged?.invoke()
     }
-
-    val sp1: Int = UiUtils.sp2px(context, 1F)
-
-    var isLoadingMore = false
-    lateinit var onLoadMore: () -> Unit
 
     override fun getItemViewType(position: Int): Int {
         val message = getItem(position)

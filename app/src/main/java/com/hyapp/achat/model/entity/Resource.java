@@ -52,6 +52,9 @@ public class Resource<T> {
         return new Resource<>(Status.SUCCESS, data, null, Action.ADD, index, false, false, false);
     }
 
+    public static <T> Resource<T> add(@NonNull T data, int index, boolean bool) {
+        return new Resource<>(Status.SUCCESS, data, null, Action.ADD, index, bool, false, false);
+    }
 
     public static <T> Resource<T> addPaging(@NonNull T data, int index, boolean bool, boolean bool2) {
         return new Resource<>(Status.SUCCESS, data, null, Action.ADD_PAGING, index, bool, bool2, false);

@@ -11,6 +11,7 @@ import com.hyapp.achat.model.objectbox.MessageDao
 import com.hyapp.achat.model.objectbox.MessageDao.waitings
 import com.hyapp.achat.model.objectbox.UserDao
 import com.hyapp.achat.viewmodel.service.SocketService
+import io.objectbox.exception.UniqueViolationException
 import io.socket.client.Socket
 import io.socket.emitter.Emitter
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -23,6 +24,7 @@ object ChatRepo {
 
     const val MESSAGE_RECEIVE: Byte = 1
     const val MESSAGE_SENT: Byte = 2
+    const val MESSAGE_READ: Byte = 3
 
     private val _contactFlow =
         MutableSharedFlow<Pair<Byte, Contact>>(extraBufferCapacity = Int.MAX_VALUE)
@@ -36,6 +38,7 @@ object ChatRepo {
     fun listen(socket: Socket) {
         socket.on(Config.ON_PV_MESSAGE, onPvMessage)
         socket.on(Config.ON_MESSAGE_SENT, onMessageSent)
+        socket.on(Config.ON_MSG_READ, onMessageRead)
     }
 
     fun sendPvMessage(message: Message, receiver: User) {
@@ -50,31 +53,68 @@ object ChatRepo {
         SocketService.ioSocket?.socket?.emit(Config.ON_PV_MESSAGE, json)
     }
 
+    fun sendWaitingsMessages() {
+        (UserLive.value ?: UserDao.get(User.CURRENT_USER_ID))?.let {
+            val messages = waitings(it.uid)
+            for (message in messages) {
+                val json = Gson().toJson(message)
+                SocketService.ioSocket?.socket?.emit(Config.ON_PV_MESSAGE, json)
+            }
+        }
+    }
+
+    fun updateAndSendMessageRead(message: Message) {
+        MessageDao.get(message.uid)?.let { MessageDao.put(it) }
+        SocketService.ioSocket?.socket?.emit(Config.ON_MSG_READ, message.uid, message.senderUid)
+    }
+
+    fun sendMessageRead(message: Message) {
+        SocketService.ioSocket?.socket?.emit(Config.ON_MSG_READ, message.uid, message.senderUid)
+    }
+
     private val onPvMessage = Emitter.Listener { args ->
         val message = Gson().fromJson(args[0].toString(), Message::class.java).apply {
             transfer = Message.TRANSFER_RECEIVE
         }
-        val contact = ContactDao.get(message.senderUid) ?: message.getContact()
-        contact.messageDelivery = Message.DELIVERY_HIDDEN
-        setupAndPutContact(contact, message)
-        MessageDao.put(message.apply { id = 0 })
-        Preferences.instance().incrementContactMessagesCount(contact.uid)
-
-        SocketService.ioSocket?.socket?.emit(Config.ON_MSG_RECEIVED, message.uid)
-        _messageFlow.tryEmit(Pair(MESSAGE_RECEIVE, message))
+        try {
+            MessageDao.put(message.apply { id = 0 })
+            val contact = ContactDao.get(message.senderUid) ?: message.getContact()
+            contact.messageDelivery = Message.DELIVERY_HIDDEN
+            setupAndPutContact(contact, message)
+            Preferences.instance().incrementContactMessagesCount(contact.uid)
+            _messageFlow.tryEmit(Pair(MESSAGE_RECEIVE, message))
+        } catch (e: UniqueViolationException) {
+            e.printStackTrace()
+        } finally {
+            SocketService.ioSocket?.socket?.emit(Config.ON_MSG_RECEIVED, message.uid)
+        }
     }
 
     private val onMessageSent = Emitter.Listener { args ->
-        val message = Gson().fromJson(args[0].toString(), Message::class.java)
-        message.delivery = Message.DELIVERY_SENT
-        ContactDao.get(message.receiverUid)?.let {
-            it.messageTime = message.time
-            it.messageDelivery = message.delivery
-            ContactDao.put(it)
-            _contactFlow.tryEmit(Pair(CONTACT_UPDATE, it))
+        MessageDao.get(args[0].toString())?.let { message ->
+            message.delivery = Message.DELIVERY_SENT
+            ContactDao.get(message.receiverUid)?.let { contact ->
+                contact.messageTime = message.time
+                contact.messageDelivery = message.delivery
+                ContactDao.put(contact)
+                _contactFlow.tryEmit(Pair(CONTACT_UPDATE, contact))
+            }
+            MessageDao.put(message)
+            _messageFlow.tryEmit(Pair(MESSAGE_SENT, message))
         }
-        MessageDao.update(message)
-        _messageFlow.tryEmit(Pair(MESSAGE_SENT, message))
+    }
+
+    private val onMessageRead = Emitter.Listener { args ->
+        MessageDao.get(args[0].toString())?.let { message ->
+            message.delivery = Message.DELIVERY_READ
+            ContactDao.get(message.receiverUid)?.let { contact ->
+                contact.messageDelivery = message.delivery
+                ContactDao.put(contact)
+                _contactFlow.tryEmit(Pair(CONTACT_UPDATE, contact))
+            }
+            MessageDao.put(message)
+            _messageFlow.tryEmit(Pair(MESSAGE_READ, message))
+        }
     }
 
     private fun setupAndPutContact(contact: Contact, message: Message) {
@@ -84,16 +124,5 @@ object ChatRepo {
         }
         ContactDao.put(contact)
         _contactFlow.tryEmit(Pair(CONTACT_PUT, contact))
-    }
-
-
-    fun sendWaitingsMessages() {
-        (UserLive.value ?: UserDao.get(User.CURRENT_USER_ID))?.let {
-            val messages = waitings(it.uid)
-            for (message in messages) {
-                val json = Gson().toJson(message)
-                SocketService.ioSocket?.socket?.emit(Config.ON_PV_MESSAGE, json)
-            }
-        }
     }
 }

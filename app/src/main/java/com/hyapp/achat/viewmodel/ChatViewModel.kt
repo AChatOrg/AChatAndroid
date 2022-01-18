@@ -93,12 +93,17 @@ class ChatViewModel(var receiver: User) : ViewModel() {
                 when (pair.first) {
                     ChatRepo.MESSAGE_RECEIVE -> {
                         if (pair.second.senderUid == receiver.uid) {
-                            addMessage(pair.second)
+                            addMessage(pair.second, true)
                         }
                     }
                     ChatRepo.MESSAGE_SENT -> {
                         if (pair.second.receiverUid == receiver.uid) {
                             updateMessageTimeAndDelivery(pair.second)
+                        }
+                    }
+                    ChatRepo.MESSAGE_READ -> {
+                        if (pair.second.receiverUid == receiver.uid) {
+                            updateMessageDelivery(pair.second)
                         }
                     }
                 }
@@ -112,15 +117,15 @@ class ChatViewModel(var receiver: User) : ViewModel() {
             Message.TRANSFER_SEND, System.currentTimeMillis(), text.toString(), textSizeUnit, "",
             receiver.uid, currentUser ?: User()
         )
-        addMessage(message)
+        addMessage(message, false)
         ChatRepo.sendPvMessage(message, receiver)
     }
 
-    private fun addMessage(message: Message) {
+    private fun addMessage(message: Message, received: Boolean) {
         val resource = _messagesLive.value ?: Resource.success(MessageList())
         val messageList = resource.data ?: MessageList()
         messageList.addMessageLast(message)
-        _messagesLive.value = Resource.add(messageList, 0)
+        _messagesLive.value = Resource.add(messageList, 0, received)
     }
 
     private fun updateMessageTimeAndDelivery(message: Message) {
@@ -130,6 +135,38 @@ class ChatViewModel(var receiver: User) : ViewModel() {
         if (updated) {
             _messagesLive.value = Resource.update(messageList, 0)
         }
+    }
+
+    private fun updateMessageDelivery(message: Message) {
+        val resource = _messagesLive.value ?: Resource.success(MessageList())
+        val messageList = resource.data ?: MessageList()
+        val updated = messageList.updateMessageDelivery(message)
+        if (updated) {
+            _messagesLive.value = Resource.update(messageList, 0)
+        }
+    }
+
+    fun readMessage(message: Message) {
+        ChatRepo.updateAndSendMessageRead(message.apply { delivery = Message.DELIVERY_READ })
+    }
+
+    fun readMessagesUntilPosition(position: Int) {
+        val resource = _messagesLive.value ?: Resource.success(MessageList())
+        val messageList = resource.data ?: MessageList()
+        val messages = mutableListOf<Message>()
+        for (i in position downTo 0) {
+            val message = messageList[i]
+            if (message.transfer == Message.TRANSFER_RECEIVE) {
+                if (message.delivery != Message.DELIVERY_READ) {
+                    message.delivery = Message.DELIVERY_READ
+                    ChatRepo.sendMessageRead(message)
+                    MessageDao.get(message.uid)?.let { messages.add(message) }
+                } else {
+                    break
+                }
+            }
+        }
+        MessageDao.put(messages)
     }
 
     class Factory(private var receiver: User) : ViewModelProvider.Factory {

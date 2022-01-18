@@ -77,6 +77,15 @@ class ChatActivity : EventActivity() {
             super.onBackPressed()
     }
 
+//    override fun onStart() {
+//        super.onStart()
+//        val lastVisiblePosition = (binding.recyclerView.layoutManager as LinearLayoutManager)
+//            .findLastCompletelyVisibleItemPosition()
+//        if (lastVisiblePosition < messageAdapter.itemCount) {
+//            viewModel.readMessagesUntilPosition(lastVisiblePosition)
+//        }
+//    }
+
     private fun init() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_chat)
         contact = intent.getParcelableExtra(EXTRA_CONTACT) ?: Contact()
@@ -126,6 +135,15 @@ class ChatActivity : EventActivity() {
                     binding.editTextDivider.visibility = VISIBLE
                 } else {
                     binding.editTextDivider.visibility = INVISIBLE
+                }
+                val lastVisiblePosition = layoutManager.findLastCompletelyVisibleItemPosition()
+                try {
+                    val message = messageAdapter.getMessage(lastVisiblePosition)
+                    if (message.transfer == Message.TRANSFER_RECEIVE && message.delivery != Message.DELIVERY_READ && isStarted) {
+                        viewModel.readMessage(message)
+                    }
+                } catch (e: ArrayIndexOutOfBoundsException) {
+                    e.printStackTrace()
                 }
             }
         })
@@ -303,25 +321,38 @@ class ChatActivity : EventActivity() {
     private fun observeMessages() {
         viewModel.messagesLive.observe(this, { res ->
             when (res.action) {
-                Resource.Action.ADD -> {
-                    messageAdapter.onListChanged = {
-                        binding.recyclerView.smoothScrollToPosition(messageAdapter.itemCount - 1)
-                        messageAdapter.onListChanged = null
-                    }
-                    messageAdapter.submitList(res.data)
-                }
-                Resource.Action.ADD_PAGING -> {
-                    messageAdapter.isLoadingMore = !res.bool
-                    if (res.bool2) {
-                        messageAdapter.onListChanged = {
-                            binding.recyclerView.scrollToPosition(messageAdapter.itemCount - 1)
-                            messageAdapter.onListChanged = null
-                        }
-                    }
-                    messageAdapter.submitList(res.data)
-                }
+                Resource.Action.ADD -> addSingleMessage(res)
+                Resource.Action.ADD_PAGING -> addPagingMessages(res)
                 Resource.Action.UPDATE -> messageAdapter.submitList(res.data)
             }
         })
+    }
+
+    private fun addSingleMessage(res: Resource<MessageList>) {
+        messageAdapter.onListChanged = {
+            if (res.bool) {
+                val lastVisiblePosition =
+                    (binding.recyclerView.layoutManager as LinearLayoutManager)
+                        .findLastCompletelyVisibleItemPosition()
+                if (lastVisiblePosition >= messageAdapter.itemCount - 3) {
+                    binding.recyclerView.smoothScrollToPosition(messageAdapter.itemCount - 1)
+                }
+            } else {
+                binding.recyclerView.smoothScrollToPosition(messageAdapter.itemCount - 1)
+            }
+            messageAdapter.onListChanged = null
+        }
+        messageAdapter.submitList(res.data)
+    }
+
+    private fun addPagingMessages(res: Resource<MessageList>) {
+        messageAdapter.isLoadingMore = !res.bool
+        if (res.bool2) {
+            messageAdapter.onListChanged = {
+                binding.recyclerView.scrollToPosition(messageAdapter.itemCount - 1)
+                messageAdapter.onListChanged = null
+            }
+        }
+        messageAdapter.submitList(res.data)
     }
 }

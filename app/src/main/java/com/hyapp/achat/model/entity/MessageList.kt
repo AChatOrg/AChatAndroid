@@ -1,6 +1,7 @@
 package com.hyapp.achat.model.entity
 
 import android.text.format.DateUtils
+import com.hyapp.achat.R
 import com.hyapp.achat.viewmodel.utils.TimeUtils
 import java.time.Instant
 import java.time.ZoneId
@@ -126,6 +127,21 @@ class MessageList : LinkedList<Message>() {
             val msg = get(i)
             if (msg.uid == message.uid) {
                 set(i, msg.copy(time = message.time, delivery = message.delivery))
+                return true
+            }
+        }
+        return false
+    }
+
+    fun updateMessageDelivery(message: Message): Boolean {
+        for (i in size - 1 downTo 0) {
+            if (get(i).uid == message.uid) {
+                for (j in i downTo 0) {
+                    val m = get(j)
+                    if (m.transfer == Message.TRANSFER_SEND && m.delivery != Message.DELIVERY_READ) {
+                        set(j, m.copy(delivery = message.delivery))
+                    } else break
+                }
                 return true
             }
         }

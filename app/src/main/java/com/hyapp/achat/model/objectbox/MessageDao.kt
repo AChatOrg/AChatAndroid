@@ -15,8 +15,18 @@ object MessageDao {
     }
 
     @JvmStatic
+    fun get(uid: String): Message? {
+        return getQuery.setParameter(Message_.uid, uid).findUnique()
+    }
+
+    @JvmStatic
     fun put(message: Message): Long {
         return ObjectBox.store.boxFor(Message::class.java).put(message)
+    }
+
+    @JvmStatic
+    fun put(messageList: List<Message>) {
+        ObjectBox.store.boxFor(Message::class.java).put(messageList)
     }
 
     @JvmStatic
@@ -27,14 +37,6 @@ object MessageDao {
         )
             .build()
             .find(offset, limit)
-    }
-
-    @JvmStatic
-    fun update(message: Message) {
-        val msg = getQuery.setParameter(Message_.uid, message.uid).findUnique()
-        if (msg != null) {
-            ObjectBox.store.boxFor(Message::class.java).put(message.apply { id = msg.id })
-        }
     }
 
     @JvmStatic

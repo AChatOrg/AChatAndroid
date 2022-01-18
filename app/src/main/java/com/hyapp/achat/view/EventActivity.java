@@ -13,15 +13,19 @@ import org.greenrobot.eventbus.ThreadMode;
 
 public class EventActivity extends AppCompatActivity {
 
+    public boolean isStarted = false;
+
     @Override
     public void onStart() {
         super.onStart();
+        isStarted = true;
         EventBus.getDefault().register(this);
     }
 
     @Override
     public void onStop() {
         super.onStop();
+        isStarted = false;
         EventBus.getDefault().unregister(this);
     }
 

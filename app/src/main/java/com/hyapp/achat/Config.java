@@ -22,4 +22,5 @@ public interface Config {
     String ON_PV_MESSAGE = "pvMessage";
     String ON_MESSAGE_SENT = "msgSent";
     String ON_MSG_RECEIVED = "msgReceived";
+    String ON_MSG_READ = "msgRead";
 }
