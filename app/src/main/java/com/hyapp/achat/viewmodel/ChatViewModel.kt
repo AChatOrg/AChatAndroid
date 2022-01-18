@@ -20,6 +20,8 @@ class ChatViewModel(var receiver: User) : ViewModel() {
         const val PROFILE_MESSAGE_UID = "profile"
     }
 
+    private val currentUser = UserDao.get(User.CURRENT_USER_ID)
+
     private val _messagesLive = MutableLiveData<Resource<MessageList>>()
     val messagesLive = _messagesLive as LiveData<Resource<MessageList>>
 
@@ -27,7 +29,6 @@ class ChatViewModel(var receiver: User) : ViewModel() {
     private var pagedCount = 0
 
     init {
-        UserLive.value = UserDao.get(User.CURRENT_USER_ID)
         loadPagedMessages()
         observeMessage()
     }
@@ -109,7 +110,7 @@ class ChatViewModel(var receiver: User) : ViewModel() {
         val message = Message(
             UUID.randomUUID().toString(), Message.TYPE_TEXT,
             Message.TRANSFER_SEND, System.currentTimeMillis(), text.toString(), textSizeUnit, "",
-            receiver.uid, UserLive.value ?: User()
+            receiver.uid, currentUser ?: User()
         )
         addMessage(message)
         ChatRepo.sendPvMessage(message, receiver)

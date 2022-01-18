@@ -2,6 +2,7 @@ package com.hyapp.achat.viewmodel
 
 import android.app.Application
 import android.content.Intent
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.hyapp.achat.Config
@@ -11,6 +12,7 @@ import com.hyapp.achat.model.Preferences
 import com.hyapp.achat.model.objectbox.UserDao
 import com.hyapp.achat.viewmodel.service.SocketService
 import com.hyapp.achat.viewmodel.utils.NetUtils
+import com.hyapp.achat.viewmodel.utils.SecureUtils
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collect
@@ -51,6 +53,7 @@ class LoginGuestViewModel(application: Application) : AndroidViewModel(applicati
             _loggedFlow.tryEmit(Event(Event.Status.LOADING))
 
             val json = JSONObject()
+            json.put("uid", SecureUtils.androidId(context))
             json.put("operation", Config.OPERATION_LOGIN_GUEST)
             json.put("name", nameTrim)
             json.put("bio", bioTrim)

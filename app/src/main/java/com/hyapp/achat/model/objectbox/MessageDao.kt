@@ -1,7 +1,5 @@
 package com.hyapp.achat.model.objectbox
 
-import com.hyapp.achat.model.entity.Contact
-import com.hyapp.achat.model.entity.Contact_
 import com.hyapp.achat.model.entity.Message
 import com.hyapp.achat.model.entity.Message_
 import io.objectbox.query.Query
@@ -37,5 +35,15 @@ object MessageDao {
         if (msg != null) {
             ObjectBox.store.boxFor(Message::class.java).put(message.apply { id = msg.id })
         }
+    }
+
+    @JvmStatic
+    fun waitings(senderUi: String): List<Message> {
+        return ObjectBox.store.boxFor(Message::class.java).query(
+            Message_.senderUid.equal(senderUi, QueryBuilder.StringOrder.CASE_SENSITIVE)
+                .and(Message_.delivery.equal(Message.DELIVERY_WAITING.toInt()))
+        )
+            .build()
+            .find()
     }
 }
