@@ -13,6 +13,7 @@ import android.view.View
 import android.view.View.*
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -60,6 +61,7 @@ class ChatActivity : EventActivity() {
     private lateinit var messageEditTextSizeAnimator: ValueAnimator
 
     private lateinit var messageAdapter: MessageAdapter
+    private var unreadCount = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,7 +71,9 @@ class ChatActivity : EventActivity() {
         setupSendButton()
         setupMessageEditText()
         setupEmojis()
+        setupFastScrollFab()
         observeMessages()
+        observeConnectivity()
     }
 
     override fun onBackPressed() {
@@ -136,10 +140,18 @@ class ChatActivity : EventActivity() {
                 } else {
                     binding.editTextDivider.visibility = INVISIBLE
                 }
-                readMessages(
-                    layoutManager.findFirstVisibleItemPosition(),
-                    layoutManager.findLastVisibleItemPosition()
-                )
+
+                val lastVisiblePosition = layoutManager.findLastVisibleItemPosition()
+                if (binding.fastScrollCard.visibility == VISIBLE && lastVisiblePosition >= messageAdapter.itemCount - 2) {
+                    binding.fastScrollCard.visibility = GONE
+                    binding.unreadBadgeCard.visibility = GONE
+                } else if (binding.fastScrollCard.visibility == GONE
+                    && lastVisiblePosition < messageAdapter.itemCount - 2
+                ) {
+                    binding.fastScrollCard.visibility = VISIBLE
+                }
+
+                readMessages(layoutManager.findFirstVisibleItemPosition(), lastVisiblePosition)
             }
         })
         //scroll on show keyboard
@@ -158,6 +170,10 @@ class ChatActivity : EventActivity() {
                     && message.delivery != Message.DELIVERY_SENT && message.isChatMessage && isStarted
                 ) {
                     viewModel.readMessage(message)
+                    if (unreadCount > 0) {
+                        unreadCount--
+                        binding.unreadBadgeTextView.text = unreadCount.toString()
+                    }
                 }
             } catch (e: ArrayIndexOutOfBoundsException) {
                 e.printStackTrace()
@@ -320,12 +336,35 @@ class ChatActivity : EventActivity() {
         })
     }
 
+
+    private fun setupFastScrollFab() {
+        binding.fastScrollCard.setOnClickListener {
+            binding.recyclerView.post { binding.recyclerView.smoothScrollToPosition(messageAdapter.itemCount - 1) }
+            unreadCount = 0
+        }
+        binding.unreadBadgeCard.setOnClickListener { v: View? ->
+            binding.recyclerView.post { binding.recyclerView.smoothScrollToPosition(messageAdapter.itemCount - 1) }
+        }
+    }
+
     private fun sendTextMessage(text: CharSequence, textSizeUnit: Int) {
         viewModel.sendPvTextMessage(text, textSizeUnit)
     }
 
     private fun sendLottieMessage(lottieDrawable: AXrLottieDrawable?) {
 
+    }
+
+    private fun observeConnectivity() {
+        ConnLive.singleton().observe(this, { status ->
+            when (status) {
+                ConnLive.Status.CONNECTING -> binding.bio.setText(R.string.connecting)
+                ConnLive.Status.CONNECTED -> binding.bio.text = contact.bio
+                ConnLive.Status.DISCONNECTED -> binding.bio.setText(R.string.disconnected)
+                ConnLive.Status.NO_NET -> binding.bio.setText(R.string.no_network_connection)
+                null -> {}
+            }
+        })
     }
 
     private fun observeMessages() {
@@ -344,11 +383,25 @@ class ChatActivity : EventActivity() {
                 val lastVisiblePosition =
                     (binding.recyclerView.layoutManager as LinearLayoutManager)
                         .findLastCompletelyVisibleItemPosition()
-                if (lastVisiblePosition >= messageAdapter.itemCount - 3) {
-                    binding.recyclerView.smoothScrollToPosition(messageAdapter.itemCount - 1)
+                if (lastVisiblePosition >= messageAdapter.itemCount - 2) {
+                    binding.recyclerView.post {
+                        binding.recyclerView.smoothScrollToPosition(
+                            messageAdapter.itemCount - 1
+                        )
+                    }
+                } else {
+                    unreadCount++
+                    binding.unreadBadgeTextView.text = unreadCount.toString()
+                    if (binding.fastScrollCard.visibility == VISIBLE) {
+                        binding.unreadBadgeCard.visibility = VISIBLE
+                    }
                 }
             } else {
-                binding.recyclerView.smoothScrollToPosition(messageAdapter.itemCount - 1)
+                binding.recyclerView.post {
+                    binding.recyclerView.smoothScrollToPosition(
+                        messageAdapter.itemCount - 1
+                    )
+                }
             }
             messageAdapter.onListChanged = null
         }
@@ -359,7 +412,7 @@ class ChatActivity : EventActivity() {
         messageAdapter.isLoadingMore = !res.bool
         if (res.bool2) {
             messageAdapter.onListChanged = {
-                binding.recyclerView.scrollToPosition(messageAdapter.itemCount - 1)
+                binding.recyclerView.post { binding.recyclerView.scrollToPosition(messageAdapter.itemCount - 1) }
                 messageAdapter.onListChanged = null
             }
         }

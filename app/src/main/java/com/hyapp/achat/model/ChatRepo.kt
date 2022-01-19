@@ -77,7 +77,9 @@ object ChatRepo {
     }
 
     fun updateAndSendMessageRead(message: Message) {
-        MessageDao.get(message.uid)?.let { MessageDao.put(message) }
+        MessageDao.get(message.uid)?.let {
+            MessageDao.put(it.apply { delivery = message.delivery })
+        }
         SocketService.ioSocket?.socket?.emit(Config.ON_MSG_READ, message.uid, message.senderUid)
     }
 

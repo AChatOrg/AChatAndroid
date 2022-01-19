@@ -6,6 +6,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:animateLayoutChanges="true"
         tools:context=".view.ChatActivity">
 
         <com.hyapp.achat.view.component.GroupAvatarView
@@ -203,6 +204,58 @@
             app:layout_constraintBottom_toTopOf="@id/emojiPopupLayout"
             app:layout_constraintEnd_toStartOf="@+id/sendImageSwitcher"
             app:layout_constraintStart_toStartOf="parent" />
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/fastScrollCard"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone"
+            app:cardBackgroundColor="@color/white"
+            app:cardCornerRadius="17dp"
+            app:cardElevation="3dp"
+            app:layout_constraintBottom_toTopOf="@id/editTextDivider"
+            app:layout_constraintEnd_toEndOf="@id/sendImageSwitcher"
+            app:layout_constraintStart_toStartOf="@id/sendImageSwitcher"
+            tools:visibility="visible">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@drawable/fast_scroll"
+                android:tint="?colorPrimary"
+                app:tint="@color/black" />
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/unreadBadgeCard"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginEnd="22dp"
+            android:layout_marginRight="22dp"
+            android:layout_marginBottom="22dp"
+            android:visibility="gone"
+            app:cardBackgroundColor="@color/green_50"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="4dp"
+            app:layout_constraintBottom_toBottomOf="@+id/fastScrollCard"
+            app:layout_constraintEnd_toEndOf="@+id/fastScrollCard"
+            tools:visibility="visible">
+
+            <TextView
+                android:id="@+id/unreadBadgeTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="1dp"
+                android:gravity="center"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                tools:text="89" />
+
+        </androidx.cardview.widget.CardView>
 
         <ImageSwitcher
             android:id="@+id/sendImageSwitcher"
