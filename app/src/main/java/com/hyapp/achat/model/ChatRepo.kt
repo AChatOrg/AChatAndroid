@@ -1,6 +1,5 @@
 package com.hyapp.achat.model
 
-import android.content.Context
 import com.google.gson.Gson
 import com.hyapp.achat.App
 import com.hyapp.achat.Config
@@ -13,7 +12,7 @@ import com.hyapp.achat.model.objectbox.MessageDao
 import com.hyapp.achat.model.objectbox.UserDao
 import com.hyapp.achat.viewmodel.ChatViewModel
 import com.hyapp.achat.viewmodel.service.SocketService
-import com.hyapp.achat.viewmodel.utils.NotifUtils
+import com.hyapp.achat.viewmodel.Notifs
 import io.objectbox.exception.UniqueViolationException
 import io.socket.client.Socket
 import io.socket.emitter.Emitter
@@ -80,7 +79,7 @@ object ChatRepo {
         }
     }
 
-    fun updateAndSendMessageRead(message: Message) {
+    fun markMessageAsRead(message: Message) {
         ContactDao.get(message.senderUid)?.let {
             var count = it.notifCount.toInt()
             if (count > 0) {
@@ -91,8 +90,8 @@ object ChatRepo {
             }
         }
         MessageDao.get(message.uid)?.let {
-            MessageDao.put(it.apply { delivery = message.delivery })
-            NotifUtils.remove(App.getContext(), it.id.toInt())
+            MessageDao.put(it.apply { delivery = Message.DELIVERY_SENT })
+            Notifs.remove(App.getContext(), it.id.toInt())
         }
         SocketService.ioSocket?.socket?.emit(Config.ON_MSG_READ, message.uid, message.senderUid)
     }
@@ -115,8 +114,8 @@ object ChatRepo {
             Preferences.instance().incrementContactMessagesCount(contact.uid)
             _messageFlow.tryEmit(Pair(MESSAGE_RECEIVE, message))
             /*send notif*/
-            if (!ChatViewModel.isActivityStarted && ChatViewModel.contactUid == contact.uid) {
-                NotifUtils.notifyMessage(App.getContext(), message, contact)
+            if (!ChatViewModel.isActivityStarted || ChatViewModel.contactUid != contact.uid) {
+                Notifs.notifyMessage(App.getContext(), message, contact)
             }
         } catch (e: UniqueViolationException) {
             e.printStackTrace()
@@ -164,7 +163,8 @@ object ChatRepo {
         if (message.type == Message.TYPE_TEXT) {
             contact.message = message.text
         }
-        ContactDao.put(contact)
+        val contactId = ContactDao.put(contact)
+        contact.id = contactId
         _contactFlow.tryEmit(Pair(CONTACT_PUT, contact))
     }
 }

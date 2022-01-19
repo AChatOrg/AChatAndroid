@@ -1,5 +1,6 @@
 package com.hyapp.achat.view
 
+import android.animation.LayoutTransition
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
@@ -11,6 +12,7 @@ import android.text.TextWatcher
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.*
+import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import androidx.databinding.DataBindingUtil
@@ -62,6 +64,8 @@ class ChatActivity : EventActivity() {
     private lateinit var messageAdapter: MessageAdapter
     private var unreadCount = 0
 
+    private lateinit var layoutTransition: LayoutTransition
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         init()
@@ -102,6 +106,7 @@ class ChatActivity : EventActivity() {
             this,
             ChatViewModel.Factory(contact.getUser())
         )[ChatViewModel::class.java]
+        layoutTransition = (binding.root as ViewGroup).layoutTransition
     }
 
     private fun setupContact() {
@@ -174,7 +179,7 @@ class ChatActivity : EventActivity() {
                 if (message.transfer == Message.TRANSFER_RECEIVE && message.delivery != Message.DELIVERY_READ
                     && message.delivery != Message.DELIVERY_SENT && message.isChatMessage && ChatViewModel.isActivityStarted
                 ) {
-                    viewModel.readMessage(message)
+                    viewModel.markMessageAsRead(message)
                     if (unreadCount > 0) {
                         unreadCount--
                         binding.unreadBadgeTextView.text = unreadCount.toString()
@@ -214,13 +219,21 @@ class ChatActivity : EventActivity() {
                     binding.sendImageSwitcher.setImageResource(R.drawable.ic_action_send)
                     binding.attach.animate().alpha(0F).translationX(dp46.toFloat()).setDuration(100)
                         .withStartAction { binding.attach.setBackgroundResource(0) }
-                        .withEndAction { binding.attach.visibility = INVISIBLE }
+                        .withEndAction {
+                            layoutTransition.disableTransitionType(LayoutTransition.DISAPPEARING)
+                            binding.attach.visibility = INVISIBLE
+                            layoutTransition.enableTransitionType(LayoutTransition.DISAPPEARING)
+                        }
                     isEditTextEmpty = false
                 } else if (p0!!.isEmpty()) {
                     binding.sendImageSwitcher.setOnTouchListener(null)
                     binding.sendImageSwitcher.setImageResource(R.drawable.ic_action_mic)
                     binding.attach.animate().alpha(1F).translationX(0F).setDuration(100)
-                        .withStartAction { binding.attach.visibility = VISIBLE }
+                        .withStartAction {
+                            layoutTransition.disableTransitionType(LayoutTransition.APPEARING)
+                            binding.attach.visibility = VISIBLE
+                            layoutTransition.enableTransitionType(LayoutTransition.APPEARING)
+                        }
                         .withEndAction { binding.attach.setBackgroundResource(R.drawable.chat_inputs_ripple_bg_circle) }
                     isEditTextEmpty = true
                 }
@@ -389,11 +402,7 @@ class ChatActivity : EventActivity() {
                     (binding.recyclerView.layoutManager as LinearLayoutManager)
                         .findLastCompletelyVisibleItemPosition()
                 if (lastVisiblePosition >= messageAdapter.itemCount - 2) {
-                    binding.recyclerView.post {
-                        binding.recyclerView.smoothScrollToPosition(
-                            messageAdapter.itemCount - 1
-                        )
-                    }
+                    binding.recyclerView.smoothScrollToPosition(messageAdapter.itemCount - 1)
                 } else {
                     unreadCount++
                     binding.unreadBadgeTextView.text = unreadCount.toString()
@@ -402,11 +411,7 @@ class ChatActivity : EventActivity() {
                     }
                 }
             } else {
-                binding.recyclerView.post {
-                    binding.recyclerView.smoothScrollToPosition(
-                        messageAdapter.itemCount - 1
-                    )
-                }
+                binding.recyclerView.smoothScrollToPosition(messageAdapter.itemCount - 1)
             }
             messageAdapter.onListChanged = null
         }
@@ -417,7 +422,7 @@ class ChatActivity : EventActivity() {
         messageAdapter.isLoadingMore = !res.bool
         if (res.bool2) {
             messageAdapter.onListChanged = {
-                binding.recyclerView.post { binding.recyclerView.scrollToPosition(messageAdapter.itemCount - 1) }
+                binding.recyclerView.scrollToPosition(messageAdapter.itemCount - 1)
                 messageAdapter.onListChanged = null
             }
         }

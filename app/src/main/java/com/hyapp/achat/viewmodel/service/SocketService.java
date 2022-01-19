@@ -15,14 +15,8 @@ import com.hyapp.achat.model.ChatRepo;
 import com.hyapp.achat.model.IOSocket;
 import com.hyapp.achat.model.entity.ConnLive;
 import com.hyapp.achat.model.Preferences;
-import com.hyapp.achat.model.entity.Message;
-import com.hyapp.achat.model.entity.User;
-import com.hyapp.achat.model.objectbox.MessageDao;
-import com.hyapp.achat.model.objectbox.UserDao;
 import com.hyapp.achat.viewmodel.utils.NetUtils;
-import com.hyapp.achat.viewmodel.utils.NotifUtils;
-
-import java.util.List;
+import com.hyapp.achat.viewmodel.Notifs;
 
 public class SocketService extends Service {
 
@@ -51,8 +45,8 @@ public class SocketService extends Service {
     public void onCreate() {
         registerReceiver(netReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
         ConnLive.singleton().setValue(ConnLive.Status.CONNECTING);
-        NotifUtils.createSocketChannel(this);
-        NotifUtils.createMessagingChannel(this);
+        Notifs.createSocketChannel(this);
+        Notifs.createMessagingChannel(this);
     }
 
     @Override
@@ -65,7 +59,7 @@ public class SocketService extends Service {
             ChatRepo.INSTANCE.sendReadsMessages();
         }
 
-        startForeground(NotifUtils.ID_SOCKET, NotifUtils.getSocketNotif(this));
+        startForeground(Notifs.ID_SOCKET, Notifs.getSocketNotif(this));
         return START_STICKY;
     }
 

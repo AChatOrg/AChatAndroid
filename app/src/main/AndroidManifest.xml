@@ -57,6 +57,8 @@
             android:exported="false">
             <intent-filter>
                 <action android:name="ACTION_EXIT" />
+                <action android:name="ACTION_REPLY_MESSAGE" />
+                <action android:name="ACTION_MARK_MESSAGE_AS_READ" />
             </intent-filter>
         </receiver>
     </application>

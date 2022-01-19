@@ -153,8 +153,8 @@ class ChatViewModel(var receiver: User) : ViewModel() {
         }
     }
 
-    fun readMessage(message: Message) {
-        ChatRepo.updateAndSendMessageRead(message.apply { delivery = Message.DELIVERY_SENT })
+    fun markMessageAsRead(message: Message) {
+        ChatRepo.markMessageAsRead(message)
     }
 
 //    fun readMessagesUntilPosition(position: Int) {

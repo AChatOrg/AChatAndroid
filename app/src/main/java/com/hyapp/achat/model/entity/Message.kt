@@ -1,12 +1,15 @@
 package com.hyapp.achat.model.entity
 
+import android.os.Parcelable
 import android.util.Pair
 import io.objectbox.annotation.Entity
 import io.objectbox.annotation.Id
 import io.objectbox.annotation.Index
 import io.objectbox.annotation.Unique
+import kotlinx.parcelize.Parcelize
 
 @Entity
+@Parcelize
 data class Message(
     @Index
     @Unique
@@ -37,7 +40,7 @@ data class Message(
 
     @Id
     var id: Long = 0
-) {
+) : Parcelable {
     constructor(
         uid: String = "",
         type: Byte = TYPE_TEXT,

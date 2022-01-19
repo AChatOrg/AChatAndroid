@@ -1,11 +1,7 @@
 package com.hyapp.achat.model.entity
 
 import android.text.format.DateUtils
-import com.hyapp.achat.R
 import com.hyapp.achat.viewmodel.utils.TimeUtils
-import java.time.Instant
-import java.time.ZoneId
-import java.time.temporal.ChronoUnit
 import java.util.*
 
 class MessageList : LinkedList<Message>() {
@@ -44,36 +40,36 @@ class MessageList : LinkedList<Message>() {
         return haveDateSeparatorPrev
     }
 
-    private fun setupBubbleAddingFirst(message: Message): Boolean {
-        var haveDateSeparatorPrev = false
+    private fun setupBubbleAddingFirst(message: Message): Long {
+        var nextTime = 0L
         if (size == 0) {
             message.bubble = Message.BUBBLE_SINGLE
         } else {
-            val prev = get(0)
-            if (prev.isChatMessage && prev.transfer == message.transfer && prev.time - message.time < 60000) {
+            val next = get(0)
+            if (next.isChatMessage && next.transfer == message.transfer && next.time - message.time < 60000) {
                 message.bubble = Message.BUBBLE_START
                 if (size >= 2) {
-                    val prevPrev = get(1)
-                    if (prevPrev.isChatMessage && prevPrev.transfer == message.transfer && prevPrev.time - prev.time < 60000) {
-                        prev.bubble = Message.BUBBLE_MIDDLE
+                    val nextNext = get(1)
+                    if (nextNext.isChatMessage && nextNext.transfer == message.transfer && nextNext.time - next.time < 60000) {
+                        next.bubble = Message.BUBBLE_MIDDLE
                     } else {
-                        prev.bubble = Message.BUBBLE_END
+                        next.bubble = Message.BUBBLE_END
                     }
                 } else {
-                    prev.bubble = Message.BUBBLE_END
+                    next.bubble = Message.BUBBLE_END
                 }
-                // prevChanged = true
+                // nextChanged
             } else {
                 message.bubble = Message.BUBBLE_SINGLE
             }
             //if two time is not for one day
-            if (!TimeUtils.isSameDay(prev.time, message.time)) {
-                haveDateSeparatorPrev = true
-                prev.bubble = Message.BUBBLE_START
-                //prevChanged = true
+            if (!TimeUtils.isSameDay(next.time, message.time)) {
+                nextTime = next.time
+                next.bubble = Message.BUBBLE_START
+                //nextChanged
             }
         }
-        return haveDateSeparatorPrev
+        return nextTime
     }
 
     fun addMessageLast(message: Message) {
@@ -100,13 +96,13 @@ class MessageList : LinkedList<Message>() {
     }
 
     fun addMessageFirst(message: Message) {
-        var haveDateSeparatorPrev = false
+        var nextMessageTime = 0L
         if (message.isChatMessage) {
-            haveDateSeparatorPrev = setupBubbleAddingFirst(message)
+            nextMessageTime = setupBubbleAddingFirst(message)
         }
-        if (haveDateSeparatorPrev) {
+        if (nextMessageTime != 0L) {
             val details = DateUtils.getRelativeTimeSpanString(
-                message.time,
+                nextMessageTime,
                 System.currentTimeMillis(),
                 DateUtils.DAY_IN_MILLIS,
                 DateUtils.FORMAT_ABBREV_RELATIVE
@@ -114,7 +110,7 @@ class MessageList : LinkedList<Message>() {
             val detailsMessage = Message(
                 uid = UUID.randomUUID().toString(),
                 type = Message.TYPE_DETAILS,
-                time = message.time,
+                time = nextMessageTime,
                 text = details
             )
             addFirst(detailsMessage)
