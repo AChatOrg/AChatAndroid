@@ -48,4 +48,14 @@ object MessageDao {
             .build()
             .find()
     }
+
+    @JvmStatic
+    fun reads(receiverUi: String): List<Message> {
+        return ObjectBox.store.boxFor(Message::class.java).query(
+            Message_.receiverUid.equal(receiverUi, QueryBuilder.StringOrder.CASE_SENSITIVE)
+                .and(Message_.delivery.equal(Message.DELIVERY_SENT.toInt()))
+        )
+            .build()
+            .find()
+    }
 }

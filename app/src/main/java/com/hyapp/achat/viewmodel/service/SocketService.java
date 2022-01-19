@@ -61,6 +61,7 @@ public class SocketService extends Service {
             ioSocket = new IOSocket(loginJson);
             Preferences.instance().putLogged(true);
             ChatRepo.INSTANCE.sendWaitingsMessages();
+            ChatRepo.INSTANCE.sendReadsMessages();
         }
 
         startForeground(NotifUtils.ID_SOCKET, NotifUtils.getSocketNotif(this));

@@ -136,21 +136,31 @@ class ChatActivity : EventActivity() {
                 } else {
                     binding.editTextDivider.visibility = INVISIBLE
                 }
-                val lastVisiblePosition = layoutManager.findLastCompletelyVisibleItemPosition()
-                try {
-                    val message = messageAdapter.getMessage(lastVisiblePosition)
-                    if (message.transfer == Message.TRANSFER_RECEIVE && message.delivery != Message.DELIVERY_READ && isStarted) {
-                        viewModel.readMessage(message)
-                    }
-                } catch (e: ArrayIndexOutOfBoundsException) {
-                    e.printStackTrace()
-                }
+                readMessages(
+                    layoutManager.findFirstVisibleItemPosition(),
+                    layoutManager.findLastVisibleItemPosition()
+                )
             }
         })
         //scroll on show keyboard
         binding.recyclerView.addOnLayoutChangeListener { _: View?, _: Int, _: Int, _: Int, bottom: Int, _: Int, _: Int, _: Int, oldBottom: Int ->
             if (bottom < oldBottom) {
                 binding.recyclerView.smoothScrollBy(0, oldBottom - bottom)
+            }
+        }
+    }
+
+    private fun readMessages(firstVisiblePosition: Int, lastVisiblePosition: Int) {
+        for (i in firstVisiblePosition..lastVisiblePosition) {
+            try {
+                val message = messageAdapter.getMessage(i)
+                if (message.transfer == Message.TRANSFER_RECEIVE && message.delivery != Message.DELIVERY_READ
+                    && message.delivery != Message.DELIVERY_SENT && message.isChatMessage && isStarted
+                ) {
+                    viewModel.readMessage(message)
+                }
+            } catch (e: ArrayIndexOutOfBoundsException) {
+                e.printStackTrace()
             }
         }
     }

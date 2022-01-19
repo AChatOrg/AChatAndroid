@@ -8,7 +8,6 @@ import com.hyapp.achat.model.entity.User
 import com.hyapp.achat.model.entity.UserLive
 import com.hyapp.achat.model.objectbox.ContactDao
 import com.hyapp.achat.model.objectbox.MessageDao
-import com.hyapp.achat.model.objectbox.MessageDao.waitings
 import com.hyapp.achat.model.objectbox.UserDao
 import com.hyapp.achat.viewmodel.service.SocketService
 import io.objectbox.exception.UniqueViolationException
@@ -39,6 +38,7 @@ object ChatRepo {
         socket.on(Config.ON_PV_MESSAGE, onPvMessage)
         socket.on(Config.ON_MESSAGE_SENT, onMessageSent)
         socket.on(Config.ON_MSG_READ, onMessageRead)
+        socket.on(Config.ON_MSG_READ_RECEIVED, onMessageReadReceived)
     }
 
     fun sendPvMessage(message: Message, receiver: User) {
@@ -55,7 +55,7 @@ object ChatRepo {
 
     fun sendWaitingsMessages() {
         (UserLive.value ?: UserDao.get(User.CURRENT_USER_ID))?.let {
-            val messages = waitings(it.uid)
+            val messages = MessageDao.waitings(it.uid)
             for (message in messages) {
                 val json = Gson().toJson(message)
                 SocketService.ioSocket?.socket?.emit(Config.ON_PV_MESSAGE, json)
@@ -63,18 +63,32 @@ object ChatRepo {
         }
     }
 
+    fun sendReadsMessages() {
+        (UserLive.value ?: UserDao.get(User.CURRENT_USER_ID))?.let {
+            val messages = MessageDao.reads(it.uid)
+            for (message in messages) {
+                SocketService.ioSocket?.socket?.emit(
+                    Config.ON_MSG_READ,
+                    message.uid,
+                    message.senderUid
+                )
+            }
+        }
+    }
+
     fun updateAndSendMessageRead(message: Message) {
-        MessageDao.get(message.uid)?.let { MessageDao.put(it) }
+        MessageDao.get(message.uid)?.let { MessageDao.put(message) }
         SocketService.ioSocket?.socket?.emit(Config.ON_MSG_READ, message.uid, message.senderUid)
     }
 
-    fun sendMessageRead(message: Message) {
-        SocketService.ioSocket?.socket?.emit(Config.ON_MSG_READ, message.uid, message.senderUid)
-    }
+//    fun sendMessageRead(message: Message) {
+//        SocketService.ioSocket?.socket?.emit(Config.ON_MSG_READ, message.uid, message.senderUid)
+//    }
 
     private val onPvMessage = Emitter.Listener { args ->
         val message = Gson().fromJson(args[0].toString(), Message::class.java).apply {
             transfer = Message.TRANSFER_RECEIVE
+            delivery = Message.DELIVERY_WAITING
         }
         try {
             MessageDao.put(message.apply { id = 0 })
@@ -114,6 +128,13 @@ object ChatRepo {
             }
             MessageDao.put(message)
             _messageFlow.tryEmit(Pair(MESSAGE_READ, message))
+            SocketService.ioSocket?.socket?.emit(Config.ON_MSG_READ_RECEIVED, message.uid)
+        }
+    }
+
+    private val onMessageReadReceived = Emitter.Listener { args ->
+        MessageDao.get(args[0].toString())?.let { message ->
+            MessageDao.put(message.apply { delivery = Message.DELIVERY_READ })
         }
     }
 

@@ -147,27 +147,27 @@ class ChatViewModel(var receiver: User) : ViewModel() {
     }
 
     fun readMessage(message: Message) {
-        ChatRepo.updateAndSendMessageRead(message.apply { delivery = Message.DELIVERY_READ })
+        ChatRepo.updateAndSendMessageRead(message.apply { delivery = Message.DELIVERY_SENT })
     }
 
-    fun readMessagesUntilPosition(position: Int) {
-        val resource = _messagesLive.value ?: Resource.success(MessageList())
-        val messageList = resource.data ?: MessageList()
-        val messages = mutableListOf<Message>()
-        for (i in position downTo 0) {
-            val message = messageList[i]
-            if (message.transfer == Message.TRANSFER_RECEIVE) {
-                if (message.delivery != Message.DELIVERY_READ) {
-                    message.delivery = Message.DELIVERY_READ
-                    ChatRepo.sendMessageRead(message)
-                    MessageDao.get(message.uid)?.let { messages.add(message) }
-                } else {
-                    break
-                }
-            }
-        }
-        MessageDao.put(messages)
-    }
+//    fun readMessagesUntilPosition(position: Int) {
+//        val resource = _messagesLive.value ?: Resource.success(MessageList())
+//        val messageList = resource.data ?: MessageList()
+//        val messages = mutableListOf<Message>()
+//        for (i in position downTo 0) {
+//            val message = messageList[i]
+//            if (message.transfer == Message.TRANSFER_RECEIVE) {
+//                if (message.delivery != Message.DELIVERY_READ) {
+//                    message.delivery = Message.DELIVERY_READ
+//                    ChatRepo.sendMessageRead(message)
+//                    MessageDao.get(message.uid)?.let { messages.add(message) }
+//                } else {
+//                    break
+//                }
+//            }
+//        }
+//        MessageDao.put(messages)
+//    }
 
     class Factory(private var receiver: User) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
