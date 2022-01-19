@@ -52,6 +52,7 @@ public class SocketService extends Service {
         registerReceiver(netReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
         ConnLive.singleton().setValue(ConnLive.Status.CONNECTING);
         NotifUtils.createSocketChannel(this);
+        NotifUtils.createMessagingChannel(this);
     }
 
     @Override

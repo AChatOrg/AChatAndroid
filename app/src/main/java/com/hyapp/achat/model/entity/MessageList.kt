@@ -29,7 +29,7 @@ class MessageList : LinkedList<Message>() {
                 } else {
                     prev.bubble = Message.BUBBLE_START
                 }
-                set(size - 1, prev.copy(id = 0))
+                set(size - 1, prev.copy(time = prev.time + 1))
                 //prevChanged
             } else {
                 message.bubble = Message.BUBBLE_SINGLE
@@ -37,7 +37,7 @@ class MessageList : LinkedList<Message>() {
             if (!DateUtils.isToday(prev.time)) {
                 haveDateSeparatorPrev = true
                 prev.bubble = Message.BUBBLE_END
-                set(size - 1, prev.copy(id = 0))
+                set(size - 1, prev.copy(time = prev.time + 1))
                 //prevChanged
             }
         }

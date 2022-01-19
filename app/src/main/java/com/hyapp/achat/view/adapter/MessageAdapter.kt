@@ -49,7 +49,7 @@ class MessageAdapter(val context: Context, val recyclerView: RecyclerView) :
                         oldItem.delivery != newItem.delivery -> {
                             PAYLOAD_DELIVERY
                         }
-                        oldItem.id != newItem.id -> {
+                        oldItem.time != newItem.time -> {
                             PAYLOAD_BUBBLE
                         }
                         else -> {

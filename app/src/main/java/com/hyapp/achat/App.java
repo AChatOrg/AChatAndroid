@@ -1,5 +1,6 @@
 package com.hyapp.achat;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.View;
 
@@ -19,14 +20,18 @@ import com.hyapp.achat.view.component.emojiview.sticker.StickerCategory;
 
 public class App extends MultiDexApplication {
 
+    @SuppressLint("StaticFieldLeak")
+    private static Context context;
+
     @Override
     public void onCreate() {
         super.onCreate();
-        Preferences.init(this);
-        Fresco.initialize(this);
-        ObjectBox.init(this);
-        AXrLottie.init(this);
-        AXEmojiManager.install(this, new AXIOSEmojiProvider(this));
+        context = getApplicationContext();
+        Preferences.init(context);
+        Fresco.initialize(context);
+        ObjectBox.init(context);
+        AXrLottie.init(context);
+        AXEmojiManager.install(context, new AXIOSEmojiProvider(context));
         AXEmojiManager.setStickerViewCreatorListener(new StickerViewCreatorListener() {
             @Override
             public View onCreateStickerView(@NonNull Context context, @Nullable StickerCategory category, boolean isRecent) {
@@ -38,5 +43,9 @@ public class App extends MultiDexApplication {
                 return new AXrLottieImageView(context);
             }
         });
+    }
+
+    public static Context getContext() {
+        return context;
     }
 }

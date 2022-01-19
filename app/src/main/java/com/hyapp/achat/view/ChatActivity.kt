@@ -13,7 +13,6 @@ import android.view.View
 import android.view.View.*
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
-import android.widget.TextView
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -44,7 +43,7 @@ import java.util.*
 class ChatActivity : EventActivity() {
 
     companion object {
-        private const val EXTRA_CONTACT = "contact"
+        const val EXTRA_CONTACT = "contact"
 
         @JvmStatic
         fun start(context: Context, contact: Contact) {
@@ -81,14 +80,20 @@ class ChatActivity : EventActivity() {
             super.onBackPressed()
     }
 
-//    override fun onStart() {
-//        super.onStart()
+    override fun onStart() {
+        super.onStart()
+        viewModel.activityStarted()
 //        val lastVisiblePosition = (binding.recyclerView.layoutManager as LinearLayoutManager)
 //            .findLastCompletelyVisibleItemPosition()
 //        if (lastVisiblePosition < messageAdapter.itemCount) {
 //            viewModel.readMessagesUntilPosition(lastVisiblePosition)
 //        }
-//    }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        viewModel.activityStopped()
+    }
 
     private fun init() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_chat)
@@ -167,7 +172,7 @@ class ChatActivity : EventActivity() {
             try {
                 val message = messageAdapter.getMessage(i)
                 if (message.transfer == Message.TRANSFER_RECEIVE && message.delivery != Message.DELIVERY_READ
-                    && message.delivery != Message.DELIVERY_SENT && message.isChatMessage && isStarted
+                    && message.delivery != Message.DELIVERY_SENT && message.isChatMessage && ChatViewModel.isActivityStarted
                 ) {
                     viewModel.readMessage(message)
                     if (unreadCount > 0) {

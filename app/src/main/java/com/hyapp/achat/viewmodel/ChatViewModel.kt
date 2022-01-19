@@ -18,6 +18,12 @@ class ChatViewModel(var receiver: User) : ViewModel() {
     companion object {
         const val PAGING_LIMIT: Long = 50
         const val PROFILE_MESSAGE_UID = "profile"
+
+        @JvmStatic
+        var isActivityStarted = false
+
+        @JvmStatic
+        var contactUid = ""
     }
 
     private val currentUser = UserDao.get(User.CURRENT_USER_ID)
@@ -29,6 +35,7 @@ class ChatViewModel(var receiver: User) : ViewModel() {
     private var pagedCount = 0
 
     init {
+        contactUid = receiver.uid
         loadPagedMessages()
         observeMessage()
     }
@@ -168,6 +175,14 @@ class ChatViewModel(var receiver: User) : ViewModel() {
 //        }
 //        MessageDao.put(messages)
 //    }
+
+    fun activityStarted() {
+        isActivityStarted = true
+    }
+
+    fun activityStopped() {
+        isActivityStarted = false
+    }
 
     class Factory(private var receiver: User) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {

@@ -8,48 +8,51 @@ import io.objectbox.annotation.Unique
 
 @Entity
 data class Message(
-        @Index
-        @Unique
-        var uid: String = "",
-        var type: Byte = TYPE_TEXT,
-        var transfer: Byte = TRANSFER_RECEIVE,
-        var time: Long = 0,
-        var text: String = "",
-        var extraTextSize: Int = 0,
-        var mediaPath: String = "",
+    @Index
+    @Unique
+    var uid: String = "",
+    var type: Byte = TYPE_TEXT,
+    var transfer: Byte = TRANSFER_RECEIVE,
+    var time: Long = 0,
+    var text: String = "",
+    var extraTextSize: Int = 0,
+    var mediaPath: String = "",
 
-        @Index
-        var receiverUid: String = "",
+    @Index
+    var receiverUid: String = "",
 
-        @Index
-        var senderUid: String = "",
-        var senderRank: Byte = 0,
-        var senderScore: Int = 0,
-        var senderLoginTime: Long = 0,
-        var senderName: String = "",
-        var senderBio: String = "",
-        var senderGender: Byte = UserConsts.GENDER_MALE,
-        var senderAvatars: MutableList<String> = mutableListOf(),
-        var senderOnlineTime: Long = UserConsts.TIME_ONLINE,
+    @Index
+    var senderUid: String = "",
+    var senderRank: Byte = 0,
+    var senderScore: Int = 0,
+    var senderLoginTime: Long = 0,
+    var senderName: String = "",
+    var senderBio: String = "",
+    var senderGender: Byte = UserConsts.GENDER_MALE,
+    var senderAvatars: MutableList<String> = mutableListOf(),
+    var senderOnlineTime: Long = UserConsts.TIME_ONLINE,
 
-        var delivery: Byte = DELIVERY_WAITING,
-        var bubble: Byte = BUBBLE_SINGLE,
+    var delivery: Byte = DELIVERY_WAITING,
+    var bubble: Byte = BUBBLE_SINGLE,
 
-        @Id
-        var id: Long = 0
+    @Id
+    var id: Long = 0
 ) {
-    constructor(uid: String = "",
-                type: Byte = TYPE_TEXT,
-                transfer: Byte = TRANSFER_RECEIVE,
-                time: Long = 0,
-                text: String = "",
-                extraTextSize: Int = 0,
-                mediaPath: String = "",
-                receiverUid: String = "",
-                user: User
-    ) : this(uid, type, transfer, time, text, extraTextSize, mediaPath, receiverUid,
-            user.uid, user.rank, user.score, user.loginTime, user.name, user.bio, user.gender,
-            user.avatars, user.onlineTime)
+    constructor(
+        uid: String = "",
+        type: Byte = TYPE_TEXT,
+        transfer: Byte = TRANSFER_RECEIVE,
+        time: Long = 0,
+        text: String = "",
+        extraTextSize: Int = 0,
+        mediaPath: String = "",
+        receiverUid: String = "",
+        user: User
+    ) : this(
+        uid, type, transfer, time, text, extraTextSize, mediaPath, receiverUid,
+        user.uid, user.rank, user.score, user.loginTime, user.name, user.bio, user.gender,
+        user.avatars, user.onlineTime
+    )
 
     companion object {
         const val TRANSFER_SEND: Byte = 1
@@ -111,9 +114,11 @@ data class Message(
     }
 
     fun getContact(): Contact {
-        return Contact(Contact.TYPE_SINGLE,
-                senderName, senderBio, senderGender, senderAvatars, senderOnlineTime,
-                senderUid, senderRank, senderScore, senderLoginTime,
-                text, time, mediaPath)
+        return Contact(
+            Contact.TYPE_SINGLE,
+            senderName, senderBio, senderGender, senderAvatars, senderOnlineTime,
+            senderUid, senderRank, senderScore, senderLoginTime,
+            text, time, mediaPath
+        )
     }
 }

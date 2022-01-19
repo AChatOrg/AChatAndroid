@@ -1,6 +1,8 @@
 package com.hyapp.achat.model
 
+import android.content.Context
 import com.google.gson.Gson
+import com.hyapp.achat.App
 import com.hyapp.achat.Config
 import com.hyapp.achat.model.entity.Contact
 import com.hyapp.achat.model.entity.Message
@@ -9,7 +11,9 @@ import com.hyapp.achat.model.entity.UserLive
 import com.hyapp.achat.model.objectbox.ContactDao
 import com.hyapp.achat.model.objectbox.MessageDao
 import com.hyapp.achat.model.objectbox.UserDao
+import com.hyapp.achat.viewmodel.ChatViewModel
 import com.hyapp.achat.viewmodel.service.SocketService
+import com.hyapp.achat.viewmodel.utils.NotifUtils
 import io.objectbox.exception.UniqueViolationException
 import io.socket.client.Socket
 import io.socket.emitter.Emitter
@@ -44,10 +48,10 @@ object ChatRepo {
     fun sendPvMessage(message: Message, receiver: User) {
         val json = Gson().toJson(message)
 
+        message.id = MessageDao.put(message.apply { id = 0 })
         val contact = ContactDao.get(receiver.uid) ?: Contact(receiver)
         contact.messageDelivery = Message.DELIVERY_WAITING
         setupAndPutContact(contact, message)
-        MessageDao.put(message.apply { id = 0 })
         Preferences.instance().incrementContactMessagesCount(contact.uid)
 
         SocketService.ioSocket?.socket?.emit(Config.ON_PV_MESSAGE, json)
@@ -77,8 +81,18 @@ object ChatRepo {
     }
 
     fun updateAndSendMessageRead(message: Message) {
+        ContactDao.get(message.senderUid)?.let {
+            var count = it.notifCount.toInt()
+            if (count > 0) {
+                count--
+                it.notifCount = count.toString()
+                ContactDao.put(it)
+                _contactFlow.tryEmit(Pair(CONTACT_UPDATE, it))
+            }
+        }
         MessageDao.get(message.uid)?.let {
             MessageDao.put(it.apply { delivery = message.delivery })
+            NotifUtils.remove(App.getContext(), it.id.toInt())
         }
         SocketService.ioSocket?.socket?.emit(Config.ON_MSG_READ, message.uid, message.senderUid)
     }
@@ -93,12 +107,17 @@ object ChatRepo {
             delivery = Message.DELIVERY_WAITING
         }
         try {
-            MessageDao.put(message.apply { id = 0 })
+            message.id = MessageDao.put(message.apply { id = 0 })
             val contact = ContactDao.get(message.senderUid) ?: message.getContact()
             contact.messageDelivery = Message.DELIVERY_HIDDEN
+            contact.notifCount = (contact.notifCount.toInt() + 1).toString()
             setupAndPutContact(contact, message)
             Preferences.instance().incrementContactMessagesCount(contact.uid)
             _messageFlow.tryEmit(Pair(MESSAGE_RECEIVE, message))
+            /*send notif*/
+            if (!ChatViewModel.isActivityStarted && ChatViewModel.contactUid == contact.uid) {
+                NotifUtils.notifyMessage(App.getContext(), message, contact)
+            }
         } catch (e: UniqueViolationException) {
             e.printStackTrace()
         } finally {
