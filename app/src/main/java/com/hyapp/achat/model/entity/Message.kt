@@ -89,11 +89,8 @@ data class Message(
         get() = type != TYPE_DETAILS && type != TYPE_PROFILE
 
     fun setAndGetTextSizes(sp1: Int): Pair<Float, Int> {
-        var textSize: Float = ((TEXT_SIZE_SP + extraTextSize) * sp1).toFloat()
-        var emojiSize: Float = ((TEXT_SIZE_SP + 3 + extraTextSize) * sp1).toFloat()
-
-        if (extraTextSize == 0)
-            return Pair(textSize, emojiSize.toInt())
+        var textSize = ((TEXT_SIZE_SP + extraTextSize) * sp1).toFloat()
+        var emojiSize = ((TEXT_SIZE_SP + 3 + extraTextSize) * sp1).toFloat()
 
         var hasText = false
         for (element in text) {

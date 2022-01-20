@@ -11,13 +11,17 @@ import com.hyapp.achat.model.objectbox.ContactDao
 import com.hyapp.achat.model.objectbox.MessageDao
 import com.hyapp.achat.model.objectbox.UserDao
 import com.hyapp.achat.viewmodel.ChatViewModel
-import com.hyapp.achat.viewmodel.service.SocketService
 import com.hyapp.achat.viewmodel.Notifs
+import com.hyapp.achat.viewmodel.service.SocketService
 import io.objectbox.exception.UniqueViolationException
 import io.socket.client.Socket
 import io.socket.emitter.Emitter
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.withContext
 
 object ChatRepo {
 
@@ -27,6 +31,8 @@ object ChatRepo {
     const val MESSAGE_RECEIVE: Byte = 1
     const val MESSAGE_SENT: Byte = 2
     const val MESSAGE_READ: Byte = 3
+
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 
     private val _contactFlow =
         MutableSharedFlow<Pair<Byte, Contact>>(extraBufferCapacity = Int.MAX_VALUE)
@@ -44,56 +50,68 @@ object ChatRepo {
         socket.on(Config.ON_MSG_READ_RECEIVED, onMessageReadReceived)
     }
 
-    fun sendPvMessage(message: Message, receiver: User) {
-        val json = Gson().toJson(message)
+    suspend fun sendPvMessage(message: Message, receiver: User) {
+        withContext(ioDispatcher) {
+            ensureActive()
+            val json = Gson().toJson(message)
 
-        message.id = MessageDao.put(message.apply { id = 0 })
-        val contact = ContactDao.get(receiver.uid) ?: Contact(receiver)
-        contact.messageDelivery = Message.DELIVERY_WAITING
-        setupAndPutContact(contact, message)
-        Preferences.instance().incrementContactMessagesCount(contact.uid)
+            message.id = MessageDao.put(message.apply { id = 0 })
+            val contact = ContactDao.get(receiver.uid) ?: Contact(receiver)
+            contact.messageDelivery = Message.DELIVERY_WAITING
+            setupAndPutContact(contact, message)
+            Preferences.instance().incrementContactMessagesCount(contact.uid)
 
-        SocketService.ioSocket?.socket?.emit(Config.ON_PV_MESSAGE, json)
+            SocketService.ioSocket?.socket?.emit(Config.ON_PV_MESSAGE, json)
+        }
     }
 
-    fun sendWaitingsMessages() {
-        (UserLive.value ?: UserDao.get(User.CURRENT_USER_ID))?.let {
-            val messages = MessageDao.waitings(it.uid)
-            for (message in messages) {
-                val json = Gson().toJson(message)
-                SocketService.ioSocket?.socket?.emit(Config.ON_PV_MESSAGE, json)
+    suspend fun sendWaitingsMessages() {
+        withContext(ioDispatcher) {
+            ensureActive()
+            (UserLive.value ?: UserDao.get(User.CURRENT_USER_ID))?.let {
+                val messages = MessageDao.waitings(it.uid)
+                for (message in messages) {
+                    val json = Gson().toJson(message)
+                    SocketService.ioSocket?.socket?.emit(Config.ON_PV_MESSAGE, json)
+                }
             }
         }
     }
 
-    fun sendReadsMessages() {
-        (UserLive.value ?: UserDao.get(User.CURRENT_USER_ID))?.let {
-            val messages = MessageDao.reads(it.uid)
-            for (message in messages) {
-                SocketService.ioSocket?.socket?.emit(
-                    Config.ON_MSG_READ,
-                    message.uid,
-                    message.senderUid
-                )
+    suspend fun sendReadsMessages() {
+        withContext(ioDispatcher) {
+            ensureActive()
+            (UserLive.value ?: UserDao.get(User.CURRENT_USER_ID))?.let {
+                val messages = MessageDao.reads(it.uid)
+                for (message in messages) {
+                    SocketService.ioSocket?.socket?.emit(
+                        Config.ON_MSG_READ,
+                        message.uid,
+                        message.senderUid
+                    )
+                }
             }
         }
     }
 
-    fun markMessageAsRead(message: Message) {
-        ContactDao.get(message.senderUid)?.let {
-            var count = it.notifCount.toInt()
-            if (count > 0) {
-                count--
-                it.notifCount = count.toString()
-                ContactDao.put(it)
-                _contactFlow.tryEmit(Pair(CONTACT_UPDATE, it))
+    suspend fun markMessageAsRead(message: Message) {
+        withContext(ioDispatcher) {
+            ensureActive()
+            ContactDao.get(message.senderUid)?.let {
+                var count = it.notifCount.toInt()
+                if (count > 0) {
+                    count--
+                    it.notifCount = count.toString()
+                    ContactDao.put(it)
+                    _contactFlow.tryEmit(Pair(CONTACT_UPDATE, it))
+                }
             }
+            MessageDao.get(message.uid)?.let {
+                MessageDao.put(it.apply { delivery = Message.DELIVERY_SENT })
+                Notifs.remove(App.getContext(), it.id.toInt())
+            }
+            SocketService.ioSocket?.socket?.emit(Config.ON_MSG_READ, message.uid, message.senderUid)
         }
-        MessageDao.get(message.uid)?.let {
-            MessageDao.put(it.apply { delivery = Message.DELIVERY_SENT })
-            Notifs.remove(App.getContext(), it.id.toInt())
-        }
-        SocketService.ioSocket?.socket?.emit(Config.ON_MSG_READ, message.uid, message.senderUid)
     }
 
 //    fun sendMessageRead(message: Message) {

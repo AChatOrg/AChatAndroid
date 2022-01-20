@@ -7,8 +7,8 @@ import com.hyapp.achat.model.Preferences
 import com.hyapp.achat.model.entity.*
 import com.hyapp.achat.model.objectbox.MessageDao
 import com.hyapp.achat.model.objectbox.UserDao
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 import java.util.*
 import kotlin.math.max
 import kotlin.math.min
@@ -26,6 +26,8 @@ class ChatViewModel(var receiver: User) : ViewModel() {
         var contactUid = ""
     }
 
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
+
     private val currentUser = UserDao.get(User.CURRENT_USER_ID)
 
     private val _messagesLive = MutableLiveData<Resource<MessageList>>()
@@ -41,57 +43,66 @@ class ChatViewModel(var receiver: User) : ViewModel() {
     }
 
     fun loadPagedMessages() {
-        val resource = _messagesLive.value ?: Resource.success(MessageList())
-        val messageList = resource.data ?: MessageList()
+        viewModelScope.launch(ioDispatcher) {
+            ensureActive()
+            val resource = _messagesLive.value ?: Resource.success(MessageList())
+            val messageList = resource.data ?: MessageList()
 
-        if (initCount <= 0) {
-            messageList.addFirst(
-                Message(
-                    uid = PROFILE_MESSAGE_UID,
-                    type = Message.TYPE_PROFILE,
-                    user = receiver
+            if (initCount <= 0) {
+                messageList.addFirst(
+                    Message(
+                        uid = PROFILE_MESSAGE_UID,
+                        type = Message.TYPE_PROFILE,
+                        user = receiver
+                    )
+                )
+                _messagesLive.postValue(Resource.addPaging(messageList, 1, false, false))
+                return@launch
+            }
+            val remaining = initCount - ++pagedCount * PAGING_LIMIT
+            val hasNext = remaining > 0
+            val offset = max(remaining, 0)
+            val limit = min(remaining + PAGING_LIMIT, PAGING_LIMIT)
+            val messages = MessageDao.all(receiver.uid, offset, limit)
+
+            val oldSize = messageList.size
+            messageList.addMessageFirst(messages[messages.size - 1])
+
+            for (i in messages.size - 2 downTo 0) {
+                messageList.addMessageFirst(messages[i])
+            }
+            if (!hasNext) {
+                val details = DateUtils.getRelativeTimeSpanString(
+                    messages[0].time,
+                    System.currentTimeMillis(),
+                    DateUtils.DAY_IN_MILLIS,
+                    DateUtils.FORMAT_ABBREV_RELATIVE
+                ).toString()
+                val detailsMessage = Message(
+                    uid = UUID.randomUUID().toString(),
+                    type = Message.TYPE_DETAILS,
+                    time = messages[0].time,
+                    text = details
+                )
+                messageList.addFirst(detailsMessage)
+                messageList.addFirst(
+                    Message(
+                        uid = PROFILE_MESSAGE_UID,
+                        type = Message.TYPE_PROFILE,
+                        user = receiver
+                    )
+                )
+            }
+
+            _messagesLive.postValue(
+                Resource.addPaging(
+                    messageList,
+                    messageList.size - oldSize,
+                    hasNext,
+                    pagedCount == 1
                 )
             )
-            _messagesLive.value = Resource.addPaging(messageList, 1, false, false)
-            return
         }
-        val remaining = initCount - ++pagedCount * PAGING_LIMIT
-        val hasNext = remaining > 0
-        val offset = max(remaining, 0)
-        val limit = min(remaining + PAGING_LIMIT, PAGING_LIMIT)
-        val messages = MessageDao.all(receiver.uid, offset, limit)
-
-        val oldSize = messageList.size
-        messageList.addMessageFirst(messages[messages.size - 1])
-
-        for (i in messages.size - 2 downTo 0) {
-            messageList.addMessageFirst(messages[i])
-        }
-        if (!hasNext) {
-            val details = DateUtils.getRelativeTimeSpanString(
-                messages[0].time,
-                System.currentTimeMillis(),
-                DateUtils.DAY_IN_MILLIS,
-                DateUtils.FORMAT_ABBREV_RELATIVE
-            ).toString()
-            val detailsMessage = Message(
-                uid = UUID.randomUUID().toString(),
-                type = Message.TYPE_DETAILS,
-                time = messages[0].time,
-                text = details
-            )
-            messageList.addFirst(detailsMessage)
-            messageList.addFirst(
-                Message(
-                    uid = PROFILE_MESSAGE_UID,
-                    type = Message.TYPE_PROFILE,
-                    user = receiver
-                )
-            )
-        }
-
-        _messagesLive.value =
-            Resource.addPaging(messageList, messageList.size - oldSize, hasNext, pagedCount == 1)
     }
 
     private fun observeMessage() {
@@ -125,7 +136,9 @@ class ChatViewModel(var receiver: User) : ViewModel() {
             receiver.uid, currentUser ?: User()
         )
         addMessage(message, false)
-        ChatRepo.sendPvMessage(message, receiver)
+        viewModelScope.launch {
+            ChatRepo.sendPvMessage(message, receiver)
+        }
     }
 
     private fun addMessage(message: Message, received: Boolean) {
@@ -154,7 +167,9 @@ class ChatViewModel(var receiver: User) : ViewModel() {
     }
 
     fun markMessageAsRead(message: Message) {
-        ChatRepo.markMessageAsRead(message)
+        viewModelScope.launch {
+            ChatRepo.markMessageAsRead(message)
+        }
     }
 
 //    fun readMessagesUntilPosition(position: Int) {

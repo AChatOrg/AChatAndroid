@@ -9,31 +9,38 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class SpeedyLinearLayoutManager extends LinearLayoutManager {
 
-    private int smoothScrollDuration;
+    private boolean isSmoothScrollSpeedDefault;
+    private final int smoothScrollDuration;
+    private OnScrollStop onScrollStop;
+
+    public interface OnScrollStop {
+        void onStop(SpeedyLinearLayoutManager layoutManager);
+    }
 
     public SpeedyLinearLayoutManager(Context context, int smoothScrollDuration) {
         super(context);
         this.smoothScrollDuration = smoothScrollDuration;
-    }
-
-    public SpeedyLinearLayoutManager(Context context, int orientation, boolean reverseLayout, int smoothScrollDuration) {
-        super(context, orientation, reverseLayout);
-        this.smoothScrollDuration = smoothScrollDuration;
-    }
-
-    public SpeedyLinearLayoutManager(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes, int smoothScrollDuration) {
-        super(context, attrs, defStyleAttr, defStyleRes);
-        this.smoothScrollDuration = smoothScrollDuration;
+        isSmoothScrollSpeedDefault = false;
     }
 
     @Override
     public void smoothScrollToPosition(RecyclerView recyclerView, RecyclerView.State state, int position) {
-
         final LinearSmoothScroller linearSmoothScroller = new LinearSmoothScroller(recyclerView.getContext()) {
 
             @Override
             protected int calculateTimeForScrolling(int dx) {
-                return smoothScrollDuration;
+                if (!isSmoothScrollSpeedDefault) {
+                    return smoothScrollDuration;
+                }
+                return super.calculateTimeForScrolling(dx);
+            }
+
+            @Override
+            protected void onStop() {
+                super.onStop();
+                if (onScrollStop != null) {
+                    onScrollStop.onStop(SpeedyLinearLayoutManager.this);
+                }
             }
         };
 
@@ -41,11 +48,11 @@ public class SpeedyLinearLayoutManager extends LinearLayoutManager {
         startSmoothScroll(linearSmoothScroller);
     }
 
-    public int getSmoothScrollDuration() {
-        return smoothScrollDuration;
+    public void setSmoothScrollSpeedDefault(boolean smoothScrollSpeedDefault) {
+        isSmoothScrollSpeedDefault = smoothScrollSpeedDefault;
     }
 
-    public void setSmoothScrollDuration(int smoothScrollDuration) {
-        this.smoothScrollDuration = smoothScrollDuration;
+    public void setOnScrollStop(OnScrollStop onScrollStop) {
+        this.onScrollStop = onScrollStop;
     }
 }

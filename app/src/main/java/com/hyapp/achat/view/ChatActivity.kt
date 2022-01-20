@@ -131,7 +131,7 @@ class ChatActivity : EventActivity() {
     }
 
     private fun setupRecyclerView() {
-        val layoutManager: LinearLayoutManager = SpeedyLinearLayoutManager(this, 100)
+        val layoutManager = SpeedyLinearLayoutManager(this, 100)
         binding.recyclerView.layoutManager = layoutManager
         binding.recyclerView.setHasFixedSize(true)
         messageAdapter = MessageAdapter(this, binding.recyclerView)
@@ -153,9 +153,9 @@ class ChatActivity : EventActivity() {
 
                 val lastVisiblePosition = layoutManager.findLastVisibleItemPosition()
                 if (binding.fastScrollCard.visibility == VISIBLE && lastVisiblePosition >= messageAdapter.itemCount - 2) {
-                    binding.fastScrollCard.visibility = GONE
-                    binding.unreadBadgeCard.visibility = GONE
-                } else if (binding.fastScrollCard.visibility == GONE
+                    binding.fastScrollCard.visibility = INVISIBLE
+                    binding.unreadBadgeCard.visibility = INVISIBLE
+                } else if (binding.fastScrollCard.visibility != VISIBLE
                     && lastVisiblePosition < messageAdapter.itemCount - 2
                 ) {
                     binding.fastScrollCard.visibility = VISIBLE
@@ -245,7 +245,7 @@ class ChatActivity : EventActivity() {
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    private val sendButtonTouchListener = OnTouchListener { view, event ->
+    private val sendButtonTouchListener = OnTouchListener { _, event ->
         val sp1 = UiUtils.sp2px(this, 1F)
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
@@ -357,12 +357,16 @@ class ChatActivity : EventActivity() {
 
     private fun setupFastScrollFab() {
         binding.fastScrollCard.setOnClickListener {
-            binding.recyclerView.post { binding.recyclerView.smoothScrollToPosition(messageAdapter.itemCount - 1) }
-            unreadCount = 0
+            (binding.recyclerView.layoutManager as SpeedyLinearLayoutManager).setSmoothScrollSpeedDefault(
+                true
+            )
+            (binding.recyclerView.layoutManager as SpeedyLinearLayoutManager).setOnScrollStop {
+                it.setSmoothScrollSpeedDefault(false)
+                it.setOnScrollStop(null)
+            }
+            binding.recyclerView.smoothScrollToPosition(messageAdapter.itemCount - 1)
         }
-        binding.unreadBadgeCard.setOnClickListener { v: View? ->
-            binding.recyclerView.post { binding.recyclerView.smoothScrollToPosition(messageAdapter.itemCount - 1) }
-        }
+        unreadCount = 0
     }
 
     private fun sendTextMessage(text: CharSequence, textSizeUnit: Int) {
@@ -397,10 +401,9 @@ class ChatActivity : EventActivity() {
 
     private fun addSingleMessage(res: Resource<MessageList>) {
         messageAdapter.onListChanged = {
+            val lastVisiblePosition = (binding.recyclerView.layoutManager as LinearLayoutManager)
+                .findLastCompletelyVisibleItemPosition()
             if (res.bool) {
-                val lastVisiblePosition =
-                    (binding.recyclerView.layoutManager as LinearLayoutManager)
-                        .findLastCompletelyVisibleItemPosition()
                 if (lastVisiblePosition >= messageAdapter.itemCount - 2) {
                     binding.recyclerView.smoothScrollToPosition(messageAdapter.itemCount - 1)
                 } else {
@@ -411,7 +414,18 @@ class ChatActivity : EventActivity() {
                     }
                 }
             } else {
-                binding.recyclerView.smoothScrollToPosition(messageAdapter.itemCount - 1)
+                if (lastVisiblePosition < messageAdapter.itemCount - 10) {
+                    (binding.recyclerView.layoutManager as SpeedyLinearLayoutManager).setSmoothScrollSpeedDefault(
+                        true
+                    )
+                    (binding.recyclerView.layoutManager as SpeedyLinearLayoutManager).setOnScrollStop {
+                        it.setSmoothScrollSpeedDefault(false)
+                        it.setOnScrollStop(null)
+                    }
+                    binding.recyclerView.smoothScrollToPosition(messageAdapter.itemCount - 1)
+                } else {
+                    binding.recyclerView.smoothScrollToPosition(messageAdapter.itemCount - 1)
+                }
             }
             messageAdapter.onListChanged = null
         }
