@@ -69,4 +69,5 @@
     <string name="you_can_add_your_contacts">You can add your contacts and chat with them</string>
     <string name="reply">Reply</string>
     <string name="mark_as_read">Mark as read</string>
+    <string name="typing">Typing…</string>
 </resources>

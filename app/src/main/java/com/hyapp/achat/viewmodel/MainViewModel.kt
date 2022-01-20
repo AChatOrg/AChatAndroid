@@ -12,12 +12,13 @@ import com.hyapp.achat.model.objectbox.ContactDao
 import com.hyapp.achat.model.Preferences
 import com.hyapp.achat.model.objectbox.UserDao
 import com.hyapp.achat.viewmodel.service.SocketService
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 
 @ExperimentalCoroutinesApi
 class MainViewModel(application: Application) : AndroidViewModel(application) {
+
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 
     private val _contactsLive = MutableLiveData<ContactList>()
     val contactsLive = _contactsLive as LiveData<ContactList>
@@ -25,6 +26,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _usersLive = MutableLiveData<Resource<SortedList<User>>>()
     val usersLive = _usersLive as LiveData<Resource<SortedList<User>>>
 
+    private var stopTypingJob: Job? = null
 
     init {
         UserLive.value = UserDao.get(User.CURRENT_USER_ID)
@@ -55,6 +57,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 when (pair.first) {
                     ChatRepo.CONTACT_PUT -> putContact(pair.second)
                     ChatRepo.CONTACT_UPDATE -> updateContact(pair.second)
+                    ChatRepo.CONTACT_TYPING -> signalTyping(pair.second)
                 }
             }
         }
@@ -92,6 +95,25 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val updated = contactList.update(contact)
         if (updated) {
             _contactsLive.value = contactList
+        }
+    }
+
+    private fun signalTyping(contact: Contact) {
+        _contactsLive.value?.let { list ->
+            var updated = list.update(contact.apply { isTyping = true })
+            if (updated) {
+                _contactsLive.value = list
+            }
+            stopTypingJob?.cancel()
+            stopTypingJob = viewModelScope.launch(ioDispatcher) {
+                delay(3000)
+                ContactDao.get(contact.uid)?.let {
+                    updated = list.update(it.apply { isTyping = false })
+                    if (updated) {
+                        _contactsLive.postValue(list)
+                    }
+                }
+            }
         }
     }
 }

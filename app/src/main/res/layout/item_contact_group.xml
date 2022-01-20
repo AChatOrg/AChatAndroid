@@ -81,7 +81,6 @@
             android:gravity="start"
             android:maxLines="1"
             android:singleLine="true"
-            android:text="@{contact.message}"
             android:textAlignment="gravity"
             android:textColor="@color/grey_35"
             android:textSize="@dimen/text_12"

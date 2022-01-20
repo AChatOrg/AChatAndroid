@@ -22,11 +22,13 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.withContext
+import java.util.*
 
 object ChatRepo {
 
     const val CONTACT_PUT: Byte = 1
     const val CONTACT_UPDATE: Byte = 2
+    const val CONTACT_TYPING: Byte = 3
 
     const val MESSAGE_RECEIVE: Byte = 1
     const val MESSAGE_SENT: Byte = 2
@@ -48,6 +50,7 @@ object ChatRepo {
         socket.on(Config.ON_MESSAGE_SENT, onMessageSent)
         socket.on(Config.ON_MSG_READ, onMessageRead)
         socket.on(Config.ON_MSG_READ_RECEIVED, onMessageReadReceived)
+        socket.on(Config.ON_TYPING, onTyping)
     }
 
     suspend fun sendPvMessage(message: Message, receiver: User) {
@@ -97,15 +100,7 @@ object ChatRepo {
     suspend fun markMessageAsRead(message: Message) {
         withContext(ioDispatcher) {
             ensureActive()
-            ContactDao.get(message.senderUid)?.let {
-                var count = it.notifCount.toInt()
-                if (count > 0) {
-                    count--
-                    it.notifCount = count.toString()
-                    ContactDao.put(it)
-                    _contactFlow.tryEmit(Pair(CONTACT_UPDATE, it))
-                }
-            }
+            message.delivery = Message.DELIVERY_SENT
             MessageDao.get(message.uid)?.let {
                 MessageDao.put(it.apply { delivery = Message.DELIVERY_SENT })
                 Notifs.remove(App.getContext(), it.id.toInt())
@@ -114,9 +109,33 @@ object ChatRepo {
         }
     }
 
+    suspend fun clearContactNotifs(contactUid: String) {
+        withContext(ioDispatcher) {
+            ContactDao.get(contactUid)?.let {
+                it.notifCount = "0"
+                ContactDao.put(it)
+                _contactFlow.tryEmit(Pair(CONTACT_UPDATE, it))
+            }
+        }
+    }
+
+    fun sendTyping(receiverUid: String) {
+        SocketService.ioSocket?.socket?.emit(Config.ON_TYPING, receiverUid)
+    }
+
 //    fun sendMessageRead(message: Message) {
 //        SocketService.ioSocket?.socket?.emit(Config.ON_MSG_READ, message.uid, message.senderUid)
 //    }
+
+    private fun setupAndPutContact(contact: Contact, message: Message) {
+        contact.messageTime = message.time
+        if (message.type == Message.TYPE_TEXT) {
+            contact.message = message.text
+        }
+        val contactId = ContactDao.put(contact)
+        contact.id = contactId
+        _contactFlow.tryEmit(Pair(CONTACT_PUT, contact))
+    }
 
     private val onPvMessage = Emitter.Listener { args ->
         val message = Gson().fromJson(args[0].toString(), Message::class.java).apply {
@@ -127,12 +146,14 @@ object ChatRepo {
             message.id = MessageDao.put(message.apply { id = 0 })
             val contact = ContactDao.get(message.senderUid) ?: message.getContact()
             contact.messageDelivery = Message.DELIVERY_HIDDEN
-            contact.notifCount = (contact.notifCount.toInt() + 1).toString()
+            if (ChatViewModel.isActivityStoppedForContact(contact.uid)) {
+                contact.notifCount = (contact.notifCount.toInt() + 1).toString()
+            }
             setupAndPutContact(contact, message)
             Preferences.instance().incrementContactMessagesCount(contact.uid)
             _messageFlow.tryEmit(Pair(MESSAGE_RECEIVE, message))
             /*send notif*/
-            if (!ChatViewModel.isActivityStarted || ChatViewModel.contactUid != contact.uid) {
+            if (ChatViewModel.isActivityStoppedForContact(contact.uid)) {
                 Notifs.notifyMessage(App.getContext(), message, contact)
             }
         } catch (e: UniqueViolationException) {
@@ -176,13 +197,9 @@ object ChatRepo {
         }
     }
 
-    private fun setupAndPutContact(contact: Contact, message: Message) {
-        contact.messageTime = message.time
-        if (message.type == Message.TYPE_TEXT) {
-            contact.message = message.text
+    private val onTyping = Emitter.Listener { args ->
+        ContactDao.get(args[0].toString())?.let {
+            _contactFlow.tryEmit(Pair(CONTACT_TYPING, it))
         }
-        val contactId = ContactDao.put(contact)
-        contact.id = contactId
-        _contactFlow.tryEmit(Pair(CONTACT_PUT, contact))
     }
 }

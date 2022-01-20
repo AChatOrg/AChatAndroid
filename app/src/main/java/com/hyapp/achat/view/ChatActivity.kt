@@ -9,6 +9,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.*
@@ -17,6 +18,7 @@ import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.aghajari.rlottie.AXrLottieDrawable
@@ -40,6 +42,8 @@ import com.hyapp.achat.view.component.sticker.a18StickerProvider
 import com.hyapp.achat.view.utils.UiUtils
 import com.hyapp.achat.viewmodel.ChatViewModel
 import com.hyapp.achat.viewmodel.utils.TimeUtils
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.util.*
 
 class ChatActivity : EventActivity() {
@@ -65,6 +69,7 @@ class ChatActivity : EventActivity() {
     private var unreadCount = 0
 
     private lateinit var layoutTransition: LayoutTransition
+    private var isMessageSentAndNotTyping = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -207,6 +212,7 @@ class ChatActivity : EventActivity() {
     private fun setupMessageEditText() {
         messageEditTextSizeAnimator = ValueAnimator.ofInt(0, 30).setDuration(2000)
         var isEditTextEmpty = true
+        var lastSentTypingTime = 0L
         val dp46 = UiUtils.dp2px(this, if (UiUtils.isRtl(this)) -46F else 46F)
         binding.messageEditText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
@@ -225,6 +231,7 @@ class ChatActivity : EventActivity() {
                             layoutTransition.enableTransitionType(LayoutTransition.DISAPPEARING)
                         }
                     isEditTextEmpty = false
+                    isMessageSentAndNotTyping = false
                 } else if (p0!!.isEmpty()) {
                     binding.sendImageSwitcher.setOnTouchListener(null)
                     binding.sendImageSwitcher.setImageResource(R.drawable.ic_action_mic)
@@ -236,10 +243,15 @@ class ChatActivity : EventActivity() {
                         }
                         .withEndAction { binding.attach.setBackgroundResource(R.drawable.chat_inputs_ripple_bg_circle) }
                     isEditTextEmpty = true
+                    lastSentTypingTime = 0L
                 }
             }
 
             override fun afterTextChanged(p0: Editable?) {
+                if (!isMessageSentAndNotTyping && System.currentTimeMillis() - lastSentTypingTime >= 3000) {
+                    viewModel.sendTyping()
+                    lastSentTypingTime = System.currentTimeMillis()
+                }
             }
         })
     }
@@ -249,6 +261,7 @@ class ChatActivity : EventActivity() {
         val sp1 = UiUtils.sp2px(this, 1F)
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
+                isMessageSentAndNotTyping = true
                 messageEditTextSizeAnimator.addUpdateListener {
                     val size = Message.TEXT_SIZE_SP + it.animatedValue as Int
                     binding.messageEditText.textSize = size.toFloat()
@@ -402,9 +415,9 @@ class ChatActivity : EventActivity() {
     private fun addSingleMessage(res: Resource<MessageList>) {
         messageAdapter.onListChanged = {
             val lastVisiblePosition = (binding.recyclerView.layoutManager as LinearLayoutManager)
-                .findLastCompletelyVisibleItemPosition()
+                .findLastVisibleItemPosition()
             if (res.bool) {
-                if (lastVisiblePosition >= messageAdapter.itemCount - 2) {
+                if (lastVisiblePosition >= messageAdapter.itemCount - 3) {
                     binding.recyclerView.smoothScrollToPosition(messageAdapter.itemCount - 1)
                 } else {
                     unreadCount++

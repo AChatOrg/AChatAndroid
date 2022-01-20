@@ -24,6 +24,11 @@ class ChatViewModel(var receiver: User) : ViewModel() {
 
         @JvmStatic
         var contactUid = ""
+
+        @JvmStatic
+        fun isActivityStoppedForContact(uid: String): Boolean {
+            return !isActivityStarted || contactUid != uid
+        }
     }
 
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
@@ -191,8 +196,15 @@ class ChatViewModel(var receiver: User) : ViewModel() {
 //        MessageDao.put(messages)
 //    }
 
+    fun sendTyping() {
+        ChatRepo.sendTyping(contactUid)
+    }
+
     fun activityStarted() {
         isActivityStarted = true
+        viewModelScope.launch {
+            ChatRepo.clearContactNotifs(contactUid)
+        }
     }
 
     fun activityStopped() {

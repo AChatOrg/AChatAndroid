@@ -70,6 +70,7 @@ data class Message(
         const val TYPE_DETAILS: Byte = 12
         const val TYPE_PROFILE: Byte = 14
         const val TYPE_LOTTIE: Byte = 16
+        const val TYPE_TYPING: Byte = 18
 
         const val DELIVERY_HIDDEN: Byte = 1
         const val DELIVERY_WAITING: Byte = 2

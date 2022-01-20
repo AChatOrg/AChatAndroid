@@ -24,5 +24,6 @@ public interface Config {
     String ON_MSG_RECEIVED = "msgReceived";
     String ON_MSG_READ = "msgRead";
     String ON_MSG_READ_RECEIVED = "msgReadReceived";
+    String ON_TYPING = "typing";
 
 }
