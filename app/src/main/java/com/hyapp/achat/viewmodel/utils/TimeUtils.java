@@ -22,6 +22,7 @@ public class TimeUtils {
     }
 
     public static String timeAgoShort(long duration) {
+        duration = Math.abs(duration);
         long[] times = new long[]{
                 TimeUnit.DAYS.toMillis(365)
                 , TimeUnit.DAYS.toMillis(30)

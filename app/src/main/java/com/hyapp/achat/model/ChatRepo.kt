@@ -33,6 +33,8 @@ object ChatRepo {
     const val MESSAGE_RECEIVE: Byte = 1
     const val MESSAGE_SENT: Byte = 2
     const val MESSAGE_READ: Byte = 3
+    const val MESSAGE_TYPING: Byte = 4
+    const val MESSAGE_ONLINE_TIME: Byte = 5
 
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 
@@ -51,6 +53,7 @@ object ChatRepo {
         socket.on(Config.ON_MSG_READ, onMessageRead)
         socket.on(Config.ON_MSG_READ_RECEIVED, onMessageReadReceived)
         socket.on(Config.ON_TYPING, onTyping)
+        socket.on(Config.ON_ONLINE_TIME, onOnlineTime)
     }
 
     suspend fun sendPvMessage(message: Message, receiver: User) {
@@ -103,11 +106,15 @@ object ChatRepo {
             message.delivery = Message.DELIVERY_SENT
             MessageDao.get(message.uid)?.let {
                 MessageDao.put(it.apply { delivery = Message.DELIVERY_SENT })
-                Notifs.remove(App.getContext(), it.id.toInt())
+                Notifs.remove(App.context, it.id.toInt())
             }
             SocketService.ioSocket?.socket?.emit(Config.ON_MSG_READ, message.uid, message.senderUid)
         }
     }
+
+//    fun sendMessageRead(message: Message) {
+//        SocketService.ioSocket?.socket?.emit(Config.ON_MSG_READ, message.uid, message.senderUid)
+//    }
 
     suspend fun clearContactNotifs(contactUid: String) {
         withContext(ioDispatcher) {
@@ -123,9 +130,9 @@ object ChatRepo {
         SocketService.ioSocket?.socket?.emit(Config.ON_TYPING, receiverUid)
     }
 
-//    fun sendMessageRead(message: Message) {
-//        SocketService.ioSocket?.socket?.emit(Config.ON_MSG_READ, message.uid, message.senderUid)
-//    }
+    fun sendOnlineTime(isOnline: Boolean) {
+        SocketService.ioSocket?.socket?.emit(Config.ON_ONLINE_TIME, isOnline)
+    }
 
     private fun setupAndPutContact(contact: Contact, message: Message) {
         contact.messageTime = message.time
@@ -154,7 +161,7 @@ object ChatRepo {
             _messageFlow.tryEmit(Pair(MESSAGE_RECEIVE, message))
             /*send notif*/
             if (ChatViewModel.isActivityStoppedForContact(contact.uid)) {
-                Notifs.notifyMessage(App.getContext(), message, contact)
+                Notifs.notifyMessage(App.context, message, contact)
             }
         } catch (e: UniqueViolationException) {
             e.printStackTrace()
@@ -200,6 +207,25 @@ object ChatRepo {
     private val onTyping = Emitter.Listener { args ->
         ContactDao.get(args[0].toString())?.let {
             _contactFlow.tryEmit(Pair(CONTACT_TYPING, it))
+            _messageFlow.tryEmit(
+                Pair(
+                    MESSAGE_TYPING,
+                    Message(
+                        type = Message.TYPE_TYPING,
+                        receiverUid = it.uid,
+                        uid = UUID.randomUUID().toString()
+                    )
+                )
+            )
+        }
+    }
+
+    private val onOnlineTime = Emitter.Listener { args ->
+        ContactDao.get(args[0].toString())?.let {
+            it.onlineTime = args[1].toString().toLong()
+            ContactDao.put(it)
+            _contactFlow.tryEmit(Pair(CONTACT_UPDATE, it))
+            _messageFlow.tryEmit(Pair(MESSAGE_ONLINE_TIME, Message(receiverUid = it.uid, time = it.onlineTime)))
         }
     }
 }

@@ -19,6 +19,8 @@
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/drawable/bg_button.xml" value="0.2203125" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/drawable/bg_dialog_permission_rational.xml" value="0.20625" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/drawable/chat_bubble_receive_end.xml" value="0.10260416666666666" />
+        <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/drawable/chat_bubble_receive_rounded.xml" value="0.2169230769230769" />
+        <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/drawable/chat_bubble_receive_single.xml" value="0.2169230769230769" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/drawable/chat_inputs_ripple_bg_circle.xml" value="0.2169230769230769" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/drawable/circle_solid_green.xml" value="0.2169230769230769" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/drawable/gender_circle_people_female_bg.xml" value="0.2203125" />
@@ -49,6 +51,7 @@
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/item_message_profile_single.xml" value="0.15942028985507245" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/item_message_text_receive.xml" value="0.15942028985507245" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/item_message_text_send.xml" value="0.15942028985507245" />
+        <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/item_message_typing.xml" value="0.33" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/item_people.xml" value="0.25" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/item_suggestion.xml" value="0.15443840579710144" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/layout_empty_contact.xml" value="0.2" />

@@ -23,7 +23,7 @@ import com.hyapp.achat.viewmodel.utils.TimeUtils
 class ContactAdapter(private val context: Context) :
     ListAdapter<Contact, ContactAdapter.Holder>(DIFF_CALLBACK) {
 
-    val typingStr = context.getString(R.string.typing)
+    val typingStr = context.getString(R.string.typing_three_dots)
 
     companion object {
         val DIFF_CALLBACK: DiffUtil.ItemCallback<Contact> =
@@ -145,7 +145,7 @@ class ContactAdapter(private val context: Context) :
                 binding.onlineTime.setBackgroundResource(R.drawable.last_online_contact_bg_green)
             } else {
                 binding.onlineTime.text =
-                    TimeUtils.timeAgoShort(System.currentTimeMillis() - contact.onlineTime)
+                    TimeUtils.timeAgoShort(System.currentTimeMillis() - contact.onlineTime - 1000)
                 binding.onlineTime.setBackgroundResource(R.drawable.last_online_contact_bg_grey)
             }
         }

@@ -84,6 +84,9 @@ class MessageAdapter(val context: Context, val recyclerView: RecyclerView) :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
         when (viewType) {
+            Message.TRANSFER_RECEIVE + Message.TYPE_TYPING -> return EmptyHolder(
+                LayoutInflater.from(context).inflate(R.layout.item_message_typing, parent, false)
+            )
             Message.TRANSFER_SEND + Message.TYPE_TEXT -> return TextHolder(
                 LayoutInflater.from(
                     context
@@ -335,5 +338,11 @@ class MessageAdapter(val context: Context, val recyclerView: RecyclerView) :
         override val bubbleView: View?
             get() = null
 
+    }
+
+    inner class EmptyHolder(itemView: View) : Holder(itemView) {
+
+        override fun bind(message: Message) {
+        }
     }
 }

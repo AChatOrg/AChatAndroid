@@ -11,6 +11,7 @@ import com.hyapp.achat.model.entity.*
 import com.hyapp.achat.model.objectbox.ContactDao
 import com.hyapp.achat.model.Preferences
 import com.hyapp.achat.model.objectbox.UserDao
+import com.hyapp.achat.view.EventActivity
 import com.hyapp.achat.viewmodel.service.SocketService
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
@@ -114,6 +115,18 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     }
                 }
             }
+        }
+    }
+
+    fun activityStarted() {
+        if (EventActivity.startedActivities > 0) {
+            ChatRepo.sendOnlineTime(true)
+        }
+    }
+
+    fun activityStopped() {
+        if (EventActivity.startedActivities < 1) {
+            ChatRepo.sendOnlineTime(false)
         }
     }
 }

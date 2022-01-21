@@ -16,7 +16,7 @@ public interface Config {
     String ON_USER_LEFT = "userLeft";
 
     /*On People*/
-    String ON_USERS = "people";
+    String ON_USERS = "users";
 
     /*On Chat*/
     String ON_PV_MESSAGE = "pvMessage";
@@ -25,5 +25,5 @@ public interface Config {
     String ON_MSG_READ = "msgRead";
     String ON_MSG_READ_RECEIVED = "msgReadReceived";
     String ON_TYPING = "typing";
-
+    String ON_ONLINE_TIME = "onlineTime";
 }

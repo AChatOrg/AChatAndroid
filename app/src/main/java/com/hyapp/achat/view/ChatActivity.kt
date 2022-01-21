@@ -82,6 +82,7 @@ class ChatActivity : EventActivity() {
         setupFastScrollFab()
         observeMessages()
         observeConnectivity()
+        observeOnlineTime()
     }
 
     override fun onBackPressed() {
@@ -454,5 +455,18 @@ class ChatActivity : EventActivity() {
             }
         }
         messageAdapter.submitList(res.data)
+    }
+
+    private fun observeOnlineTime() {
+        viewModel.onlineTimeLive.observe(this) { time ->
+            if (time == Contact.TIME_ONLINE) {
+                binding.onlineTime.text = ""
+                binding.onlineTime.setBackgroundResource(R.drawable.last_online_chat_bg_green)
+            } else {
+                binding.onlineTime.text =
+                    TimeUtils.timeAgoShort(System.currentTimeMillis() - time - 1000)
+                binding.onlineTime.setBackgroundResource(R.drawable.last_online_chat_bg_grey)
+            }
+        }
     }
 }

@@ -5,6 +5,7 @@ import androidx.lifecycle.*
 import com.hyapp.achat.model.ChatRepo
 import com.hyapp.achat.model.Preferences
 import com.hyapp.achat.model.entity.*
+import com.hyapp.achat.model.objectbox.ContactDao
 import com.hyapp.achat.model.objectbox.MessageDao
 import com.hyapp.achat.model.objectbox.UserDao
 import kotlinx.coroutines.*
@@ -38,8 +39,13 @@ class ChatViewModel(var receiver: User) : ViewModel() {
     private val _messagesLive = MutableLiveData<Resource<MessageList>>()
     val messagesLive = _messagesLive as LiveData<Resource<MessageList>>
 
+    private val _onlineTimeLive = MutableLiveData<Long>()
+    val onlineTimeLive = _onlineTimeLive as LiveData<Long>
+
     private val initCount = Preferences.instance().getContactMessagesCount(receiver.uid)
     private var pagedCount = 0
+
+    private var stopTypingJob: Job? = null
 
     init {
         contactUid = receiver.uid
@@ -129,6 +135,16 @@ class ChatViewModel(var receiver: User) : ViewModel() {
                             updateMessageDelivery(pair.second)
                         }
                     }
+                    ChatRepo.MESSAGE_TYPING -> {
+                        if (pair.second.receiverUid == receiver.uid) {
+                            signalTyping(pair.second)
+                        }
+                    }
+                    ChatRepo.MESSAGE_ONLINE_TIME -> {
+                        if (pair.second.receiverUid == receiver.uid) {
+                            setOnlineTime(pair.second)
+                        }
+                    }
                 }
             }
         }
@@ -149,6 +165,9 @@ class ChatViewModel(var receiver: User) : ViewModel() {
     private fun addMessage(message: Message, received: Boolean) {
         val resource = _messagesLive.value ?: Resource.success(MessageList())
         val messageList = resource.data ?: MessageList()
+        if (messageList.last.type == Message.TYPE_TYPING) {
+            messageList.removeLast()
+        }
         messageList.addMessageLast(message)
         _messagesLive.value = Resource.add(messageList, 0, received)
     }
@@ -177,6 +196,26 @@ class ChatViewModel(var receiver: User) : ViewModel() {
         }
     }
 
+    private fun signalTyping(message: Message) {
+        val resource = _messagesLive.value ?: Resource.success(MessageList())
+        val messageList = resource.data ?: MessageList()
+
+
+        if (messageList.last.type != Message.TYPE_TYPING) {
+            messageList.addLast(message)
+            _messagesLive.value = Resource.add(messageList, 0, true)
+        }
+
+        stopTypingJob?.cancel()
+        stopTypingJob = viewModelScope.launch {
+            delay(3000)
+            if (messageList.last.type == Message.TYPE_TYPING) {
+                messageList.removeLast()
+                _messagesLive.value = Resource.update(messageList, 0)
+            }
+        }
+    }
+
 //    fun readMessagesUntilPosition(position: Int) {
 //        val resource = _messagesLive.value ?: Resource.success(MessageList())
 //        val messageList = resource.data ?: MessageList()
@@ -198,6 +237,11 @@ class ChatViewModel(var receiver: User) : ViewModel() {
 
     fun sendTyping() {
         ChatRepo.sendTyping(contactUid)
+    }
+
+    private fun setOnlineTime(message: Message) {
+        _onlineTimeLive.value = message.time
+        receiver.onlineTime = message.time
     }
 
     fun activityStarted() {

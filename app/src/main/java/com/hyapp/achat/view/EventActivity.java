@@ -13,16 +13,20 @@ import org.greenrobot.eventbus.ThreadMode;
 
 public class EventActivity extends AppCompatActivity {
 
+    public static byte startedActivities = 0;
+
     @Override
     public void onStart() {
         super.onStart();
         EventBus.getDefault().register(this);
+        startedActivities++;
     }
 
     @Override
     public void onStop() {
         super.onStop();
         EventBus.getDefault().unregister(this);
+        startedActivities--;
     }
 
     protected void alert(@StringRes int titleRes, String message) {
