@@ -9,7 +9,6 @@ import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.*
@@ -18,7 +17,6 @@ import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.aghajari.rlottie.AXrLottieDrawable
@@ -42,8 +40,6 @@ import com.hyapp.achat.view.component.sticker.a18StickerProvider
 import com.hyapp.achat.view.utils.UiUtils
 import com.hyapp.achat.viewmodel.ChatViewModel
 import com.hyapp.achat.viewmodel.utils.TimeUtils
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import java.util.*
 
 class ChatActivity : EventActivity() {
@@ -75,14 +71,13 @@ class ChatActivity : EventActivity() {
         super.onCreate(savedInstanceState)
         init()
         setupRecyclerView()
-        setupContact()
         setupSendButton()
         setupMessageEditText()
         setupEmojis()
         setupFastScrollFab()
         observeMessages()
         observeConnectivity()
-        observeOnlineTime()
+        observeContact()
     }
 
     override fun onBackPressed() {
@@ -113,27 +108,6 @@ class ChatActivity : EventActivity() {
             ChatViewModel.Factory(contact.getUser())
         )[ChatViewModel::class.java]
         layoutTransition = (binding.root as ViewGroup).layoutTransition
-    }
-
-    private fun setupContact() {
-        binding.run {
-            name.text = contact.name
-            bio.text = contact.bio
-            if (contact.type == Contact.TYPE_SINGLE) {
-                avatar.setAvatars(contact.avatars)
-                if (contact.onlineTime == Contact.TIME_ONLINE) {
-                    onlineTime.text = ""
-                    onlineTime.setBackgroundResource(R.drawable.last_online_chat_bg_green)
-                } else {
-                    onlineTime.text =
-                        TimeUtils.timeAgoShort(System.currentTimeMillis() - contact.onlineTime)
-                    onlineTime.setBackgroundResource(R.drawable.last_online_chat_bg_grey)
-                }
-            } else {
-                avatar.setAvatars(contact.avatars)
-                onlineTime.visibility = GONE
-            }
-        }
     }
 
     private fun setupRecyclerView() {
@@ -420,7 +394,7 @@ class ChatActivity : EventActivity() {
             if (res.bool) {
                 if (lastVisiblePosition >= messageAdapter.itemCount - 3) {
                     binding.recyclerView.smoothScrollToPosition(messageAdapter.itemCount - 1)
-                } else {
+                } else if (messageAdapter.getMessage(messageAdapter.itemCount - 1).isChatMessage) {
                     unreadCount++
                     binding.unreadBadgeTextView.text = unreadCount.toString()
                     if (binding.fastScrollCard.visibility == VISIBLE) {
@@ -457,15 +431,26 @@ class ChatActivity : EventActivity() {
         messageAdapter.submitList(res.data)
     }
 
-    private fun observeOnlineTime() {
-        viewModel.onlineTimeLive.observe(this) { time ->
-            if (time == Contact.TIME_ONLINE) {
-                binding.onlineTime.text = ""
-                binding.onlineTime.setBackgroundResource(R.drawable.last_online_chat_bg_green)
-            } else {
-                binding.onlineTime.text =
-                    TimeUtils.timeAgoShort(System.currentTimeMillis() - time - 1000)
-                binding.onlineTime.setBackgroundResource(R.drawable.last_online_chat_bg_grey)
+    private fun observeContact() {
+        viewModel.contactLive.observe(this) { cont ->
+            contact = cont
+            binding.run {
+                name.text = cont.name
+                bio.text = cont.bio
+                if (cont.type == Contact.TYPE_SINGLE) {
+                    avatar.setAvatars(cont.avatars)
+                    if (cont.onlineTime == Contact.TIME_ONLINE) {
+                        onlineTime.text = ""
+                        onlineTime.setBackgroundResource(R.drawable.last_online_chat_bg_green)
+                    } else {
+                        onlineTime.text =
+                            TimeUtils.timeAgoShort(System.currentTimeMillis() - cont.onlineTime)
+                        onlineTime.setBackgroundResource(R.drawable.last_online_chat_bg_grey)
+                    }
+                } else {
+                    avatar.setAvatars(cont.avatars)
+                    onlineTime.visibility = GONE
+                }
             }
         }
     }

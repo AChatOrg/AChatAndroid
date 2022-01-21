@@ -33,6 +33,7 @@ class MessageAdapter(val context: Context, val recyclerView: RecyclerView) :
     companion object {
         const val PAYLOAD_BUBBLE: Byte = 0
         const val PAYLOAD_DELIVERY: Byte = 1
+        const val PAYLOAD_ONLINE_TIME: Byte = 2
 
         val DIFF_CALLBACK: DiffUtil.ItemCallback<Message> =
             object : DiffUtil.ItemCallback<Message>() {
@@ -51,6 +52,9 @@ class MessageAdapter(val context: Context, val recyclerView: RecyclerView) :
                         }
                         oldItem.time != newItem.time -> {
                             PAYLOAD_BUBBLE
+                        }
+                        oldItem.senderOnlineTime != newItem.senderOnlineTime -> {
+                            PAYLOAD_ONLINE_TIME
                         }
                         else -> {
                             null
@@ -193,16 +197,8 @@ class MessageAdapter(val context: Context, val recyclerView: RecyclerView) :
             super.bind(message)
             val contact = message.getContact()
             if (contact.type == Contact.TYPE_SINGLE) {
-                val avatars = contact.avatars
                 avatar.setAvatars(contact.avatars)
-                if (contact.onlineTime == Contact.TIME_ONLINE) {
-                    onlineTime.text = ""
-                    onlineTime.setBackgroundResource(R.drawable.last_online_profile_bg_green)
-                } else {
-                    onlineTime.text =
-                        TimeUtils.timeAgoShort(System.currentTimeMillis() - contact.onlineTime)
-                    onlineTime.setBackgroundResource(R.drawable.last_online_profile_bg_grey)
-                }
+                setOnlineTime(message.senderOnlineTime)
                 onlineTime.visibility = View.VISIBLE
             } else {
                 avatar.setAvatars(contact.avatars)
@@ -211,6 +207,26 @@ class MessageAdapter(val context: Context, val recyclerView: RecyclerView) :
             val pair = PersonUtils.rankInt2rankStrResAndColor(contact.rank)
             rank.setText(pair.first)
             rank.setTextColor(pair.second)
+        }
+
+        override fun bind(message: Message, payloads: List<Any?>) {
+            super.bind(message, payloads)
+            for (payload in payloads) {
+                when (payload as Byte) {
+                    PAYLOAD_ONLINE_TIME -> setOnlineTime(message.senderOnlineTime)
+                }
+            }
+        }
+
+        private fun setOnlineTime(time: Long) {
+            if (time == Contact.TIME_ONLINE) {
+                onlineTime.text = ""
+                onlineTime.setBackgroundResource(R.drawable.last_online_profile_bg_green)
+            } else {
+                onlineTime.text =
+                    TimeUtils.timeAgoShort(System.currentTimeMillis() - time)
+                onlineTime.setBackgroundResource(R.drawable.last_online_profile_bg_grey)
+            }
         }
     }
 
@@ -225,7 +241,6 @@ class MessageAdapter(val context: Context, val recyclerView: RecyclerView) :
         protected val avatar: SimpleDraweeView? = itemView.findViewById(R.id.avatar)
         protected val time: TextView = itemView.findViewById(R.id.time)
         protected val delivery: AppCompatImageView? = itemView.findViewById(R.id.read)
-        protected val online: View? = itemView.findViewById(R.id.lastOnline)
 
         override fun bind(message: Message) {
             setBubble(message)
@@ -281,8 +296,6 @@ class MessageAdapter(val context: Context, val recyclerView: RecyclerView) :
                         time.visibility = View.VISIBLE
                         val avatars = message.senderAvatars
                         avatar?.setImageURI(if (avatars.isNotEmpty()) avatars[0] else null)
-                        online?.visibility =
-                            if (message.senderOnlineTime == Contact.TIME_ONLINE) View.VISIBLE else View.GONE
                     } else {
                         avatar?.visibility = View.GONE
                         time.visibility = View.GONE

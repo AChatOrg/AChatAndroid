@@ -40,4 +40,16 @@ class ContactList : LinkedList<Contact> {
         }
         return false
     }
+
+    fun refreshOnlineTimes(): Boolean {
+        var updated = false
+        for (i in 0 until size) {
+            val contact = get(i)
+            if (contact.onlineTime != Contact.TIME_ONLINE) {
+                set(i, contact.copy(onlineTime = contact.onlineTime + 1))
+                updated = true
+            }
+        }
+        return updated
+    }
 }

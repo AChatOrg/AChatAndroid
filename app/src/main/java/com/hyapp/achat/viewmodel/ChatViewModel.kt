@@ -1,13 +1,14 @@
 package com.hyapp.achat.viewmodel
 
 import android.text.format.DateUtils
+import android.util.Log
 import androidx.lifecycle.*
 import com.hyapp.achat.model.ChatRepo
 import com.hyapp.achat.model.Preferences
 import com.hyapp.achat.model.entity.*
-import com.hyapp.achat.model.objectbox.ContactDao
 import com.hyapp.achat.model.objectbox.MessageDao
 import com.hyapp.achat.model.objectbox.UserDao
+import com.hyapp.achat.view.EventActivity
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 import java.util.*
@@ -36,18 +37,20 @@ class ChatViewModel(var receiver: User) : ViewModel() {
 
     private val currentUser = UserDao.get(User.CURRENT_USER_ID)
 
+    private val _contactLive = MutableLiveData<Contact>()
+    val contactLive = _contactLive as LiveData<Contact>
+
     private val _messagesLive = MutableLiveData<Resource<MessageList>>()
     val messagesLive = _messagesLive as LiveData<Resource<MessageList>>
-
-    private val _onlineTimeLive = MutableLiveData<Long>()
-    val onlineTimeLive = _onlineTimeLive as LiveData<Long>
 
     private val initCount = Preferences.instance().getContactMessagesCount(receiver.uid)
     private var pagedCount = 0
 
     private var stopTypingJob: Job? = null
+    private var refreshOnlineTimeJob: Job? = null
 
     init {
+        _contactLive.value = Contact(receiver)
         contactUid = receiver.uid
         loadPagedMessages()
         observeMessage()
@@ -142,7 +145,7 @@ class ChatViewModel(var receiver: User) : ViewModel() {
                     }
                     ChatRepo.MESSAGE_ONLINE_TIME -> {
                         if (pair.second.receiverUid == receiver.uid) {
-                            setOnlineTime(pair.second)
+                            updateOnlineTime(pair.second.time)
                         }
                     }
                 }
@@ -239,20 +242,41 @@ class ChatViewModel(var receiver: User) : ViewModel() {
         ChatRepo.sendTyping(contactUid)
     }
 
-    private fun setOnlineTime(message: Message) {
-        _onlineTimeLive.value = message.time
-        receiver.onlineTime = message.time
+    private fun updateOnlineTime(time: Long) {
+        receiver.onlineTime = time
+        _contactLive.value = Contact(receiver)
+        _messagesLive.value?.data?.let {
+            val first = it.first
+            if (first.type == Message.TYPE_PROFILE) {
+                it[0] = first.copy(senderOnlineTime = receiver.onlineTime)
+                _messagesLive.value = Resource.update(it, 0)
+            }
+        }
     }
 
     fun activityStarted() {
+        if (EventActivity.startedActivities > 0) {
+            ChatRepo.sendOnlineTime(true)
+        }
         isActivityStarted = true
         viewModelScope.launch {
             ChatRepo.clearContactNotifs(contactUid)
         }
+        refreshOnlineTimeJob?.cancel()
+        refreshOnlineTimeJob = viewModelScope.launch {
+            while (isActivityStarted) {
+                delay(60000)
+                updateOnlineTime(if (receiver.onlineTime != Contact.TIME_ONLINE) receiver.onlineTime + 1 else receiver.onlineTime)
+            }
+        }
     }
 
     fun activityStopped() {
+        if (EventActivity.startedActivities < 1) {
+            ChatRepo.sendOnlineTime(false)
+        }
         isActivityStarted = false
+        refreshOnlineTimeJob?.cancel()
     }
 
     class Factory(private var receiver: User) : ViewModelProvider.Factory {

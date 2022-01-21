@@ -1,6 +1,7 @@
 package com.hyapp.achat.viewmodel
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -28,6 +29,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val usersLive = _usersLive as LiveData<Resource<SortedList<User>>>
 
     private var stopTypingJob: Job? = null
+    private var refreshOnlineTimeJob: Job? = null
 
     init {
         UserLive.value = UserDao.get(User.CURRENT_USER_ID)
@@ -118,9 +120,23 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    private fun refreshOnlineTimes() {
+        _contactsLive.value?.let {
+            it.refreshOnlineTimes()
+            _contactsLive.value = it
+        }
+    }
+
     fun activityStarted() {
         if (EventActivity.startedActivities > 0) {
             ChatRepo.sendOnlineTime(true)
+        }
+        refreshOnlineTimeJob?.cancel()
+        refreshOnlineTimeJob = viewModelScope.launch {
+            while (true) {
+                delay(60000)
+                refreshOnlineTimes()
+            }
         }
     }
 
@@ -128,5 +144,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         if (EventActivity.startedActivities < 1) {
             ChatRepo.sendOnlineTime(false)
         }
+        refreshOnlineTimeJob?.cancel()
     }
 }

@@ -26,6 +26,10 @@ class ContactAdapter(private val context: Context) :
     val typingStr = context.getString(R.string.typing_three_dots)
 
     companion object {
+        const val PAYLOAD_MESSAGE: Byte = 1
+        const val PAYLOAD_ONLINE_TIME: Byte = 2
+        const val PAYLOAD_AVATAR: Byte = 3
+
         val DIFF_CALLBACK: DiffUtil.ItemCallback<Contact> =
             object : DiffUtil.ItemCallback<Contact>() {
                 override fun areItemsTheSame(oldItem: Contact, newItem: Contact): Boolean {
@@ -34,6 +38,28 @@ class ContactAdapter(private val context: Context) :
 
                 override fun areContentsTheSame(oldItem: Contact, newItem: Contact): Boolean {
                     return oldItem == newItem
+                }
+
+                override fun getChangePayload(oldItem: Contact, newItem: Contact): Any? {
+                    return when {
+                        oldItem.message != newItem.message
+                                ||  oldItem.isTyping != newItem.isTyping
+                                || oldItem.messageDelivery != newItem.messageDelivery
+                                || oldItem.messageTime != newItem.messageTime
+                                || oldItem.notifCount != newItem.notifCount
+                                || oldItem.mediaPath != newItem.mediaPath -> {
+                            PAYLOAD_MESSAGE
+                        }
+                        oldItem.onlineTime != newItem.onlineTime -> {
+                            PAYLOAD_ONLINE_TIME
+                        }
+                        oldItem.avatars != newItem.avatars -> {
+                            PAYLOAD_AVATAR
+                        }
+                        else -> {
+                            null
+                        }
+                    }
                 }
             }
     }
@@ -76,6 +102,14 @@ class ContactAdapter(private val context: Context) :
         holder.bind(getItem(position))
     }
 
+    override fun onBindViewHolder(holder: Holder, position: Int, payloads: List<Any?>) {
+        if (payloads.isEmpty()) {
+            onBindViewHolder(holder, position)
+        } else {
+            holder.bind(getItem(position), payloads)
+        }
+    }
+
     @Suppress("LeakingThis")
     open inner class Holder(view: View) : RecyclerView.ViewHolder(view), View.OnClickListener {
         private val message: TextView = view.findViewById(R.id.message)
@@ -89,14 +123,24 @@ class ContactAdapter(private val context: Context) :
         }
 
         open fun bind(contact: Contact) {
+            setMessage(contact)
+        }
 
+        open fun bind(contact: Contact, payloads: List<Any?>) {
+            for (payload in payloads) {
+                when (payload as Byte) {
+                    PAYLOAD_MESSAGE -> setMessage(contact)
+                }
+            }
+        }
+
+        private fun setMessage(contact: Contact) {
             if (contact.isTyping) {
                 message.text = typingStr
-                messageDelivery.visibility = View.GONE
                 media.visibility = View.GONE
+                messageDelivery.visibility = View.GONE
             } else {
                 message.text = contact.message
-
                 val mediaPath = contact.mediaPath
                 if (mediaPath != "") {
                     media.visibility = View.VISIBLE
@@ -104,7 +148,6 @@ class ContactAdapter(private val context: Context) :
                 } else {
                     media.visibility = View.GONE
                 }
-
                 if (contact.messageDelivery == Message.DELIVERY_HIDDEN) {
                     messageDelivery.visibility = View.GONE
                 } else {
@@ -116,11 +159,10 @@ class ContactAdapter(private val context: Context) :
                     }
                 }
             }
-
             messageTime.text = TimeUtils.millis2DayTime(contact.messageTime)
-
             notif.visibility = if (contact.notifCount == "0") View.GONE else View.VISIBLE
         }
+
 
         override fun onClick(p0: View?) {
             ChatActivity.start(context, getItem(adapterPosition))
@@ -136,16 +178,32 @@ class ContactAdapter(private val context: Context) :
             binding.contact = contact
             binding.executePendingBindings()
 
+            setAvatar(contact)
+            setOnlineTime(contact)
+        }
+
+        override fun bind(contact: Contact, payloads: List<Any?>) {
+            super.bind(contact, payloads)
+            for (payload in payloads) {
+                when (payload as Byte) {
+                    PAYLOAD_ONLINE_TIME -> setOnlineTime(contact)
+                    PAYLOAD_AVATAR -> setAvatar(contact)
+                }
+            }
+        }
+
+        private fun setAvatar(contact: Contact) {
             val avatars = contact.avatars
             binding.avatarDraweeView.setImageURI(if (avatars.isNotEmpty()) avatars[0] else null)
+        }
 
-
+        private fun setOnlineTime(contact: Contact) {
             if (contact.onlineTime == Contact.TIME_ONLINE) {
                 binding.onlineTime.text = ""
                 binding.onlineTime.setBackgroundResource(R.drawable.last_online_contact_bg_green)
             } else {
                 binding.onlineTime.text =
-                    TimeUtils.timeAgoShort(System.currentTimeMillis() - contact.onlineTime - 1000)
+                    TimeUtils.timeAgoShort(System.currentTimeMillis() - contact.onlineTime)
                 binding.onlineTime.setBackgroundResource(R.drawable.last_online_contact_bg_grey)
             }
         }
@@ -159,6 +217,19 @@ class ContactAdapter(private val context: Context) :
             binding.contact = contact
             binding.executePendingBindings()
 
+            setAvatar(contact)
+        }
+
+        override fun bind(contact: Contact, payloads: List<Any?>) {
+            super.bind(contact, payloads)
+            for (payload in payloads) {
+                when (payload as Byte) {
+                    PAYLOAD_AVATAR -> setAvatar(contact)
+                }
+            }
+        }
+
+        private fun setAvatar(contact: Contact) {
             binding.groupAvatarView.setAvatars(contact.avatars)
         }
     }

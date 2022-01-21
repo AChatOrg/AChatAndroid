@@ -87,7 +87,7 @@ data class Message(
     }
 
     val isChatMessage
-        get() = type != TYPE_DETAILS && type != TYPE_PROFILE
+        get() = type != TYPE_DETAILS && type != TYPE_PROFILE && type != TYPE_TYPING
 
     fun setAndGetTextSizes(sp1: Int): Pair<Float, Int> {
         var textSize = ((TEXT_SIZE_SP + extraTextSize) * sp1).toFloat()

@@ -18,14 +18,6 @@
         app:placeholderImageScaleType="centerCrop"
         app:roundAsCircle="true" />
 
-    <View
-        android:id="@+id/lastOnline"
-        android:layout_width="8dp"
-        android:layout_height="8dp"
-        android:background="@drawable/last_online_message_bg_green"
-        app:layout_constraintBottom_toBottomOf="@+id/avatar"
-        app:layout_constraintStart_toStartOf="@+id/avatar" />
-
         <com.aghajari.rlottie.AXrLottieImageView
             android:id="@+id/lottieImageView"
             android:layout_width="wrap_content"
