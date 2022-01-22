@@ -48,6 +48,8 @@ public class SpeedyLinearLayoutManager extends LinearLayoutManager {
         startSmoothScroll(linearSmoothScroller);
     }
 
+
+
     public void setSmoothScrollSpeedDefault(boolean smoothScrollSpeedDefault) {
         isSmoothScrollSpeedDefault = smoothScrollSpeedDefault;
     }

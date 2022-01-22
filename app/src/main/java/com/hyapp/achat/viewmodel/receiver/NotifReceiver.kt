@@ -5,8 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.text.TextUtils
 import androidx.core.app.RemoteInput
-import com.hyapp.achat.model.ChatRepo.markMessageAsRead
-import com.hyapp.achat.model.ChatRepo.sendPvMessage
+import com.hyapp.achat.model.ChatRepo
 import com.hyapp.achat.model.entity.Contact
 import com.hyapp.achat.model.entity.Message
 import com.hyapp.achat.model.entity.User
@@ -17,7 +16,6 @@ import com.hyapp.achat.viewmodel.Notifs
 import com.hyapp.achat.viewmodel.service.SocketService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import java.util.*
@@ -63,10 +61,10 @@ class NotifReceiver : BroadcastReceiver(), CoroutineScope {
                         contact.uid, currentUser ?: User()
                     )
                     launch {
-                        sendPvMessage(newMessage, contact.getUser())
+                        ChatRepo.sendPvMessage(newMessage, contact.getUser())
                     }
                     launch {
-                        markMessageAsRead(message)
+//                        ChatRepo.markMessageAsRead(message)
                     }
                 }
             }
@@ -77,7 +75,7 @@ class NotifReceiver : BroadcastReceiver(), CoroutineScope {
         val message: Message? = intent.getParcelableExtra(EXTRA_MESSAGE)
         if (message != null) {
             launch {
-                markMessageAsRead(message)
+//                ChatRepo.markMessageAsRead(message)
             }
         }
     }

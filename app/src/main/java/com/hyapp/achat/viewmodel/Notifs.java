@@ -32,7 +32,7 @@ public class Notifs {
     public static final String CHANNEL_SOCKET = "socket";
     public static final String CHANNEL_MESSAGING = "messaging";
 
-    public static final int ID_SOCKET = 1;
+    public static final int ID_SOCKET = Integer.MAX_VALUE;
 
     public static final String ACTION_EXIT = "ACTION_EXIT";
     public static final String ACTION_REPLY_MESSAGE = "ACTION_REPLY_MESSAGE";
@@ -119,6 +119,8 @@ public class Notifs {
                     new NotificationCompat.MessagingStyle.Message(message.getText(), message.getTime(), person);
             NotificationCompat.MessagingStyle style = new NotificationCompat.MessagingStyle(person)
                     .addMessage(styleMessage)
+                    .addMessage(styleMessage)
+                    .addMessage(styleMessage)
                     .addHistoricMessage(styleMessage)
                     .setGroupConversation(false);
 
@@ -182,10 +184,10 @@ public class Notifs {
         extender.addAction(wearableReplyAction);
         extender.addAction(markAsReadAction);
 
-        builder.addAction(replyAction);
-        builder.addAction(markAsReadAction);
-        builder.extend(extender);
+//        builder.addAction(replyAction);
+//        builder.addAction(markAsReadAction);
+//        builder.extend(extender);
 
-        notificationManager(context).notify((int) message.getId(), builder.build());
+        notificationManager(context).notify((int) contact.getId(), builder.build());
     }
 }

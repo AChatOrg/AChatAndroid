@@ -43,7 +43,7 @@ class ContactAdapter(private val context: Context) :
                 override fun getChangePayload(oldItem: Contact, newItem: Contact): Any? {
                     return when {
                         oldItem.message != newItem.message
-                                ||  oldItem.isTyping != newItem.isTyping
+                                || oldItem.isTyping != newItem.isTyping
                                 || oldItem.messageDelivery != newItem.messageDelivery
                                 || oldItem.messageTime != newItem.messageTime
                                 || oldItem.notifCount != newItem.notifCount
@@ -160,7 +160,12 @@ class ContactAdapter(private val context: Context) :
                 }
             }
             messageTime.text = TimeUtils.millis2DayTime(contact.messageTime)
-            notif.visibility = if (contact.notifCount == "0") View.GONE else View.VISIBLE
+            notif.visibility = if (contact.notifCount == "0") {
+                View.GONE
+            } else {
+                notif.text = contact.notifCount
+                View.VISIBLE
+            }
         }
 
 

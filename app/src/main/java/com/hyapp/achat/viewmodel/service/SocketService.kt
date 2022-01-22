@@ -1,22 +1,20 @@
 package com.hyapp.achat.viewmodel.service
 
 import android.app.Service
-import com.hyapp.achat.model.ChatRepo.sendWaitingsMessages
-import com.hyapp.achat.model.ChatRepo.sendReadsMessages
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
-import android.os.IBinder
 import android.content.IntentFilter
 import android.net.ConnectivityManager
+import android.os.Build
+import android.os.IBinder
+import com.hyapp.achat.model.ChatRepo
+import com.hyapp.achat.model.IOSocket
+import com.hyapp.achat.model.Preferences
 import com.hyapp.achat.model.entity.ConnLive
 import com.hyapp.achat.viewmodel.Notifs
 import com.hyapp.achat.viewmodel.service.SocketService
-import com.hyapp.achat.model.IOSocket
-import com.hyapp.achat.model.ChatRepo
-import android.content.BroadcastReceiver
-import android.content.Context
 import com.hyapp.achat.viewmodel.utils.NetUtils
-import android.os.Build
-import com.hyapp.achat.model.Preferences
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -60,10 +58,10 @@ class SocketService : Service(), CoroutineScope {
             ioSocket = IOSocket(loginJson)
             Preferences.instance().putLogged(true)
             launch {
-                sendWaitingsMessages()
+                ChatRepo.sendWaitingsMessages()
             }
             launch {
-                sendReadsMessages()
+                ChatRepo.sendReadsMessages()
             }
         }
         startForeground(Notifs.ID_SOCKET, Notifs.getSocketNotif(this))

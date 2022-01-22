@@ -40,6 +40,62 @@ object MessageDao {
     }
 
     @JvmStatic
+    fun allReceivedUnReads(contactUi: String): List<Message> {
+        val isContactSender =
+            Message_.senderUid.equal(contactUi, QueryBuilder.StringOrder.CASE_SENSITIVE)
+        val isUnread = (Message_.delivery.notEqual(Message.DELIVERY_SENT.toInt())
+            .and(Message_.delivery.notEqual(Message.DELIVERY_READ.toInt())))
+        return ObjectBox.store.boxFor(Message::class.java)
+            .query(isContactSender.and(isUnread))
+            .build()
+            .find()
+    }
+
+    @JvmStatic
+    fun markAllSentAsReadUntil(lastMessage: Message) {
+        val box = ObjectBox.store.boxFor(Message::class.java)
+        val list = box
+            .query(
+                Message_.receiverUid.equal(
+                    lastMessage.receiverUid,
+                    QueryBuilder.StringOrder.CASE_SENSITIVE
+                ).and(
+                    Message_.time.lessOrEqual(lastMessage.time)
+                        .and(
+                            Message_.delivery.notEqual(Message.DELIVERY_READ.toInt())
+                        )
+                )
+            ).build()
+            .find()
+        for (message in list) {
+            message.delivery = Message.DELIVERY_READ
+        }
+        box.put(list)
+    }
+
+    @JvmStatic
+    fun markAllReceivedAsReadUntil(lastMessage: Message) {
+        val box = ObjectBox.store.boxFor(Message::class.java)
+        val list = box
+            .query(
+                Message_.senderUid.equal(
+                    lastMessage.senderUid,
+                    QueryBuilder.StringOrder.CASE_SENSITIVE
+                ).and(
+                    Message_.time.lessOrEqual(lastMessage.time)
+                        .and(
+                            Message_.delivery.notEqual(Message.DELIVERY_READ.toInt())
+                        )
+                )
+            ).build()
+            .find()
+        for (message in list) {
+            message.delivery = Message.DELIVERY_READ
+        }
+        box.put(list)
+    }
+
+    @JvmStatic
     fun waitings(senderUi: String): List<Message> {
         return ObjectBox.store.boxFor(Message::class.java).query(
             Message_.senderUid.equal(senderUi, QueryBuilder.StringOrder.CASE_SENSITIVE)
@@ -50,7 +106,7 @@ object MessageDao {
     }
 
     @JvmStatic
-    fun reads(receiverUi: String): List<Message> {
+    fun allSentUnReads(receiverUi: String): List<Message> {
         return ObjectBox.store.boxFor(Message::class.java).query(
             Message_.receiverUid.equal(receiverUi, QueryBuilder.StringOrder.CASE_SENSITIVE)
                 .and(Message_.delivery.equal(Message.DELIVERY_SENT.toInt()))

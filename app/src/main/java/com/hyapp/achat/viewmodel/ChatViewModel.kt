@@ -1,7 +1,6 @@
 package com.hyapp.achat.viewmodel
 
 import android.text.format.DateUtils
-import android.util.Log
 import androidx.lifecycle.*
 import com.hyapp.achat.model.ChatRepo
 import com.hyapp.achat.model.Preferences
@@ -52,11 +51,11 @@ class ChatViewModel(var receiver: User) : ViewModel() {
     init {
         _contactLive.value = Contact(receiver)
         contactUid = receiver.uid
-        loadPagedMessages()
+        loadPagedReadMessages()
         observeMessage()
     }
 
-    fun loadPagedMessages() {
+    fun loadPagedReadMessages() {
         viewModelScope.launch(ioDispatcher) {
             ensureActive()
             val resource = _messagesLive.value ?: Resource.success(MessageList())
@@ -79,11 +78,22 @@ class ChatViewModel(var receiver: User) : ViewModel() {
             val limit = min(remaining + PAGING_LIMIT, PAGING_LIMIT)
             val messages = MessageDao.all(receiver.uid, offset, limit)
 
-            val oldSize = messageList.size
-            messageList.addMessageFirst(messages[messages.size - 1])
+            val firstMessage = messages[messages.size - 1]
+            if (firstMessage.transfer == Message.TRANSFER_SEND
+                || (firstMessage.transfer == Message.TRANSFER_RECEIVE &&
+                        (firstMessage.delivery == Message.DELIVERY_SENT || firstMessage.delivery == Message.DELIVERY_READ))
+            ) {
+                messageList.addMessageFirst(firstMessage)
+            }
 
             for (i in messages.size - 2 downTo 0) {
-                messageList.addMessageFirst(messages[i])
+                val message = messages[i]
+                if (message.transfer == Message.TRANSFER_SEND
+                    || (message.transfer == Message.TRANSFER_RECEIVE &&
+                            (message.delivery == Message.DELIVERY_SENT || message.delivery == Message.DELIVERY_READ))
+                ) {
+                    messageList.addMessageFirst(message)
+                }
             }
             if (!hasNext) {
                 val details = DateUtils.getRelativeTimeSpanString(
@@ -111,11 +121,24 @@ class ChatViewModel(var receiver: User) : ViewModel() {
             _messagesLive.postValue(
                 Resource.addPaging(
                     messageList,
-                    messageList.size - oldSize,
+                    0,
                     hasNext,
                     pagedCount == 1
                 )
             )
+        }
+    }
+
+    fun loadUnreadMessages() {
+        viewModelScope.launch(ioDispatcher) {
+            ensureActive()
+            _messagesLive.value?.data?.let { list ->
+                val messages = MessageDao.allReceivedUnReads(receiver.uid)
+                for (message in messages) {
+                    list.addMessageLast(message)
+                }
+                _messagesLive.postValue(Resource.addUnread(list, messages.size))
+            }
         }
     }
 
@@ -176,26 +199,28 @@ class ChatViewModel(var receiver: User) : ViewModel() {
     }
 
     private fun updateMessageTimeAndDelivery(message: Message) {
-        val resource = _messagesLive.value ?: Resource.success(MessageList())
-        val messageList = resource.data ?: MessageList()
-        val updated = messageList.updateMessageTimeAndDelivery(message)
-        if (updated) {
-            _messagesLive.value = Resource.update(messageList, 0)
+        _messagesLive.value?.data?.let { list ->
+            val updated = list.updateMessageTimeAndDelivery(message)
+            if (updated) {
+                _messagesLive.value = Resource.update(list, 0)
+            }
         }
     }
 
     private fun updateMessageDelivery(message: Message) {
-        val resource = _messagesLive.value ?: Resource.success(MessageList())
-        val messageList = resource.data ?: MessageList()
-        val updated = messageList.updateMessageDelivery(message)
-        if (updated) {
-            _messagesLive.value = Resource.update(messageList, 0)
+        _messagesLive.value?.data?.let { list ->
+            val updated = list.updateMessageDelivery(message)
+            if (updated) {
+                _messagesLive.value = Resource.update(list, 0)
+            }
         }
     }
 
-    fun markMessageAsRead(message: Message) {
-        viewModelScope.launch {
-            ChatRepo.markMessageAsRead(message)
+    fun markMessageAsRead(changedMessages: List<Message>) {
+        if (changedMessages.isNotEmpty()) {
+            viewModelScope.launch {
+                ChatRepo.markMessageAsRead(Contact(receiver), changedMessages)
+            }
         }
     }
 
@@ -259,9 +284,9 @@ class ChatViewModel(var receiver: User) : ViewModel() {
             ChatRepo.sendOnlineTime(true)
         }
         isActivityStarted = true
-        viewModelScope.launch {
-            ChatRepo.clearContactNotifs(contactUid)
-        }
+//        viewModelScope.launch {
+//            ChatRepo.clearContactNotifs(contactUid)
+//        }
         refreshOnlineTimeJob?.cancel()
         refreshOnlineTimeJob = viewModelScope.launch {
             while (isActivityStarted) {

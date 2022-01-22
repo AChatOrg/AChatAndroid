@@ -10,7 +10,7 @@ public class Resource<T> {
 
     public enum Status {SUCCESS, ERROR, LOADING}
 
-    public enum Action {ADD, REMOVE, UPDATE, ADD_PAGING}
+    public enum Action {ADD, REMOVE, UPDATE, ADD_PAGING, ADD_UNREAD}
 
     @NonNull
     public final Status status;
@@ -58,6 +58,10 @@ public class Resource<T> {
 
     public static <T> Resource<T> addPaging(@NonNull T data, int index, boolean bool, boolean bool2) {
         return new Resource<>(Status.SUCCESS, data, null, Action.ADD_PAGING, index, bool, bool2, false);
+    }
+
+    public static <T> Resource<T> addUnread(@NonNull T data, int index) {
+        return new Resource<>(Status.SUCCESS, data, null, Action.ADD_UNREAD, index, false, false, false);
     }
 
     public static <T> Resource<T> remove(@NonNull T data, int index) {

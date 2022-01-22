@@ -95,7 +95,8 @@ class MessageList : LinkedList<Message>() {
         addLast(message)
     }
 
-    fun addMessageFirst(message: Message) {
+    fun addMessageFirst(message: Message): Boolean {
+        var detailsAdded = false
         var nextMessageTime = 0L
         if (message.isChatMessage) {
             nextMessageTime = setupBubbleAddingFirst(message)
@@ -114,8 +115,10 @@ class MessageList : LinkedList<Message>() {
                 text = details
             )
             addFirst(detailsMessage)
+            detailsAdded = true
         }
         addFirst(message)
+        return detailsAdded
     }
 
     fun updateMessageTimeAndDelivery(message: Message): Boolean {
@@ -129,31 +132,31 @@ class MessageList : LinkedList<Message>() {
         return false
     }
 
-//    fun updateMessageDelivery(message: Message): Boolean {
-//        for (i in size - 1 downTo 0) {
-//            if (get(i).uid == message.uid) {
-//                for (j in i downTo 0) {
-//                    val m = get(j)
-//                    if (m.isChatMessage && m.transfer == Message.TRANSFER_SEND && m.delivery != Message.DELIVERY_READ) {
-//                        set(j, m.copy(delivery = message.delivery))
-//                    } else break
-//                }
-//                return true
-//            }
-//        }
-//        return false
-//    }
-
     fun updateMessageDelivery(message: Message): Boolean {
         for (i in size - 1 downTo 0) {
-            val m = get(i)
-            if (m.uid == message.uid) {
-                if (m.isChatMessage && m.transfer == Message.TRANSFER_SEND && m.delivery != Message.DELIVERY_READ) {
-                    set(i, m.copy(delivery = message.delivery))
+            if (get(i).uid == message.uid) {
+                for (j in i downTo 0) {
+                    val m = get(j)
+                    if (m.isChatMessage && m.transfer == Message.TRANSFER_SEND && m.delivery != Message.DELIVERY_READ) {
+                        set(j, m.copy(delivery = message.delivery))
+                    } else break
                 }
                 return true
             }
         }
         return false
     }
+
+//    fun updateMessageDelivery(message: Message): Boolean {
+//        for (i in size - 1 downTo 0) {
+//            val m = get(i)
+//            if (m.uid == message.uid) {
+//                if (m.isChatMessage && m.transfer == Message.TRANSFER_SEND && m.delivery != Message.DELIVERY_READ) {
+//                    set(i, m.copy(delivery = message.delivery))
+//                }
+//                return true
+//            }
+//        }
+//        return false
+//    }
 }

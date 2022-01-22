@@ -21,8 +21,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.util.*
+import kotlin.math.max
 
 object ChatRepo {
 
@@ -37,6 +40,7 @@ object ChatRepo {
     const val MESSAGE_ONLINE_TIME: Byte = 5
 
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
+    private val mutex = Mutex()
 
     private val _contactFlow =
         MutableSharedFlow<Pair<Byte, Contact>>(extraBufferCapacity = Int.MAX_VALUE)
@@ -59,15 +63,17 @@ object ChatRepo {
     suspend fun sendPvMessage(message: Message, receiver: User) {
         withContext(ioDispatcher) {
             ensureActive()
-            val json = Gson().toJson(message)
+            mutex.withLock {
+                val json = Gson().toJson(message)
 
-            message.id = MessageDao.put(message.apply { id = 0 })
-            val contact = ContactDao.get(receiver.uid) ?: Contact(receiver)
-            contact.messageDelivery = Message.DELIVERY_WAITING
-            setupAndPutContact(contact, message)
-            Preferences.instance().incrementContactMessagesCount(contact.uid)
+                message.id = MessageDao.put(message.apply { id = 0 })
+                val contact = ContactDao.get(receiver.uid) ?: Contact(receiver)
+                contact.messageDelivery = Message.DELIVERY_WAITING
+                setupAndPutContact(contact, message)
+                Preferences.instance().incrementContactMessagesCount(contact.uid)
 
-            SocketService.ioSocket?.socket?.emit(Config.ON_PV_MESSAGE, json)
+                SocketService.ioSocket?.socket?.emit(Config.ON_PV_MESSAGE, json)
+            }
         }
     }
 
@@ -88,7 +94,7 @@ object ChatRepo {
         withContext(ioDispatcher) {
             ensureActive()
             (UserLive.value ?: UserDao.get(User.CURRENT_USER_ID))?.let {
-                val messages = MessageDao.reads(it.uid)
+                val messages = MessageDao.allSentUnReads(it.uid)
                 for (message in messages) {
                     SocketService.ioSocket?.socket?.emit(
                         Config.ON_MSG_READ,
@@ -100,15 +106,26 @@ object ChatRepo {
         }
     }
 
-    suspend fun markMessageAsRead(message: Message) {
+    suspend fun markMessageAsRead(contact: Contact, changedMessages: List<Message>) {
         withContext(ioDispatcher) {
             ensureActive()
-            message.delivery = Message.DELIVERY_SENT
-            MessageDao.get(message.uid)?.let {
-                MessageDao.put(it.apply { delivery = Message.DELIVERY_SENT })
-                Notifs.remove(App.context, it.id.toInt())
+            mutex.withLock {
+                ContactDao.get(contact.uid)?.let {
+                    var count = it.notifCount.toInt()
+                    count = max(count - changedMessages.size, 0)
+                    it.notifCount = count.toString()
+                    ContactDao.put(it)
+                    _contactFlow.tryEmit(Pair(CONTACT_UPDATE, it))
+                }
+
+                MessageDao.put(changedMessages)
+                Notifs.remove(App.context, contact.id.toInt())
+                SocketService.ioSocket?.socket?.emit(
+                    Config.ON_MSG_READ,
+                    changedMessages[0].uid,
+                    contact.uid
+                )
             }
-            SocketService.ioSocket?.socket?.emit(Config.ON_MSG_READ, message.uid, message.senderUid)
         }
     }
 
@@ -116,15 +133,15 @@ object ChatRepo {
 //        SocketService.ioSocket?.socket?.emit(Config.ON_MSG_READ, message.uid, message.senderUid)
 //    }
 
-    suspend fun clearContactNotifs(contactUid: String) {
-        withContext(ioDispatcher) {
-            ContactDao.get(contactUid)?.let {
-                it.notifCount = "0"
-                ContactDao.put(it)
-                _contactFlow.tryEmit(Pair(CONTACT_UPDATE, it))
-            }
-        }
-    }
+//    suspend fun clearContactNotifs(contactUid: String) {
+//        withContext(ioDispatcher) {
+//            ContactDao.get(contactUid)?.let {
+//                it.notifCount = "0"
+//                ContactDao.put(it)
+//                _contactFlow.tryEmit(Pair(CONTACT_UPDATE, it))
+//            }
+//        }
+//    }
 
     fun sendTyping(receiverUid: String) {
         SocketService.ioSocket?.socket?.emit(Config.ON_TYPING, receiverUid)
@@ -153,9 +170,7 @@ object ChatRepo {
             message.id = MessageDao.put(message.apply { id = 0 })
             val contact = ContactDao.get(message.senderUid) ?: message.getContact()
             contact.messageDelivery = Message.DELIVERY_HIDDEN
-            if (ChatViewModel.isActivityStoppedForContact(contact.uid)) {
-                contact.notifCount = (contact.notifCount.toInt() + 1).toString()
-            }
+            contact.notifCount = (contact.notifCount.toInt() + 1).toString()
             setupAndPutContact(contact, message)
             Preferences.instance().incrementContactMessagesCount(contact.uid)
             _messageFlow.tryEmit(Pair(MESSAGE_RECEIVE, message))
@@ -192,7 +207,7 @@ object ChatRepo {
                 ContactDao.put(contact)
                 _contactFlow.tryEmit(Pair(CONTACT_UPDATE, contact))
             }
-            MessageDao.put(message)
+            MessageDao.markAllSentAsReadUntil(message)
             _messageFlow.tryEmit(Pair(MESSAGE_READ, message))
             SocketService.ioSocket?.socket?.emit(Config.ON_MSG_READ_RECEIVED, message.uid)
         }
@@ -200,7 +215,7 @@ object ChatRepo {
 
     private val onMessageReadReceived = Emitter.Listener { args ->
         MessageDao.get(args[0].toString())?.let { message ->
-            MessageDao.put(message.apply { delivery = Message.DELIVERY_READ })
+            MessageDao.markAllReceivedAsReadUntil(message)
         }
     }
 
@@ -225,7 +240,12 @@ object ChatRepo {
             it.onlineTime = args[1].toString().toLong()
             ContactDao.put(it)
             _contactFlow.tryEmit(Pair(CONTACT_UPDATE, it))
-            _messageFlow.tryEmit(Pair(MESSAGE_ONLINE_TIME, Message(receiverUid = it.uid, time = it.onlineTime)))
+            _messageFlow.tryEmit(
+                Pair(
+                    MESSAGE_ONLINE_TIME,
+                    Message(receiverUid = it.uid, time = it.onlineTime)
+                )
+            )
         }
     }
 }

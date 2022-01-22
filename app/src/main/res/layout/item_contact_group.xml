@@ -136,7 +136,6 @@
             android:paddingLeft="6dp"
             android:paddingTop="3.5dp"
             android:paddingRight="6dp"
-            android:text="@{contact.notifCount}"
             android:textColor="@color/white"
             android:textSize="12sp"
             app:layout_constraintBottom_toBottomOf="@+id/message"
