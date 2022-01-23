@@ -43,7 +43,6 @@
             android:paddingStart="@dimen/padding_8"
             android:paddingEnd="@dimen/padding_8"
             android:singleLine="true"
-            android:text="@{viewModel.getSavedName()}"
             android:textSize="@dimen/text_16"
             app:backgroundTint="@color/edit_text_tint_list"
             app:layout_constraintEnd_toEndOf="parent"
@@ -61,7 +60,6 @@
             android:imeOptions="flagNoExtractUi"
             android:inputType="text"
             android:singleLine="true"
-            android:text="@{viewModel.getSavedBio()}"
             android:textSize="@dimen/text_16"
             app:backgroundTint="@color/edit_text_tint_list"
             app:layout_constraintEnd_toEndOf="@+id/editTextUsername"
@@ -85,7 +83,6 @@
                 android:id="@+id/radioBtnMale"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:checked="@{viewModel.getSavedGender()}"
                 android:fontFamily="@font/iran_sans_regular"
                 android:text="@string/male"
                 app:buttonTint="@color/radio_button_tint_list" />
@@ -96,7 +93,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/margin_16"
                 android:layout_marginLeft="@dimen/margin_16"
-                android:checked="@{!viewModel.getSavedGender()}"
                 android:fontFamily="@font/iran_sans_regular"
                 android:text="@string/female"
                 app:buttonTint="@color/radio_button_tint_list" />

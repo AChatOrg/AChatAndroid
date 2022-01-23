@@ -1,5 +1,6 @@
 package com.hyapp.achat.model.objectbox
 
+import com.hyapp.achat.model.entity.Contact
 import com.hyapp.achat.model.entity.Message
 import com.hyapp.achat.model.entity.Message_
 import io.objectbox.query.Query
@@ -113,5 +114,9 @@ object MessageDao {
         )
             .build()
             .find()
+    }
+
+    fun removeALl() {
+        ObjectBox.store.boxFor(Message::class.java).removeAll()
     }
 }

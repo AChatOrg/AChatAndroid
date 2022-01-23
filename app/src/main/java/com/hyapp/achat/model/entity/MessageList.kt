@@ -132,7 +132,7 @@ class MessageList : LinkedList<Message>() {
         return false
     }
 
-    fun updateMessageDelivery(message: Message): Boolean {
+    fun updateAllDeliveryUntil(message: Message): Boolean {
         for (i in size - 1 downTo 0) {
             if (get(i).uid == message.uid) {
                 for (j in i downTo 0) {

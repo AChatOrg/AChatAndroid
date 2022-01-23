@@ -8,19 +8,13 @@ import android.content.IntentFilter
 import android.net.ConnectivityManager
 import android.os.Build
 import android.os.IBinder
-import com.hyapp.achat.model.ChatRepo
 import com.hyapp.achat.model.IOSocket
 import com.hyapp.achat.model.Preferences
 import com.hyapp.achat.model.entity.ConnLive
 import com.hyapp.achat.viewmodel.Notifs
-import com.hyapp.achat.viewmodel.service.SocketService
 import com.hyapp.achat.viewmodel.utils.NetUtils
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlin.coroutines.CoroutineContext
 
-class SocketService : Service(), CoroutineScope {
+class SocketService : Service() {
 
     companion object {
         const val EXTRA_LOGIN_EVENT = "LoginEvent"
@@ -38,9 +32,6 @@ class SocketService : Service(), CoroutineScope {
         }
     }
 
-    override val coroutineContext: CoroutineContext
-        get() = Dispatchers.IO
-
     override fun onBind(intent: Intent): IBinder? {
         return null
     }
@@ -54,15 +45,11 @@ class SocketService : Service(), CoroutineScope {
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         val loginJson = intent.getStringExtra(EXTRA_LOGIN_EVENT)
-        if (loginJson != null && ioSocket == null) {
-            ioSocket = IOSocket(loginJson)
-            Preferences.instance().putLogged(true)
-            launch {
-                ChatRepo.sendWaitingsMessages()
-            }
-            launch {
-                ChatRepo.sendReadsMessages()
-            }
+
+        if (ioSocket == null) {
+            ioSocket = IOSocket(loginJson ?: Preferences.instance().loginInfo)
+        } else {
+            ioSocket?.setQuery(Preferences.instance().loginInfo)
         }
         startForeground(Notifs.ID_SOCKET, Notifs.getSocketNotif(this))
         return START_STICKY
@@ -72,7 +59,6 @@ class SocketService : Service(), CoroutineScope {
         unregisterReceiver(netReceiver)
         ioSocket?.destroy()
         ioSocket = null
-        Preferences.instance().putLogged(false)
     }
 
     private val netReceiver: BroadcastReceiver = object : BroadcastReceiver() {

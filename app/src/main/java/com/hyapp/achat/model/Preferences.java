@@ -3,11 +3,18 @@ package com.hyapp.achat.model;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.hyapp.achat.Config;
+import com.hyapp.achat.model.entity.ConnLive;
+import com.hyapp.achat.viewmodel.utils.SecureUtils;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
+
+import io.socket.emitter.Emitter;
 
 public class Preferences {
 
@@ -42,6 +49,12 @@ public class Preferences {
 
     public static Preferences instance() {
         return instance;
+    }
+
+    public void deleteALl() {
+        SharedPreferences.Editor writer = preferences.edit();
+        writer.clear();
+        writer.apply();
     }
 
     public void putLogged(boolean logged) {
@@ -101,6 +114,8 @@ public class Preferences {
     public String getLoginInfo() throws JSONException {
         JSONObject json = new JSONObject();
         json.put("operation", "");
+        json.put("androidId", "");
+        json.put("uid", "");
         json.put("name", "");
         json.put("bio", "");
         json.put("gender", "1");

@@ -6,6 +6,7 @@ public interface Config {
     String SOCKET_QUERY_DATA = "data";
 
     String OPERATION_LOGIN_GUEST = "loginGuest";
+    String OPERATION_RECONNECT_GUEST = "reconnectGuest";
 
     String ON_DISCONNECT = "disconnect";
     String ON_CONNECT = "connect";

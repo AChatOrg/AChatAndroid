@@ -6,6 +6,7 @@ import android.content.Intent
 import android.text.TextUtils
 import androidx.core.app.RemoteInput
 import com.hyapp.achat.model.ChatRepo
+import com.hyapp.achat.model.LoginRepo
 import com.hyapp.achat.model.entity.Contact
 import com.hyapp.achat.model.entity.Message
 import com.hyapp.achat.model.entity.User
@@ -38,6 +39,9 @@ class NotifReceiver : BroadcastReceiver(), CoroutineScope {
     }
 
     private fun handleExitApp(context: Context) {
+        launch {
+            LoginRepo.onLogoutGuest()
+        }
         context.stopService(Intent(context, SocketService::class.java))
         EventBus.getDefault().post(ActionEvent(ActionEvent.ACTION_EXIT_APP))
     }

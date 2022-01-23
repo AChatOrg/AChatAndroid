@@ -19,7 +19,7 @@ class App : MultiDexApplication() {
     companion object {
         @SuppressLint("StaticFieldLeak")
         @JvmStatic
-        var context: Context? = null
+        lateinit var context: Context
             private set
     }
 
@@ -28,7 +28,7 @@ class App : MultiDexApplication() {
         context = applicationContext
         Preferences.init(context)
         Fresco.initialize(context)
-        ObjectBox.init(context!!)
+        ObjectBox.init(context)
         AXrLottie.init(context)
         AXEmojiManager.install(context, AXIOSEmojiProvider(context))
         AXEmojiManager.setStickerViewCreatorListener(object : StickerViewCreatorListener {

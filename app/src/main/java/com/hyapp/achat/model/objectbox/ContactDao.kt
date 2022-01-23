@@ -9,9 +9,9 @@ object ContactDao {
 
     private val getQuery: Query<Contact> by lazy {
         ObjectBox.store.boxFor(Contact::class.java)
-                .query()
-                .equal(Contact_.uid, "", QueryBuilder.StringOrder.CASE_SENSITIVE)
-                .build()
+            .query()
+            .equal(Contact_.uid, "", QueryBuilder.StringOrder.CASE_SENSITIVE)
+            .build()
     }
 
     @JvmStatic
@@ -27,12 +27,16 @@ object ContactDao {
     @JvmStatic
     fun all(): List<Contact> {
         return ObjectBox.store.boxFor(Contact::class.java).query()
-                .order(Contact_.messageTime, QueryBuilder.DESCENDING)
-                .build().find()
+            .order(Contact_.messageTime, QueryBuilder.DESCENDING)
+            .build().find()
     }
 
     @JvmStatic
     fun remove(contact: Contact): Boolean {
         return ObjectBox.store.boxFor(Contact::class.java).remove(contact.id)
+    }
+
+    fun removeALl() {
+        ObjectBox.store.boxFor(Contact::class.java).removeAll()
     }
 }

@@ -5,7 +5,6 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.view.animation.AnimationUtils
-import android.widget.ArrayAdapter
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -28,7 +27,7 @@ class LoginGuestActivity : EventActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         init()
-        setupHistory()
+//        setupHistory()
         setupProgressDialog()
         subscribeLogged()
     }
@@ -45,16 +44,16 @@ class LoginGuestActivity : EventActivity() {
         binding.viewModel = viewModel
     }
 
-    private fun setupHistory() {
-        val nameHistory = viewModel.nameHistory
-        val bioHistory = viewModel.bioHistory
-        val nameAdapter = ArrayAdapter(this, R.layout.item_suggestion, nameHistory)
-        val bioAdapter = ArrayAdapter(this, R.layout.item_suggestion, bioHistory)
-        binding.editTextUsername.threshold = 1
-        binding.editTextBio.threshold = 1
-        binding.editTextUsername.setAdapter(nameAdapter)
-        binding.editTextBio.setAdapter(bioAdapter)
-    }
+//    private fun setupHistory() {
+//        val nameHistory = viewModel.nameHistory
+//        val bioHistory = viewModel.bioHistory
+//        val nameAdapter = ArrayAdapter(this, R.layout.item_suggestion, nameHistory)
+//        val bioAdapter = ArrayAdapter(this, R.layout.item_suggestion, bioHistory)
+//        binding.editTextUsername.threshold = 1
+//        binding.editTextBio.threshold = 1
+//        binding.editTextUsername.setAdapter(nameAdapter)
+//        binding.editTextBio.setAdapter(bioAdapter)
+//    }
 
     private fun setupProgressDialog() {
         progressDialog = ProgressDialog(this, R.style.RoundedCornersDialog)

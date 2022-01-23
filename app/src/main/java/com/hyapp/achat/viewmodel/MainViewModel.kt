@@ -6,11 +6,13 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.hyapp.achat.App
 import com.hyapp.achat.model.ChatRepo
 import com.hyapp.achat.model.UsersRepo
 import com.hyapp.achat.model.entity.*
 import com.hyapp.achat.model.objectbox.ContactDao
 import com.hyapp.achat.model.Preferences
+import com.hyapp.achat.model.objectbox.ObjectBox
 import com.hyapp.achat.model.objectbox.UserDao
 import com.hyapp.achat.view.EventActivity
 import com.hyapp.achat.viewmodel.service.SocketService

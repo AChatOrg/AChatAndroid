@@ -209,7 +209,7 @@ class ChatViewModel(var receiver: User) : ViewModel() {
 
     private fun updateMessageDelivery(message: Message) {
         _messagesLive.value?.data?.let { list ->
-            val updated = list.updateMessageDelivery(message)
+            val updated = list.updateAllDeliveryUntil(message)
             if (updated) {
                 _messagesLive.value = Resource.update(list, 0)
             }

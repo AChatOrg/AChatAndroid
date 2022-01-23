@@ -13,4 +13,8 @@ object UserDao {
     fun put(user: User): Long {
         return ObjectBox.store.boxFor(User::class.java).put(user)
     }
+
+    fun removeALl() {
+        ObjectBox.store.boxFor(User::class.java).removeAll()
+    }
 }
