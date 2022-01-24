@@ -1,8 +1,6 @@
 package com.hyapp.achat.model
 
 import com.hyapp.achat.Config
-import com.hyapp.achat.model.ChatRepo.sendReadsMessages
-import com.hyapp.achat.model.ChatRepo.sendWaitingsMessages
 import com.hyapp.achat.model.entity.ConnLive
 import com.hyapp.achat.viewmodel.service.SocketService
 import io.socket.client.IO
@@ -11,7 +9,6 @@ import io.socket.emitter.Emitter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.json.JSONObject
 import java.net.URISyntaxException
 import kotlin.coroutines.CoroutineContext
 
@@ -46,12 +43,9 @@ class IOSocket(loginJson: String) : CoroutineScope {
     private val onConnect = Emitter.Listener { args ->
         ConnLive.singleton().postValue(ConnLive.Status.CONNECTED)
 
-        launch {
-            sendWaitingsMessages()
-        }
-        launch {
-            sendReadsMessages()
-        }
+        launch { ChatRepo.sendWaitingsMessages() }
+        launch { ChatRepo.sendReadsMessages() }
+        launch { ChatRepo.sendOnlineTimeContactsRequest() }
     }
 
     init {

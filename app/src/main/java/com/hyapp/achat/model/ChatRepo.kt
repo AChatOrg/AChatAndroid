@@ -3,10 +3,7 @@ package com.hyapp.achat.model
 import com.google.gson.Gson
 import com.hyapp.achat.App
 import com.hyapp.achat.Config
-import com.hyapp.achat.model.entity.Contact
-import com.hyapp.achat.model.entity.Message
-import com.hyapp.achat.model.entity.User
-import com.hyapp.achat.model.entity.UserLive
+import com.hyapp.achat.model.entity.*
 import com.hyapp.achat.model.objectbox.ContactDao
 import com.hyapp.achat.model.objectbox.MessageDao
 import com.hyapp.achat.model.objectbox.UserDao
@@ -24,7 +21,10 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import org.json.JSONArray
+import org.json.JSONObject
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.math.max
 
 object ChatRepo {
@@ -58,6 +58,7 @@ object ChatRepo {
         socket.on(Config.ON_MSG_READ_RECEIVED, onMessageReadReceived)
         socket.on(Config.ON_TYPING, onTyping)
         socket.on(Config.ON_ONLINE_TIME, onOnlineTime)
+        socket.on(Config.ON_ONLINE_TIME_CONTACTS, onOnlineTimeContact)
     }
 
     suspend fun sendPvMessage(message: Message, receiver: User) {
@@ -149,6 +150,17 @@ object ChatRepo {
 
     fun sendOnlineTime(isOnline: Boolean) {
         SocketService.ioSocket?.socket?.emit(Config.ON_ONLINE_TIME, isOnline)
+    }
+
+    suspend fun sendOnlineTimeContactsRequest() {
+        withContext(ioDispatcher) {
+            val contacts = ContactDao.all()
+            val list = ArrayList<String>()
+            for (contact in contacts) {
+                list.add(contact.uid)
+            }
+            SocketService.ioSocket?.socket?.emit(Config.ON_ONLINE_TIME_CONTACTS, JSONArray(list))
+        }
     }
 
     private fun setupAndPutContact(contact: Contact, message: Message) {
@@ -246,6 +258,18 @@ object ChatRepo {
                     Message(receiverUid = it.uid, time = it.onlineTime)
                 )
             )
+        }
+    }
+
+    private val onOnlineTimeContact = Emitter.Listener { args ->
+        val jsonArray = JSONArray(args[0].toString())
+        for (i in 0 until jsonArray.length()) {
+            val json = JSONObject(jsonArray[i].toString())
+            ContactDao.get(json.getString("uid"))?.let { contact ->
+                contact.onlineTime = json.getLong("onlineTime")
+                ContactDao.put(contact)
+                _contactFlow.tryEmit(Pair(CONTACT_UPDATE, contact))
+            }
         }
     }
 }

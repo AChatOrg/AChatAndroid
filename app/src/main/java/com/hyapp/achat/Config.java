@@ -27,4 +27,6 @@ public interface Config {
     String ON_MSG_READ_RECEIVED = "msgReadReceived";
     String ON_TYPING = "typing";
     String ON_ONLINE_TIME = "onlineTime";
+    String ON_ONLINE_TIME_CONTACTS = "onlineTimeContacts";
+
 }
