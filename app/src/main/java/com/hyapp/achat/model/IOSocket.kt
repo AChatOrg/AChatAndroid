@@ -32,7 +32,7 @@ class IOSocket(loginJson: String) : CoroutineScope {
         socket.on(Config.ON_DISCONNECT, onDisconnect)
         socket.on(Config.ON_CONNECT, onConnect)
         LoginRepo.listen(socket)
-        UsersRepo.listen(socket)
+        UsersRoomsRepo.listen(socket)
         ChatRepo.listen(socket)
     }
 

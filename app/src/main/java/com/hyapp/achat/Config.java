@@ -15,9 +15,12 @@ public interface Config {
     String ON_LOGGED = "logged";
     String ON_USER_CAME = "userCame";
     String ON_USER_LEFT = "userLeft";
+    String ON_ROOM_CREATE = "roomCreate";
+    String ON_ROOM_DELETE = "roomDelete";
 
     /*On People*/
     String ON_USERS = "users";
+    String ON_ROOMS = "rooms";
 
     /*On Chat*/
     String ON_PV_MESSAGE = "pvMessage";

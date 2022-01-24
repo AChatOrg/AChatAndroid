@@ -41,6 +41,7 @@
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/emoji_item.xml" value="0.14855072463768115" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/emoji_skin_popup.xml" value="0.14855072463768115" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/fragment_people_groups.xml" value="0.2" />
+        <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/fragment_users_rooms.xml" value="0.17255434782608695" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/group_avatar.xml" value="0.18659420289855072" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/item_contact_group.xml" value="0.22" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/item_contact_single.xml" value="0.25" />
@@ -54,7 +55,9 @@
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/item_message_text_send.xml" value="0.15942028985507245" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/item_message_typing.xml" value="0.33" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/item_people.xml" value="0.25" />
+        <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/item_room.xml" value="0.25" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/item_suggestion.xml" value="0.15443840579710144" />
+        <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/item_user.xml" value="0.1" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/layout_empty_contact.xml" value="0.2" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/layout_people_groups.xml" value="0.25" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/layout_status_message.xml" value="0.25" />

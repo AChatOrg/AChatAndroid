@@ -85,7 +85,7 @@ class ContactAdapter(private val context: Context) :
             binding.lifecycleOwner = context as LifecycleOwner
             return SingleHolder(binding)
         }
-        if (viewType.toByte() == Contact.TYPE_GROUP) {
+        if (viewType.toByte() == Contact.TYPE_ROOM) {
             val binding: ItemContactGroupBinding = DataBindingUtil.inflate(
                 LayoutInflater.from(context),
                 R.layout.item_contact_group,

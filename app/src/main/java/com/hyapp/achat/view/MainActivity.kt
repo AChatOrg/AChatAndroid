@@ -13,7 +13,7 @@ import com.hyapp.achat.model.entity.ContactList
 import com.hyapp.achat.model.entity.Resource
 import com.hyapp.achat.view.adapter.ContactAdapter
 import com.hyapp.achat.view.component.AbstractTabSelectedListener
-import com.hyapp.achat.view.fragment.GroupsFragment
+import com.hyapp.achat.view.fragment.RoomsFragment
 import com.hyapp.achat.view.fragment.UsersFragment
 import com.hyapp.achat.viewmodel.MainViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -34,8 +34,8 @@ class MainActivity : EventActivity() {
         init()
         setupContacts()
         observeContacts()
-        setupPeopleGroups()
-        observePeopleGroupsSize()
+        setupUsersRooms()
+        observeUsersRoomsSize()
         observeConnectivity()
         setupFab()
     }
@@ -86,9 +86,9 @@ class MainActivity : EventActivity() {
             { contactList: ContactList? -> contactAdapter.submitList(contactList) })
     }
 
-    private fun setupPeopleGroups() {
+    private fun setupUsersRooms() {
         val usersFragment = UsersFragment()
-        val groupsFragment = GroupsFragment()
+        val groupsFragment = RoomsFragment()
         binding.peopleGroups.peopleGroupsTitle.text =
             String.format(getString(R.string.onile_s), peopleSize)
         val manager = supportFragmentManager
@@ -116,27 +116,27 @@ class MainActivity : EventActivity() {
                         trans.show(groupsFragment)
                     }
                 }
-                resetPeopleGroupsTitle(ConnLive.singleton().value)
+                resetUsersRoomsTitle(ConnLive.singleton().value)
                 trans.commit()
             }
         })
     }
 
-    private fun observePeopleGroupsSize() {
+    private fun observeUsersRoomsSize() {
         viewModel.usersLive.observe(this) { res ->
             if (res.status == Resource.Status.SUCCESS) {
                 peopleSize = res.data!!.size
-                resetPeopleGroupsTitle()
+                resetUsersRoomsTitle()
             }
         }
     }
 
     private fun observeConnectivity() {
         ConnLive.singleton()
-            .observe(this, { status: ConnLive.Status? -> this.resetPeopleGroupsTitle(status) })
+            .observe(this, { status: ConnLive.Status? -> this.resetUsersRoomsTitle(status) })
     }
 
-    private fun resetPeopleGroupsTitle(status: ConnLive.Status?) {
+    private fun resetUsersRoomsTitle(status: ConnLive.Status?) {
         if (status == null) return
         when (status) {
             ConnLive.Status.CONNECTING -> {
@@ -145,7 +145,7 @@ class MainActivity : EventActivity() {
             }
             ConnLive.Status.CONNECTED -> {
                 binding.title.setText(R.string.app_name)
-                resetPeopleGroupsTitle()
+                resetUsersRoomsTitle()
             }
             ConnLive.Status.DISCONNECTED -> {
                 binding.title.setText(R.string.disconnected)
@@ -158,7 +158,7 @@ class MainActivity : EventActivity() {
         }
     }
 
-    private fun resetPeopleGroupsTitle() {
+    private fun resetUsersRoomsTitle() {
         if (binding.peopleGroups.tabLayout.selectedTabPosition == 0) {
             binding.peopleGroups.peopleGroupsTitle.text =
                 String.format(getString(R.string.onile_s), peopleSize)

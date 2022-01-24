@@ -1,18 +1,15 @@
 package com.hyapp.achat.viewmodel
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.hyapp.achat.App
 import com.hyapp.achat.model.ChatRepo
-import com.hyapp.achat.model.UsersRepo
+import com.hyapp.achat.model.UsersRoomsRepo
 import com.hyapp.achat.model.entity.*
 import com.hyapp.achat.model.objectbox.ContactDao
 import com.hyapp.achat.model.Preferences
-import com.hyapp.achat.model.objectbox.ObjectBox
 import com.hyapp.achat.model.objectbox.UserDao
 import com.hyapp.achat.view.EventActivity
 import com.hyapp.achat.viewmodel.service.SocketService
@@ -30,6 +27,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val _usersLive = MutableLiveData<Resource<SortedList<User>>>()
     val usersLive = _usersLive as LiveData<Resource<SortedList<User>>>
 
+    private val _roomsLive = MutableLiveData<Resource<SortedList<Room>>>()
+    val roomsLive = _roomsLive as LiveData<Resource<SortedList<Room>>>
+
     private var stopTypingJob: Job? = null
     private var refreshOnlineTimeJob: Job? = null
 
@@ -39,6 +39,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         SocketService.start(context, Preferences.instance().loginInfo)
         loadContacts()
         reloadUsers()
+        reloadRooms()
         observeContacts()
         observeUsers()
     }
@@ -50,8 +51,17 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     fun reloadUsers() {
         _usersLive.value = Resource.loading(null)
         viewModelScope.launch {
-            UsersRepo.requestUsers().collect { userList ->
+            UsersRoomsRepo.requestUsers().collect { userList ->
                 _usersLive.value = Resource.success(userList)
+            }
+        }
+    }
+
+    fun reloadRooms() {
+        _roomsLive.value = Resource.loading(null)
+        viewModelScope.launch {
+            UsersRoomsRepo.requestRooms().collect { roomList ->
+                _roomsLive.value = Resource.success(roomList)
             }
         }
     }
@@ -71,18 +81,32 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private fun observeUsers() {
         viewModelScope.launch {
             launch {
-                UsersRepo.userCameFlow.collect { user ->
-                    usersLive.value?.data?.let {
-                        it.add(user)
-                        _usersLive.value = Resource.success(it)
-                    }
-                }
-            }
-            launch {
-                UsersRepo.userLeftFlow.collect { user ->
-                    usersLive.value?.data?.let {
-                        it.remove(user)
-                        _usersLive.value = Resource.success(it)
+                UsersRoomsRepo.flow.collect { pair ->
+                    when (pair.first) {
+                        UsersRoomsRepo.USER_CAME -> {
+                            usersLive.value?.data?.let {
+                                it.add(pair.second as User)
+                                _usersLive.value = Resource.success(it)
+                            }
+                        }
+                        UsersRoomsRepo.USER_LEFT -> {
+                            usersLive.value?.data?.let {
+                                it.remove(pair.second as User)
+                                _usersLive.value = Resource.success(it)
+                            }
+                        }
+                        UsersRoomsRepo.ROOM_CREATE -> {
+                            roomsLive.value?.data?.let {
+                                it.add(pair.second as Room)
+                                _roomsLive.value = Resource.success(it)
+                            }
+                        }
+                        UsersRoomsRepo.ROOM_DELETE -> {
+                            roomsLive.value?.data?.let {
+                                it.remove(pair.second as Room)
+                                _roomsLive.value = Resource.success(it)
+                            }
+                        }
                     }
                 }
             }

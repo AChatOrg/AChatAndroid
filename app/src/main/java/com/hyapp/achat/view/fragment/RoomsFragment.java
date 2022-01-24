@@ -17,17 +17,19 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.hyapp.achat.R;
 import com.hyapp.achat.databinding.FragmentUsersRoomsBinding;
 import com.hyapp.achat.model.entity.Event;
+import com.hyapp.achat.model.entity.Room;
 import com.hyapp.achat.model.entity.SortedList;
 import com.hyapp.achat.model.entity.User;
+import com.hyapp.achat.view.adapter.RoomAdapter;
 import com.hyapp.achat.view.adapter.UserAdapter;
 import com.hyapp.achat.viewmodel.MainViewModel;
 
-public class UsersFragment extends Fragment {
+public class RoomsFragment extends Fragment {
 
     private MainViewModel viewModel;
     private FragmentUsersRoomsBinding binding;
 
-    private UserAdapter adapter;
+    private RoomAdapter adapter;
 
     @Nullable
     @Override
@@ -41,7 +43,7 @@ public class UsersFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         viewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
         binding.setLifecycleOwner(getViewLifecycleOwner());
-        binding.swipeRefreshLayout.setOnRefreshListener(() -> viewModel.reloadUsers());
+        binding.swipeRefreshLayout.setOnRefreshListener(() -> viewModel.reloadRooms());
         setupRecyclerView(requireContext(), view);
         observePeople();
     }
@@ -50,12 +52,12 @@ public class UsersFragment extends Fragment {
         binding.recyclerView.setHasFixedSize(true);
         binding.recyclerView.setItemAnimator(null);
         binding.recyclerView.setLayoutManager(new LinearLayoutManager(context));
-        adapter = new UserAdapter(context);
+        adapter = new RoomAdapter(context);
         binding.recyclerView.setAdapter(adapter);
     }
 
     private void observePeople() {
-        viewModel.getUsersLive().observe(getViewLifecycleOwner(), res -> {
+        viewModel.getRoomsLive().observe(getViewLifecycleOwner(), res -> {
             switch (res.status) {
                 case SUCCESS:
                     onSuccess(res.data);
@@ -70,7 +72,7 @@ public class UsersFragment extends Fragment {
         });
     }
 
-    private void onSuccess(SortedList<User> list) {
+    private void onSuccess(SortedList<Room> list) {
         binding.swipeRefreshLayout.setRefreshing(false);
         binding.progressBar.setVisibility(View.GONE);
         adapter.submitList(list);

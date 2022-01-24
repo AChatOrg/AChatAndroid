@@ -44,9 +44,16 @@ data class Contact(
         user.avatars, user.onlineTime, user.uid, user.rank, user.score, user.loginTime
     )
 
+    constructor(room: Room, membersStr: String, onlineStr: String) : this(
+        TYPE_ROOM, room.name,
+        "${room.memberCount} " + membersStr + ", ${room.onlineMemberCount} " + onlineStr,
+        room.gender,
+        room.avatars, TIME_ONLINE, room.uid, 0, 0, 0
+    )
+
     companion object {
         const val TYPE_SINGLE: Byte = 1
-        const val TYPE_GROUP: Byte = 2
+        const val TYPE_ROOM: Byte = 2
 
         const val TIME_ONLINE: Long = 0
     }

@@ -101,7 +101,7 @@
         <include
             android:id="@+id/peopleGroups"
             tools:visibility="gone"
-            layout="@layout/layout_people_groups"
+            layout="@layout/layout_users_rooms"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="start" />
