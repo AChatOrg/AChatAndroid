@@ -96,7 +96,7 @@
     },
     {
       "id": "2:7262915003648557870",
-      "lastPropertyId": "21:8595874104176518939",
+      "lastPropertyId": "22:7317676651528543696",
       "name": "Message",
       "properties": [
         {
@@ -205,6 +205,11 @@
           "id": "21:8595874104176518939",
           "name": "senderOnlineTime",
           "type": 6
+        },
+        {
+          "id": "22:7317676651528543696",
+          "name": "chatType",
+          "type": 2
         }
       ],
       "relations": []

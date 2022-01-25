@@ -63,12 +63,12 @@
             <com.google.android.material.tabs.TabItem
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/people" />
+                android:text="@string/users" />
 
             <com.google.android.material.tabs.TabItem
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/groups" />
+                android:text="@string/rooms" />
 
         </com.google.android.material.tabs.TabLayout>
 

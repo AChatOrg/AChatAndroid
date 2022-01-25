@@ -25,8 +25,8 @@ class MainActivity : EventActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var contactAdapter: ContactAdapter
 
-    private var peopleSize = 0
-    private val groupsSize = 0
+    private var usersSize = 0
+    private var roomsSize = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -90,7 +90,7 @@ class MainActivity : EventActivity() {
         val usersFragment = UsersFragment()
         val groupsFragment = RoomsFragment()
         binding.peopleGroups.peopleGroupsTitle.text =
-            String.format(getString(R.string.onile_s), peopleSize)
+            String.format(getString(R.string.onile_s), usersSize)
         val manager = supportFragmentManager
         val transaction = manager.beginTransaction()
         for (fragment in manager.fragments) {
@@ -125,7 +125,13 @@ class MainActivity : EventActivity() {
     private fun observeUsersRoomsSize() {
         viewModel.usersLive.observe(this) { res ->
             if (res.status == Resource.Status.SUCCESS) {
-                peopleSize = res.data!!.size
+                usersSize = res.data!!.size
+                resetUsersRoomsTitle()
+            }
+        }
+        viewModel.roomsLive.observe(this) { res ->
+            if (res.status == Resource.Status.SUCCESS) {
+                roomsSize = res.data!!.size
                 resetUsersRoomsTitle()
             }
         }
@@ -161,10 +167,10 @@ class MainActivity : EventActivity() {
     private fun resetUsersRoomsTitle() {
         if (binding.peopleGroups.tabLayout.selectedTabPosition == 0) {
             binding.peopleGroups.peopleGroupsTitle.text =
-                String.format(getString(R.string.onile_s), peopleSize)
+                String.format(getString(R.string.onile_s), usersSize)
         } else {
             binding.peopleGroups.peopleGroupsTitle.text =
-                String.format(getString(R.string.groups_s), groupsSize)
+                String.format(getString(R.string.rooms_s), roomsSize)
         }
     }
 

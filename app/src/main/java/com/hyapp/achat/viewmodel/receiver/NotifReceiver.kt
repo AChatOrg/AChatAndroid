@@ -62,10 +62,10 @@ class NotifReceiver : BroadcastReceiver(), CoroutineScope {
                     val newMessage = Message(
                         UUID.randomUUID().toString(), Message.TYPE_TEXT,
                         Message.TRANSFER_SEND, System.currentTimeMillis(), text.toString(), 0, "",
-                        contact.uid, currentUser ?: User()
+                        contact.uid, currentUser ?: User(), message.chatType
                     )
                     launch {
-                        ChatRepo.sendPvMessage(newMessage, contact.getUser())
+                        ChatRepo.sendMessage(newMessage, contact)
                     }
                     launch {
 //                        ChatRepo.markMessageAsRead(message)

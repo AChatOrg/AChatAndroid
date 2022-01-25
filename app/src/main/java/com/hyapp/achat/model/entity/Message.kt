@@ -35,11 +35,14 @@ data class Message(
     var senderAvatars: MutableList<String> = mutableListOf(),
     var senderOnlineTime: Long = UserConsts.TIME_ONLINE,
 
+    var chatType: Byte = CHAT_TYPE_PV,
+
     var delivery: Byte = DELIVERY_WAITING,
     var bubble: Byte = BUBBLE_SINGLE,
 
     @Id
     var id: Long = 0
+
 ) : Parcelable {
     constructor(
         uid: String = "",
@@ -50,11 +53,12 @@ data class Message(
         extraTextSize: Int = 0,
         mediaPath: String = "",
         receiverUid: String = "",
-        user: User
+        user: User,
+        chatType: Byte= CHAT_TYPE_PV
     ) : this(
         uid, type, transfer, time, text, extraTextSize, mediaPath, receiverUid,
         user.uid, user.rank, user.score, user.loginTime, user.name, user.bio, user.gender,
-        user.avatars, user.onlineTime
+        user.avatars, user.onlineTime, chatType
     )
 
     companion object {
@@ -84,10 +88,16 @@ data class Message(
 
         const val TEXT_SIZE_SP = 14
         const val EMOJI_SIZE_LARGEST_SP = 36
+
+        const val CHAT_TYPE_PV: Byte = 1
+        const val CHAT_TYPE_ROOM: Byte = 2
     }
 
     val isChatMessage
         get() = type != TYPE_DETAILS && type != TYPE_PROFILE && type != TYPE_TYPING
+
+    val isPvMessage
+        get() = chatType == CHAT_TYPE_PV
 
     fun setAndGetTextSizes(sp1: Int): Pair<Float, Int> {
         var textSize = ((TEXT_SIZE_SP + extraTextSize) * sp1).toFloat()
@@ -116,7 +126,7 @@ data class Message(
 
     fun getContact(): Contact {
         return Contact(
-            Contact.TYPE_SINGLE,
+            Contact.TYPE_USER,
             senderName, senderBio, senderGender, senderAvatars, senderOnlineTime,
             senderUid, senderRank, senderScore, senderLoginTime,
             text, time, mediaPath

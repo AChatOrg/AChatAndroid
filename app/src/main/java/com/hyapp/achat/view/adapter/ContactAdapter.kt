@@ -1,5 +1,6 @@
 package com.hyapp.achat.view.adapter
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -43,7 +44,7 @@ class ContactAdapter(private val context: Context) :
                 override fun getChangePayload(oldItem: Contact, newItem: Contact): Any? {
                     return when {
                         oldItem.message != newItem.message
-                                || oldItem.isTyping != newItem.isTyping
+                                || oldItem.typingName != newItem.typingName
                                 || oldItem.messageDelivery != newItem.messageDelivery
                                 || oldItem.messageTime != newItem.messageTime
                                 || oldItem.notifCount != newItem.notifCount
@@ -75,7 +76,7 @@ class ContactAdapter(private val context: Context) :
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
-        if (viewType.toByte() == Contact.TYPE_SINGLE) {
+        if (viewType.toByte() == Contact.TYPE_USER) {
             val binding: ItemContactSingleBinding = DataBindingUtil.inflate(
                 LayoutInflater.from(context),
                 R.layout.item_contact_single,
@@ -134,9 +135,10 @@ class ContactAdapter(private val context: Context) :
             }
         }
 
+        @SuppressLint("SetTextI18n")
         private fun setMessage(contact: Contact) {
-            if (contact.isTyping) {
-                message.text = typingStr
+            if (contact.typingName != null) {
+                message.text = "${contact.typingName} $typingStr"
                 media.visibility = View.GONE
                 messageDelivery.visibility = View.GONE
             } else {

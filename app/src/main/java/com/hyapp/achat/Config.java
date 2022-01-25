@@ -22,8 +22,8 @@ public interface Config {
     String ON_USERS = "users";
     String ON_ROOMS = "rooms";
 
-    /*On Chat*/
-    String ON_PV_MESSAGE = "pvMessage";
+    /*On Pv Chat*/
+    String ON_MESSAGE = "message";
     String ON_MESSAGE_SENT = "msgSent";
     String ON_MSG_RECEIVED = "msgReceived";
     String ON_MSG_READ = "msgRead";
@@ -31,5 +31,6 @@ public interface Config {
     String ON_TYPING = "typing";
     String ON_ONLINE_TIME = "onlineTime";
     String ON_ONLINE_TIME_CONTACTS = "onlineTimeContacts";
-
+    /*On Pv Chat*/
+    String ON_JOIN_LEAVE_ROOM = "joinLeaveRoom";
 }

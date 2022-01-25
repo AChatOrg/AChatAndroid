@@ -1,6 +1,5 @@
 package com.hyapp.achat.model.objectbox
 
-import com.hyapp.achat.model.entity.Contact
 import com.hyapp.achat.model.entity.Message
 import com.hyapp.achat.model.entity.Message_
 import io.objectbox.query.Query
@@ -40,6 +39,13 @@ object MessageDao {
             .find(offset, limit)
     }
 
+    fun allRoom(roomUid: String, offset: Long, limit: Long): List<Message> {
+        return ObjectBox.store.boxFor(Message::class.java).query()
+            .equal(Message_.receiverUid, roomUid, QueryBuilder.StringOrder.CASE_SENSITIVE)
+            .build()
+            .find(offset, limit)
+    }
+
     @JvmStatic
     fun allReceivedUnReads(contactUi: String): List<Message> {
         val isContactSender =
@@ -48,6 +54,24 @@ object MessageDao {
             .and(Message_.delivery.notEqual(Message.DELIVERY_READ.toInt())))
         return ObjectBox.store.boxFor(Message::class.java)
             .query(isContactSender.and(isUnread))
+            .build()
+            .find()
+    }
+
+    @JvmStatic
+    fun allReceivedUnReadsRoom(currUserUid: String, roomUid: String): List<Message> {
+        val isFromRoom =
+            (Message_.receiverUid.equal(roomUid, QueryBuilder.StringOrder.CASE_SENSITIVE)
+                .and(
+                    Message_.senderUid.notEqual(
+                        currUserUid,
+                        QueryBuilder.StringOrder.CASE_SENSITIVE
+                    )
+                ))
+        val isUnread = (Message_.delivery.notEqual(Message.DELIVERY_SENT.toInt())
+            .and(Message_.delivery.notEqual(Message.DELIVERY_READ.toInt())))
+        return ObjectBox.store.boxFor(Message::class.java)
+            .query(isFromRoom.and(isUnread))
             .build()
             .find()
     }

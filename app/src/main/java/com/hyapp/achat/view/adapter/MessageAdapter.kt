@@ -88,7 +88,7 @@ class MessageAdapter(val context: Context, val recyclerView: RecyclerView) :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
         when (viewType) {
-            Message.TRANSFER_RECEIVE + Message.TYPE_TYPING -> return EmptyHolder(
+            Message.TRANSFER_RECEIVE + Message.TYPE_TYPING -> return TypingHolder(
                 LayoutInflater.from(context).inflate(R.layout.item_message_typing, parent, false)
             )
             Message.TRANSFER_SEND + Message.TYPE_TEXT -> return TextHolder(
@@ -196,7 +196,7 @@ class MessageAdapter(val context: Context, val recyclerView: RecyclerView) :
         override fun bind(message: Message) {
             super.bind(message)
             val contact = message.getContact()
-            if (contact.type == Contact.TYPE_SINGLE) {
+            if (contact.type == Contact.TYPE_USER) {
                 avatar.setAvatars(contact.avatars)
                 setOnlineTime(message.senderOnlineTime)
                 onlineTime.visibility = View.VISIBLE
@@ -353,9 +353,12 @@ class MessageAdapter(val context: Context, val recyclerView: RecyclerView) :
 
     }
 
-    inner class EmptyHolder(itemView: View) : Holder(itemView) {
+    inner class TypingHolder(itemView: View) : Holder(itemView) {
+        val avatar = itemView.findViewById<SimpleDraweeView>(R.id.avatar)
 
         override fun bind(message: Message) {
+            val ava = message.senderAvatars
+            avatar.setImageURI(if (ava.isNotEmpty()) ava[0] else null)
         }
     }
 }

@@ -129,7 +129,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun signalTyping(contact: Contact) {
         _contactsLive.value?.let { list ->
-            var updated = list.update(contact.apply { isTyping = true })
+            var updated = list.update(contact)
             if (updated) {
                 _contactsLive.value = list
             }
@@ -137,7 +137,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             stopTypingJob = viewModelScope.launch(ioDispatcher) {
                 delay(3000)
                 ContactDao.get(contact.uid)?.let {
-                    updated = list.update(it.apply { isTyping = false })
+                    updated = list.update(it.apply { typingName = null })
                     if (updated) {
                         _contactsLive.postValue(list)
                     }

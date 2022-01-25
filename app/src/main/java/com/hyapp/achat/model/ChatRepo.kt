@@ -1,9 +1,11 @@
 package com.hyapp.achat.model
 
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.hyapp.achat.App
 import com.hyapp.achat.Config
 import com.hyapp.achat.model.entity.*
+import com.hyapp.achat.model.gson.UserDeserializer
 import com.hyapp.achat.model.objectbox.ContactDao
 import com.hyapp.achat.model.objectbox.MessageDao
 import com.hyapp.achat.model.objectbox.UserDao
@@ -52,7 +54,7 @@ object ChatRepo {
 
 
     fun listen(socket: Socket) {
-        socket.on(Config.ON_PV_MESSAGE, onPvMessage)
+        socket.on(Config.ON_MESSAGE, onPvMessage)
         socket.on(Config.ON_MESSAGE_SENT, onMessageSent)
         socket.on(Config.ON_MSG_READ, onMessageRead)
         socket.on(Config.ON_MSG_READ_RECEIVED, onMessageReadReceived)
@@ -61,19 +63,21 @@ object ChatRepo {
         socket.on(Config.ON_ONLINE_TIME_CONTACTS, onOnlineTimeContact)
     }
 
-    suspend fun sendPvMessage(message: Message, receiver: User) {
+    suspend fun sendMessage(message: Message, cont: Contact) {
         withContext(ioDispatcher) {
             ensureActive()
             mutex.withLock {
                 val json = Gson().toJson(message)
 
                 message.id = MessageDao.put(message.apply { id = 0 })
-                val contact = ContactDao.get(receiver.uid) ?: Contact(receiver)
+
+                val contact = ContactDao.get(cont.uid) ?: cont
+
                 contact.messageDelivery = Message.DELIVERY_WAITING
                 setupAndPutContact(contact, message)
                 Preferences.instance().incrementContactMessagesCount(contact.uid)
 
-                SocketService.ioSocket?.socket?.emit(Config.ON_PV_MESSAGE, json)
+                SocketService.ioSocket?.socket?.emit(Config.ON_MESSAGE, json)
             }
         }
     }
@@ -85,7 +89,7 @@ object ChatRepo {
                 val messages = MessageDao.waitings(it.uid)
                 for (message in messages) {
                     val json = Gson().toJson(message)
-                    SocketService.ioSocket?.socket?.emit(Config.ON_PV_MESSAGE, json)
+                    SocketService.ioSocket?.socket?.emit(Config.ON_MESSAGE, json)
                 }
             }
         }
@@ -124,7 +128,8 @@ object ChatRepo {
                 SocketService.ioSocket?.socket?.emit(
                     Config.ON_MSG_READ,
                     changedMessages[0].uid,
-                    contact.uid
+                    contact.uid,
+                    changedMessages[0].isPvMessage
                 )
             }
         }
@@ -144,8 +149,8 @@ object ChatRepo {
 //        }
 //    }
 
-    fun sendTyping(receiverUid: String) {
-        SocketService.ioSocket?.socket?.emit(Config.ON_TYPING, receiverUid)
+    fun sendTyping(receiverUid: String, isRoom: Boolean) {
+        SocketService.ioSocket?.socket?.emit(Config.ON_TYPING, receiverUid, isRoom)
     }
 
     fun sendOnlineTime(isOnline: Boolean) {
@@ -161,6 +166,10 @@ object ChatRepo {
             }
             SocketService.ioSocket?.socket?.emit(Config.ON_ONLINE_TIME_CONTACTS, JSONArray(list))
         }
+    }
+
+    fun sendJoinLeaveRoom(roomUid: String, isJoinOrLeave: Boolean) {
+        SocketService.ioSocket?.socket?.emit(Config.ON_JOIN_LEAVE_ROOM, roomUid, isJoinOrLeave)
     }
 
     private fun setupAndPutContact(contact: Contact, message: Message) {
@@ -179,21 +188,35 @@ object ChatRepo {
             delivery = Message.DELIVERY_WAITING
         }
         try {
-            message.id = MessageDao.put(message.apply { id = 0 })
-            val contact = ContactDao.get(message.senderUid) ?: message.getContact()
-            contact.messageDelivery = Message.DELIVERY_HIDDEN
-            contact.notifCount = (contact.notifCount.toInt() + 1).toString()
-            setupAndPutContact(contact, message)
-            Preferences.instance().incrementContactMessagesCount(contact.uid)
+
+            val contact = if (message.isPvMessage)
+                ContactDao.get(message.senderUid) ?: message.getContact()
+            else
+                ContactDao.get(message.receiverUid)
+
             _messageFlow.tryEmit(Pair(MESSAGE_RECEIVE, message))
-            /*send notif*/
-            if (ChatViewModel.isActivityStoppedForContact(contact.uid)) {
-                Notifs.notifyMessage(App.context, message, contact)
+
+            if (contact != null) {
+                message.id = MessageDao.put(message.apply { id = 0 })
+
+                contact.messageDelivery = Message.DELIVERY_HIDDEN
+                contact.notifCount = (contact.notifCount.toInt() + 1).toString()
+                setupAndPutContact(contact, message)
+                Preferences.instance().incrementContactMessagesCount(contact.uid)
+                /*send notif*/
+                if (ChatViewModel.isActivityStoppedForContact(contact.uid)) {
+                    Notifs.notifyMessage(App.context, message, contact)
+                }
             }
         } catch (e: UniqueViolationException) {
             e.printStackTrace()
         } finally {
-            SocketService.ioSocket?.socket?.emit(Config.ON_MSG_RECEIVED, message.uid)
+            SocketService.ioSocket?.socket?.emit(
+                Config.ON_MSG_RECEIVED,
+                message.uid,
+                message.isPvMessage,
+                message.receiverUid
+            )
         }
     }
 
@@ -221,7 +244,7 @@ object ChatRepo {
             }
             MessageDao.markAllSentAsReadUntil(message)
             _messageFlow.tryEmit(Pair(MESSAGE_READ, message))
-            SocketService.ioSocket?.socket?.emit(Config.ON_MSG_READ_RECEIVED, message.uid)
+            SocketService.ioSocket?.socket?.emit(Config.ON_MSG_READ_RECEIVED, message.uid, message.isPvMessage, message.receiverUid)
         }
     }
 
@@ -232,18 +255,39 @@ object ChatRepo {
     }
 
     private val onTyping = Emitter.Listener { args ->
-        ContactDao.get(args[0].toString())?.let {
-            _contactFlow.tryEmit(Pair(CONTACT_TYPING, it))
-            _messageFlow.tryEmit(
-                Pair(
-                    MESSAGE_TYPING,
-                    Message(
-                        type = Message.TYPE_TYPING,
-                        receiverUid = it.uid,
-                        uid = UUID.randomUUID().toString()
+        if (args.size < 2) {//if isRoom
+            ContactDao.get(args[0].toString())?.let {
+                _contactFlow.tryEmit(Pair(CONTACT_TYPING, it))
+                _messageFlow.tryEmit(
+                    Pair(
+                        MESSAGE_TYPING,
+                        Message(
+                            uid = UUID.randomUUID().toString(),
+                            type = Message.TYPE_TYPING,
+                            receiverUid = it.uid,
+                        )
                     )
                 )
-            )
+            }
+        } else {
+            ContactDao.get(args[0].toString())?.let {
+                val user = GsonBuilder()
+                    .registerTypeAdapter(User::class.java, UserDeserializer())
+                    .create()
+                    .fromJson(args[1].toString(), User::class.java)
+                _contactFlow.tryEmit(Pair(CONTACT_TYPING, it.apply { typingName = user.name }))
+                _messageFlow.tryEmit(
+                    Pair(
+                        MESSAGE_TYPING,
+                        Message(
+                            uid = UUID.randomUUID().toString(),
+                            type = Message.TYPE_TYPING,
+                            receiverUid = it.uid,
+                            user = user
+                        )
+                    )
+                )
+            }
         }
     }
 

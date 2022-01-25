@@ -11,7 +11,7 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 @Entity
 data class Contact(
-    var type: Byte = TYPE_SINGLE,
+    var type: Byte = TYPE_USER,
 
     var name: String = "",
     var bio: String = "",
@@ -35,12 +35,12 @@ data class Contact(
     @Id
     var id: Long = 0,
 
-    @Transient var isTyping: Boolean = false
+    @Transient var typingName: String? = null
 
 ) : UserConsts(), Parcelable {
 
     constructor(user: User) : this(
-        TYPE_SINGLE, user.name, user.bio, user.gender,
+        TYPE_USER, user.name, user.bio, user.gender,
         user.avatars, user.onlineTime, user.uid, user.rank, user.score, user.loginTime
     )
 
@@ -52,7 +52,7 @@ data class Contact(
     )
 
     companion object {
-        const val TYPE_SINGLE: Byte = 1
+        const val TYPE_USER: Byte = 1
         const val TYPE_ROOM: Byte = 2
 
         const val TIME_ONLINE: Long = 0
@@ -61,4 +61,7 @@ data class Contact(
     fun getUser(): User {
         return User(name, bio, gender, avatars, onlineTime, uid, rank, score, loginTime)
     }
+
+    val isRoom
+        get() = type == TYPE_ROOM
 }

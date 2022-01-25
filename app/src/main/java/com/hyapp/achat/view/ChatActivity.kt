@@ -79,6 +79,12 @@ class ChatActivity : EventActivity() {
         observeMessages()
         observeConnectivity()
         observeContact()
+        viewModel.onActivityCreate()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        viewModel.onActivityDestroy()
     }
 
     override fun onBackPressed() {
@@ -106,7 +112,7 @@ class ChatActivity : EventActivity() {
         contact = intent.getParcelableExtra(EXTRA_CONTACT) ?: Contact()
         viewModel = ViewModelProvider(
             this,
-            ChatViewModel.Factory(contact.getUser())
+            ChatViewModel.Factory(contact)
         )[ChatViewModel::class.java]
         layoutTransition = (binding.root as ViewGroup).layoutTransition
     }
@@ -391,7 +397,7 @@ class ChatActivity : EventActivity() {
     }
 
     private fun sendTextMessage(text: CharSequence, textSizeUnit: Int) {
-        viewModel.sendPvTextMessage(text, textSizeUnit)
+        viewModel.sendTextMessage(text, textSizeUnit)
     }
 
     private fun sendLottieMessage(lottieDrawable: AXrLottieDrawable?) {
@@ -478,7 +484,7 @@ class ChatActivity : EventActivity() {
             binding.run {
                 name.text = cont.name
                 bio.text = cont.bio
-                if (cont.type == Contact.TYPE_SINGLE) {
+                if (cont.type == Contact.TYPE_USER) {
                     avatar.setAvatars(cont.avatars)
                     if (cont.onlineTime == Contact.TIME_ONLINE) {
                         onlineTime.text = ""

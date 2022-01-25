@@ -5,6 +5,7 @@ import androidx.lifecycle.*
 import com.hyapp.achat.model.ChatRepo
 import com.hyapp.achat.model.Preferences
 import com.hyapp.achat.model.entity.*
+import com.hyapp.achat.model.objectbox.ContactDao
 import com.hyapp.achat.model.objectbox.MessageDao
 import com.hyapp.achat.model.objectbox.UserDao
 import com.hyapp.achat.view.EventActivity
@@ -14,7 +15,7 @@ import java.util.*
 import kotlin.math.max
 import kotlin.math.min
 
-class ChatViewModel(var receiver: User) : ViewModel() {
+class ChatViewModel(var contact: Contact) : ViewModel() {
 
     companion object {
         const val PAGING_LIMIT: Long = 50
@@ -42,15 +43,18 @@ class ChatViewModel(var receiver: User) : ViewModel() {
     private val _messagesLive = MutableLiveData<Resource<MessageList>>()
     val messagesLive = _messagesLive as LiveData<Resource<MessageList>>
 
-    private val initCount = Preferences.instance().getContactMessagesCount(receiver.uid)
+    private val initCount = Preferences.instance().getContactMessagesCount(contact.uid)
     private var pagedCount = 0
 
     private var stopTypingJob: Job? = null
     private var refreshOnlineTimeJob: Job? = null
 
+    private val messageChatType =
+        if (contact.type == Contact.TYPE_USER) Message.CHAT_TYPE_PV else Message.CHAT_TYPE_ROOM
+
     init {
-        _contactLive.value = Contact(receiver)
-        contactUid = receiver.uid
+        _contactLive.value = contact
+        contactUid = contact.uid
         loadPagedReadMessages()
         observeMessage()
     }
@@ -66,7 +70,7 @@ class ChatViewModel(var receiver: User) : ViewModel() {
                     Message(
                         uid = PROFILE_MESSAGE_UID,
                         type = Message.TYPE_PROFILE,
-                        user = receiver
+                        user = contact.getUser(),
                     )
                 )
                 _messagesLive.postValue(Resource.addPaging(messageList, 1, false, false))
@@ -76,7 +80,11 @@ class ChatViewModel(var receiver: User) : ViewModel() {
             val hasNext = remaining > 0
             val offset = max(remaining, 0)
             val limit = min(remaining + PAGING_LIMIT, PAGING_LIMIT)
-            val messages = MessageDao.all(receiver.uid, offset, limit)
+
+            val messages = if (contact.isRoom)
+                MessageDao.allRoom(contact.uid, offset, limit)
+            else
+                MessageDao.all(contact.uid, offset, limit)
 
             val firstMessage = messages[messages.size - 1]
             if (firstMessage.transfer == Message.TRANSFER_SEND
@@ -113,7 +121,7 @@ class ChatViewModel(var receiver: User) : ViewModel() {
                     Message(
                         uid = PROFILE_MESSAGE_UID,
                         type = Message.TYPE_PROFILE,
-                        user = receiver
+                        user = contact.getUser(),
                     )
                 )
             }
@@ -133,7 +141,11 @@ class ChatViewModel(var receiver: User) : ViewModel() {
         viewModelScope.launch(ioDispatcher) {
             ensureActive()
             _messagesLive.value?.data?.let { list ->
-                val messages = MessageDao.allReceivedUnReads(receiver.uid)
+                val messages = if (contact.isRoom)
+                    MessageDao.allReceivedUnReadsRoom((currentUser ?: User()).uid, contact.uid)
+                else
+                    MessageDao.allReceivedUnReads(contact.uid)
+
                 for (message in messages) {
                     list.addMessageLast(message)
                 }
@@ -147,27 +159,33 @@ class ChatViewModel(var receiver: User) : ViewModel() {
             ChatRepo.messageFlow.collect { pair ->
                 when (pair.first) {
                     ChatRepo.MESSAGE_RECEIVE -> {
-                        if (pair.second.senderUid == receiver.uid) {
-                            addMessage(pair.second, true)
+                        if (pair.second.isPvMessage) {
+                            if (pair.second.senderUid == contact.uid) {
+                                addMessage(pair.second, true)
+                            }
+                        } else {
+                            if (pair.second.receiverUid == contact.uid) {
+                                addMessage(pair.second, true)
+                            }
                         }
                     }
                     ChatRepo.MESSAGE_SENT -> {
-                        if (pair.second.receiverUid == receiver.uid) {
+                        if (pair.second.receiverUid == contact.uid) {
                             updateMessageTimeAndDelivery(pair.second)
                         }
                     }
                     ChatRepo.MESSAGE_READ -> {
-                        if (pair.second.receiverUid == receiver.uid) {
+                        if (pair.second.receiverUid == contact.uid) {
                             updateMessageDelivery(pair.second)
                         }
                     }
                     ChatRepo.MESSAGE_TYPING -> {
-                        if (pair.second.receiverUid == receiver.uid) {
+                        if (pair.second.receiverUid == contact.uid) {
                             signalTyping(pair.second)
                         }
                     }
                     ChatRepo.MESSAGE_ONLINE_TIME -> {
-                        if (pair.second.receiverUid == receiver.uid) {
+                        if (pair.second.receiverUid == contact.uid) {
                             updateOnlineTime(pair.second.time)
                         }
                     }
@@ -176,15 +194,15 @@ class ChatViewModel(var receiver: User) : ViewModel() {
         }
     }
 
-    fun sendPvTextMessage(text: CharSequence, textSizeUnit: Int) {
+    fun sendTextMessage(text: CharSequence, textSizeUnit: Int) {
         val message = Message(
             UUID.randomUUID().toString(), Message.TYPE_TEXT,
             Message.TRANSFER_SEND, System.currentTimeMillis(), text.toString(), textSizeUnit, "",
-            receiver.uid, currentUser ?: User()
+            contact.uid, currentUser ?: User(), messageChatType
         )
         addMessage(message, false)
         viewModelScope.launch {
-            ChatRepo.sendPvMessage(message, receiver)
+            ChatRepo.sendMessage(message, contact)
         }
     }
 
@@ -219,7 +237,7 @@ class ChatViewModel(var receiver: User) : ViewModel() {
     fun markMessageAsRead(changedMessages: List<Message>) {
         if (changedMessages.isNotEmpty()) {
             viewModelScope.launch {
-                ChatRepo.markMessageAsRead(Contact(receiver), changedMessages)
+                ChatRepo.markMessageAsRead(contact, changedMessages)
             }
         }
     }
@@ -264,16 +282,16 @@ class ChatViewModel(var receiver: User) : ViewModel() {
 //    }
 
     fun sendTyping() {
-        ChatRepo.sendTyping(contactUid)
+        ChatRepo.sendTyping(contactUid, contact.isRoom)
     }
 
     private fun updateOnlineTime(time: Long) {
-        receiver.onlineTime = time
-        _contactLive.value = Contact(receiver)
+        contact.onlineTime = time
+        _contactLive.value = contact
         _messagesLive.value?.data?.let {
             val first = it.first
             if (first.type == Message.TYPE_PROFILE) {
-                it[0] = first.copy(senderOnlineTime = receiver.onlineTime)
+                it[0] = first.copy(senderOnlineTime = contact.onlineTime)
                 _messagesLive.value = Resource.update(it, 0)
             }
         }
@@ -291,7 +309,7 @@ class ChatViewModel(var receiver: User) : ViewModel() {
         refreshOnlineTimeJob = viewModelScope.launch {
             while (isActivityStarted) {
                 delay(60000)
-                updateOnlineTime(if (receiver.onlineTime != Contact.TIME_ONLINE) receiver.onlineTime + 1 else receiver.onlineTime)
+                updateOnlineTime(if (contact.onlineTime != Contact.TIME_ONLINE) contact.onlineTime + 1 else contact.onlineTime)
             }
         }
     }
@@ -304,10 +322,30 @@ class ChatViewModel(var receiver: User) : ViewModel() {
         refreshOnlineTimeJob?.cancel()
     }
 
-    class Factory(private var receiver: User) : ViewModelProvider.Factory {
+    fun onActivityCreate() {
+        if (contact.type == Contact.TYPE_ROOM) {
+            viewModelScope.launch(ioDispatcher) {
+                if (ContactDao.get(contactUid) == null) {
+                    ChatRepo.sendJoinLeaveRoom(contactUid, true)
+                }
+            }
+        }
+    }
+
+    fun onActivityDestroy() {
+        if (contact.type == Contact.TYPE_ROOM) {
+            viewModelScope.launch(ioDispatcher) {
+                if (ContactDao.get(contactUid) == null) {
+                    ChatRepo.sendJoinLeaveRoom(contactUid, false)
+                }
+            }
+        }
+    }
+
+    class Factory(private var contact: Contact) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(ChatViewModel::class.java)) {
-                return ChatViewModel(receiver) as T
+                return ChatViewModel(contact) as T
             }
             throw IllegalArgumentException("Unknown ViewModel class")
         }
