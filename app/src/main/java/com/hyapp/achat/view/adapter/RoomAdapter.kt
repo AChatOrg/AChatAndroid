@@ -15,7 +15,9 @@ import com.hyapp.achat.databinding.ItemRoomBinding
 import com.hyapp.achat.model.entity.Contact
 import com.hyapp.achat.model.entity.Room
 import com.hyapp.achat.model.entity.UserConsts
+import com.hyapp.achat.model.entity.UserLive
 import com.hyapp.achat.view.ChatActivity.Companion.start
+import com.hyapp.achat.view.EventActivity
 import com.hyapp.achat.view.utils.UiUtils
 
 class RoomAdapter(private val context: Context) :
@@ -65,7 +67,11 @@ class RoomAdapter(private val context: Context) :
             binding.executePendingBindings()
 
             binding.bio.text =
-                "${UiUtils.formatNum(room.memberCount.toLong())} " + membersStr + ", ${UiUtils.formatNum(room.onlineMemberCount.toLong())} " + onlineStr
+                "${UiUtils.formatNum(room.memberCount.toLong())} " + membersStr + ", ${
+                    UiUtils.formatNum(
+                        room.onlineMemberCount.toLong()
+                    )
+                } " + onlineStr
 
             binding.avatar.setAvatars(room.avatars)
 
@@ -78,7 +84,24 @@ class RoomAdapter(private val context: Context) :
 
         override fun onClick(v: View) {
             val room = getItem(adapterPosition)
-            start(context, Contact(room!!, membersStr, onlineStr))
+            UserLive.value?.let { user ->
+                if (room.gender == UserConsts.GENDER_MIXED || room.gender == user.gender)
+                    start(context, Contact(room!!, membersStr, onlineStr))
+                else if (context is EventActivity) {
+                    val genderStr = when (room.gender) {
+                        UserConsts.GENDER_MALE -> context.getString(R.string.male)
+                        UserConsts.GENDER_FEMALE -> context.getString(R.string.female)
+                        else -> context.getString(R.string.mixed)
+                    }
+                    context.alert(
+                        R.string.rooms,
+                        String.format(
+                            context.getString(R.string.only_s_can_join_this_room),
+                            genderStr
+                        )
+                    )
+                }
+            }
         }
 
         init {

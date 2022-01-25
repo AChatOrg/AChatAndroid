@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <import type="com.hyapp.achat.model.entity.UserConsts" />
+
+        <variable
+            name="viewModel"
+            type="com.hyapp.achat.viewmodel.MainViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/progressBar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:trackThickness="2dp" />
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:fontFamily="@font/iran_sans_medium"
+            android:text="@string/new_room"
+            android:textSize="@dimen/text_18"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/editTextName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:autofillHints="@string/biography_optional"
+            android:fontFamily="@font/iran_sans_regular"
+            android:gravity="center"
+            android:hint="@string/room_name"
+            android:imeOptions="flagNoExtractUi"
+            android:inputType="text"
+            android:singleLine="true"
+            android:textSize="@dimen/text_16"
+            app:backgroundTint="@color/edit_text_tint_list"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/title" />
+
+        <TextView
+            android:id="@+id/genderDescription"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/determine_what_gender_can_join_the_room"
+            android:textColor="@color/grey_30"
+            android:textSize="@dimen/text_14"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@id/editTextName"
+            app:layout_constraintTop_toBottomOf="@id/editTextName" />
+
+        <RadioGroup
+            android:id="@+id/radioGroup"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:checkedButton="@id/radioBtnMixed"
+            android:gravity="start"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="@+id/editTextName"
+            app:layout_constraintStart_toStartOf="@+id/editTextName"
+            app:layout_constraintTop_toBottomOf="@+id/genderDescription">
+
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/radioBtnMixed"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="12dp"
+                android:layout_marginLeft="12dp"
+                android:layout_marginEnd="12dp"
+                android:layout_marginRight="12dp"
+                android:layout_weight="1"
+                android:fontFamily="@font/iran_sans_regular"
+                android:gravity="center"
+                android:text="@string/mixed"
+                app:buttonTint="@color/radio_button_tint_list" />
+
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/radioBtnMale"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="12dp"
+                android:layout_marginLeft="12dp"
+                android:layout_marginEnd="12dp"
+                android:layout_marginRight="12dp"
+                android:layout_weight="1"
+                android:fontFamily="@font/iran_sans_regular"
+                android:gravity="center"
+                android:text="@string/male"
+                app:buttonTint="@color/radio_button_tint_list" />
+
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/radioBtnFemale"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginStart="12dp"
+                android:layout_marginLeft="12dp"
+                android:layout_marginEnd="12dp"
+                android:layout_marginRight="12dp"
+                android:layout_weight="1"
+                android:fontFamily="@font/iran_sans_regular"
+                android:gravity="center"
+                android:text="@string/female"
+                app:buttonTint="@color/radio_button_tint_list" />
+        </RadioGroup>
+
+        <FrameLayout
+            android:id="@+id/btnCreate"
+            android:layout_width="200dp"
+            android:layout_height="44dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="24dp"
+            android:background="@drawable/bg_button"
+            android:clickable="true"
+            android:elevation="4dp"
+            android:focusable="true"
+            android:onClick="@{v -> viewModel.createRoom(editTextName.getText().toString(), radioBtnMixed.isChecked() ? UserConsts.GENDER_MIXED : radioBtnMale.isChecked() ? UserConsts.GENDER_MALE : UserConsts.GENDER_FEMALE)}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/radioGroup">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/btnCreateText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:fontFamily="@font/iran_sans_regular"
+                android:text="@string/create_room"
+                android:textAllCaps="true"
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_14" />
+        </FrameLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

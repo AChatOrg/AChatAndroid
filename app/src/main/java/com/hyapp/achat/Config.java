@@ -21,6 +21,7 @@ public interface Config {
     /*On People*/
     String ON_USERS = "users";
     String ON_ROOMS = "rooms";
+    String ON_CREATE_ROOM = "createRoom";
 
     /*On Pv Chat*/
     String ON_MESSAGE = "message";

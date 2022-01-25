@@ -13,8 +13,12 @@ import com.hyapp.achat.model.Preferences
 import com.hyapp.achat.model.objectbox.UserDao
 import com.hyapp.achat.view.EventActivity
 import com.hyapp.achat.viewmodel.service.SocketService
+import com.hyapp.achat.viewmodel.utils.NetUtils
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collect
+import java.util.*
 
 @ExperimentalCoroutinesApi
 class MainViewModel(application: Application) : AndroidViewModel(application) {
@@ -32,6 +36,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private var stopTypingJob: Job? = null
     private var refreshOnlineTimeJob: Job? = null
+
+    private val _roomCreatedFlow = MutableSharedFlow<Event>(extraBufferCapacity = 1)
+    val roomCreatedFlow = _roomCreatedFlow.asSharedFlow()
 
     init {
         UserLive.value = UserDao.get(User.CURRENT_USER_ID)
@@ -171,5 +178,29 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             ChatRepo.sendOnlineTime(false)
         }
         refreshOnlineTimeJob?.cancel()
+    }
+
+    fun createRoom(name: String, gender: Byte) {
+        val context = getApplication<Application>().applicationContext
+        if (!NetUtils.isNetConnected(context)) {
+            _roomCreatedFlow.tryEmit(Event(Event.Status.ERROR, Event.MSG_NET))
+        } else {
+            val nameTrim = name.trim()
+            if (nameTrim.isEmpty()) {
+                _roomCreatedFlow.tryEmit(Event(Event.Status.ERROR, Event.MSG_EMPTY))
+            } else {
+                _roomCreatedFlow.tryEmit(Event(Event.Status.LOADING))
+                val room = Room(nameTrim, 0, gender, emptyList(), "", 0)
+                viewModelScope.launch {
+                    UsersRoomsRepo.requestCreateRoom(room).collect { isSuccess ->
+                        if (isSuccess) {
+                            _roomCreatedFlow.tryEmit(Event(Event.Status.SUCCESS))
+                        } else {
+                            _roomCreatedFlow.tryEmit(Event(Event.Status.ERROR))
+                        }
+                    }
+                }
+            }
+        }
     }
 }

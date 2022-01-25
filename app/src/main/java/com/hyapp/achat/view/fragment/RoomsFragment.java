@@ -46,6 +46,7 @@ public class RoomsFragment extends Fragment {
         binding.swipeRefreshLayout.setOnRefreshListener(() -> viewModel.reloadRooms());
         setupRecyclerView(requireContext(), view);
         observePeople();
+        setupNewRoom();
     }
 
     private void setupRecyclerView(Context context, View view) {
@@ -90,5 +91,12 @@ public class RoomsFragment extends Fragment {
 
     private void onLoading() {
         binding.progressBar.setVisibility(View.VISIBLE);
+    }
+
+    private void setupNewRoom() {
+        binding.addRoomFab.setOnClickListener(v -> {
+            NewRoomBottomSheetFragment bottomSheet = new NewRoomBottomSheetFragment();
+            bottomSheet.show(requireActivity().getSupportFragmentManager(), "newRoom");
+        });
     }
 }

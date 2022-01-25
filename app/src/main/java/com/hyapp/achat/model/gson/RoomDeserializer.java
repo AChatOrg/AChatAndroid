@@ -19,6 +19,7 @@ public class RoomDeserializer implements JsonDeserializer<Room> {
         Room room = new Gson().fromJson(json, typeOfT);
         room.setUid(keyJson.get("uid").getAsString());
         room.setMemberCount(keyJson.get("memberCount").getAsInt());
+        room.setCreateTime(keyJson.get("createTime").getAsLong());
         return room;
     }
 }

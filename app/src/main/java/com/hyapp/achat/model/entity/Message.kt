@@ -32,7 +32,7 @@ data class Message(
     var senderName: String = "",
     var senderBio: String = "",
     var senderGender: Byte = UserConsts.GENDER_MALE,
-    var senderAvatars: MutableList<String> = mutableListOf(),
+    var senderAvatars: List<String> = mutableListOf(),
     var senderOnlineTime: Long = UserConsts.TIME_ONLINE,
 
     var chatType: Byte = CHAT_TYPE_PV,

@@ -13,7 +13,7 @@ data class User(
     var name: String = "",
     var bio: String = "",
     var gender: Byte = GENDER_MALE,
-    var avatars: MutableList<String> = mutableListOf(),
+    var avatars: List<String> = mutableListOf(),
     var onlineTime: Long = TIME_ONLINE,
 
     @Index

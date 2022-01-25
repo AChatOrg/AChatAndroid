@@ -29,7 +29,7 @@ public class EventActivity extends AppCompatActivity {
         startedActivities--;
     }
 
-    protected void alert(@StringRes int titleRes, String message) {
+    public void alert(@StringRes int titleRes, String message) {
         new AlertDialog.Builder(this, R.style.RoundedCornersDialog)
                 .setTitle(titleRes)
                 .setMessage(message)
@@ -37,7 +37,7 @@ public class EventActivity extends AppCompatActivity {
                 .show();
     }
 
-    protected void alert(@StringRes int titleRes, @StringRes int messageRes) {
+    public void alert(@StringRes int titleRes, @StringRes int messageRes) {
         alert(titleRes, getString(messageRes));
     }
 

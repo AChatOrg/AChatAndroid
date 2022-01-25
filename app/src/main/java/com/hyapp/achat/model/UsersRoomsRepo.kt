@@ -82,9 +82,9 @@ object UsersRoomsRepo {
                     .registerTypeAdapter(Room::class.java, RoomDeserializer())
                     .create()
                     .fromJson<List<Room>>(
-                    args[0].toString(),
-                    object : TypeToken<List<Room?>?>() {}.type
-                )
+                        args[0].toString(),
+                        object : TypeToken<List<Room?>?>() {}.type
+                    )
                 val roomList = SortedList<Room> { r1, r2 -> Room.compare(r1, r2) }
                 roomList.addAll(rooms)
                 trySend(roomList)
@@ -107,5 +107,21 @@ object UsersRoomsRepo {
             .create()
             .fromJson(args[0].toString(), Room::class.java)
         _flow.tryEmit(Pair(ROOM_DELETE, room))
+    }
+
+    @ExperimentalCoroutinesApi
+    fun requestCreateRoom(room: Room): Flow<Boolean> = callbackFlow {
+        SocketService.ioSocket?.socket?.let { socket ->
+            val json = GsonBuilder()
+                .registerTypeAdapter(Room::class.java, RoomDeserializer())
+                .create()
+                .toJson(room)
+            socket.emit(Config.ON_CREATE_ROOM, json)
+            socket.on(Config.ON_CREATE_ROOM) { args ->
+                socket.off(Config.ON_CREATE_ROOM)
+                trySend(args[0].toString().toBoolean())
+            }
+        }
+        awaitClose { SocketService.ioSocket?.socket?.off(Config.ON_CREATE_ROOM) }
     }
 }

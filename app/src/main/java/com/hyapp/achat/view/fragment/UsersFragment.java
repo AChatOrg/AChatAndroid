@@ -44,6 +44,7 @@ public class UsersFragment extends Fragment {
         binding.swipeRefreshLayout.setOnRefreshListener(() -> viewModel.reloadUsers());
         setupRecyclerView(requireContext(), view);
         observePeople();
+        binding.addRoomFab.setVisibility(View.GONE);
     }
 
     private void setupRecyclerView(Context context, View view) {
