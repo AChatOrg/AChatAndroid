@@ -106,6 +106,11 @@ class NewRoomBottomSheetFragment : BottomSheetDialogFragment() {
                 R.string.no_network_connection,
                 Toast.LENGTH_LONG
             ).show()
+            Event.MSG_GENDER -> Toast.makeText(
+                requireContext(),
+                R.string.room_gender_doest_match_your_gender,
+                Toast.LENGTH_LONG
+            ).show()
             else -> Toast.makeText(
                 requireContext(),
                 R.string.sorry_an_error_occurred,

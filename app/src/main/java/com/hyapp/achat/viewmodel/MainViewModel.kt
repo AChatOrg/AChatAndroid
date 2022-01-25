@@ -189,14 +189,20 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             if (nameTrim.isEmpty()) {
                 _roomCreatedFlow.tryEmit(Event(Event.Status.ERROR, Event.MSG_EMPTY))
             } else {
-                _roomCreatedFlow.tryEmit(Event(Event.Status.LOADING))
-                val room = Room(nameTrim, 0, gender, emptyList(), "", 0)
-                viewModelScope.launch {
-                    UsersRoomsRepo.requestCreateRoom(room).collect { isSuccess ->
-                        if (isSuccess) {
-                            _roomCreatedFlow.tryEmit(Event(Event.Status.SUCCESS))
-                        } else {
-                            _roomCreatedFlow.tryEmit(Event(Event.Status.ERROR))
+                UserLive.value?.let { user ->
+                    if (gender != UserConsts.GENDER_MIXED && user.gender != gender) {
+                        _roomCreatedFlow.tryEmit(Event(Event.Status.ERROR, Event.MSG_GENDER))
+                    } else {
+                        _roomCreatedFlow.tryEmit(Event(Event.Status.LOADING))
+                        val room = Room(nameTrim, 0, gender, emptyList(), "", 0)
+                        viewModelScope.launch {
+                            UsersRoomsRepo.requestCreateRoom(room).collect { isSuccess ->
+                                if (isSuccess) {
+                                    _roomCreatedFlow.tryEmit(Event(Event.Status.SUCCESS))
+                                } else {
+                                    _roomCreatedFlow.tryEmit(Event(Event.Status.ERROR))
+                                }
+                            }
                         }
                     }
                 }
