@@ -1,6 +1,7 @@
 package com.hyapp.achat.model.entity
 
 import android.os.Parcelable
+import com.hyapp.achat.view.utils.UiUtils
 import io.objectbox.annotation.Entity
 import io.objectbox.annotation.Id
 import io.objectbox.annotation.Index
@@ -46,7 +47,10 @@ data class Contact(
 
     constructor(room: Room, membersStr: String, onlineStr: String) : this(
         TYPE_ROOM, room.name,
-        "${room.memberCount} " + membersStr + ", ${room.onlineMemberCount} " + onlineStr,
+        "${
+            UiUtils.formatNum(room.memberCount.toLong())
+        } " + membersStr + "," +
+                " ${UiUtils.formatNum(room.onlineMemberCount.toLong())} " + onlineStr,
         room.gender,
         room.avatars, TIME_ONLINE, room.uid, 0, 0, 0
     )

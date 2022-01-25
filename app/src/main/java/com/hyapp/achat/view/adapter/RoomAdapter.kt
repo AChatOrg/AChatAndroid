@@ -16,6 +16,7 @@ import com.hyapp.achat.model.entity.Contact
 import com.hyapp.achat.model.entity.Room
 import com.hyapp.achat.model.entity.UserConsts
 import com.hyapp.achat.view.ChatActivity.Companion.start
+import com.hyapp.achat.view.utils.UiUtils
 
 class RoomAdapter(private val context: Context) :
     ListAdapter<Room, RoomAdapter.Holder>(DIFF_CALLBACK) {
@@ -64,7 +65,7 @@ class RoomAdapter(private val context: Context) :
             binding.executePendingBindings()
 
             binding.bio.text =
-                "${room.memberCount} " + membersStr + ", ${room.onlineMemberCount} " + onlineStr
+                "${UiUtils.formatNum(room.memberCount.toLong())} " + membersStr + ", ${UiUtils.formatNum(room.onlineMemberCount.toLong())} " + onlineStr
 
             binding.avatar.setAvatars(room.avatars)
 

@@ -30,10 +30,10 @@ object MessageDao {
     }
 
     @JvmStatic
-    fun all(contactUi: String, offset: Long, limit: Long): List<Message> {
+    fun all(currUserUid: String, contactUi: String, offset: Long, limit: Long): List<Message> {
         return ObjectBox.store.boxFor(Message::class.java).query(
             Message_.receiverUid.equal(contactUi, QueryBuilder.StringOrder.CASE_SENSITIVE)
-                .or(Message_.senderUid.equal(contactUi, QueryBuilder.StringOrder.CASE_SENSITIVE))
+                .or(Message_.receiverUid.equal(currUserUid, QueryBuilder.StringOrder.CASE_SENSITIVE))
         )
             .build()
             .find(offset, limit)

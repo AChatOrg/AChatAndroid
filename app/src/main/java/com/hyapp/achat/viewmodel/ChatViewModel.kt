@@ -84,7 +84,7 @@ class ChatViewModel(var contact: Contact) : ViewModel() {
             val messages = if (contact.isRoom)
                 MessageDao.allRoom(contact.uid, offset, limit)
             else
-                MessageDao.all(contact.uid, offset, limit)
+                MessageDao.all((currentUser ?: User()).uid, contact.uid, offset, limit)
 
             val firstMessage = messages[messages.size - 1]
             if (firstMessage.transfer == Message.TRANSFER_SEND
