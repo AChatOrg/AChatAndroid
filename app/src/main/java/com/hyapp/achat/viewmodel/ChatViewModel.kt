@@ -15,6 +15,7 @@ import java.util.*
 import kotlin.math.max
 import kotlin.math.min
 
+@ExperimentalCoroutinesApi
 class ChatViewModel(var contact: Contact) : ViewModel() {
 
     companion object {
@@ -50,13 +51,51 @@ class ChatViewModel(var contact: Contact) : ViewModel() {
     private var refreshOnlineTimeJob: Job? = null
 
     private val messageChatType =
-        if (contact.type == Contact.TYPE_USER) Message.CHAT_TYPE_PV else Message.CHAT_TYPE_ROOM
+        when {
+            contact.isUser -> Message.CHAT_TYPE_PV
+            contact.isRoom -> Message.CHAT_TYPE_ROOM
+            else -> Message.CHAT_TYPE_PV_ROOM
+        }
 
     init {
         _contactLive.value = contact
         contactUid = contact.uid
-        loadPagedReadMessages()
+        if (contact.isUser || contact.isPvRoom)
+            loadPagedReadMessages()
+        else if (contact.isRoom) {
+            loadPublicRoomMessages()
+        }
         observeMessage()
+    }
+
+    private fun loadPublicRoomMessages() {
+        viewModelScope.launch(ioDispatcher) {
+            ensureActive()
+            val resource = _messagesLive.value ?: Resource.success(MessageList())
+            val messageList = resource.data ?: MessageList()
+
+            MainViewModel.publicRoomsMessageMap[contactUid]?.let { messages ->
+                for (message in messages) {
+                    messageList.addMessageLast(message)
+                }
+            }
+
+            messageList.addFirst(
+                Message(
+                    uid = PROFILE_MESSAGE_UID,
+                    type = Message.TYPE_PROFILE,
+                    user = contact.getUser(),
+                )
+            )
+            _messagesLive.postValue(
+                Resource.addPaging(
+                    messageList,
+                    0,
+                    false,
+                    pagedCount == 1
+                )
+            )
+        }
     }
 
     fun loadPagedReadMessages() {
@@ -81,7 +120,7 @@ class ChatViewModel(var contact: Contact) : ViewModel() {
             val offset = max(remaining, 0)
             val limit = min(remaining + PAGING_LIMIT, PAGING_LIMIT)
 
-            val messages = if (contact.isRoom)
+            val messages = if (contact.isPvRoom)
                 MessageDao.allRoom(contact.uid, offset, limit)
             else
                 MessageDao.all((currentUser ?: User()).uid, contact.uid, offset, limit)
@@ -138,18 +177,20 @@ class ChatViewModel(var contact: Contact) : ViewModel() {
     }
 
     fun loadUnreadMessages() {
-        viewModelScope.launch(ioDispatcher) {
-            ensureActive()
-            _messagesLive.value?.data?.let { list ->
-                val messages = if (contact.isRoom)
-                    MessageDao.allReceivedUnReadsRoom((currentUser ?: User()).uid, contact.uid)
-                else
-                    MessageDao.allReceivedUnReads(contact.uid)
+        if (contact.isUser || contact.isPvRoom) {
+            viewModelScope.launch(ioDispatcher) {
+                ensureActive()
+                _messagesLive.value?.data?.let { list ->
+                    val messages = if (contact.isPvRoom)
+                        MessageDao.allReceivedUnReadsRoom((currentUser ?: User()).uid, contact.uid)
+                    else
+                        MessageDao.allReceivedUnReads(contact.uid)
 
-                for (message in messages) {
-                    list.addMessageLast(message)
+                    for (message in messages) {
+                        list.addMessageLast(message)
+                    }
+                    _messagesLive.postValue(Resource.addUnread(list, messages.size))
                 }
-                _messagesLive.postValue(Resource.addUnread(list, messages.size))
             }
         }
     }
@@ -159,7 +200,7 @@ class ChatViewModel(var contact: Contact) : ViewModel() {
             ChatRepo.messageFlow.collect { pair ->
                 when (pair.first) {
                     ChatRepo.MESSAGE_RECEIVE -> {
-                        if (pair.second.isPvMessage) {
+                        if (pair.second.isPv) {
                             if (pair.second.senderUid == contact.uid) {
                                 addMessage(pair.second, true)
                             }
@@ -200,6 +241,10 @@ class ChatViewModel(var contact: Contact) : ViewModel() {
             Message.TRANSFER_SEND, System.currentTimeMillis(), text.toString(), textSizeUnit, "",
             contact.uid, currentUser ?: User(), messageChatType
         )
+
+        if (message.isRoom)
+            message.delivery = Message.DELIVERY_READ
+
         addMessage(message, false)
         viewModelScope.launch {
             ChatRepo.sendMessage(message, contact)
@@ -282,7 +327,7 @@ class ChatViewModel(var contact: Contact) : ViewModel() {
 //    }
 
     fun sendTyping() {
-        ChatRepo.sendTyping(contactUid, contact.isRoom)
+        ChatRepo.sendTyping(contactUid, contact.isRoom || contact.isPvRoom)
     }
 
     private fun updateOnlineTime(time: Long) {
@@ -312,6 +357,11 @@ class ChatViewModel(var contact: Contact) : ViewModel() {
                 updateOnlineTime(if (contact.onlineTime != Contact.TIME_ONLINE) contact.onlineTime + 1 else contact.onlineTime)
             }
         }
+        if (contact.isRoom) {
+            viewModelScope.launch {
+                ChatRepo.clearContactNotifs(contactUid)
+            }
+        }
     }
 
     fun activityStopped() {
@@ -323,7 +373,7 @@ class ChatViewModel(var contact: Contact) : ViewModel() {
     }
 
     fun onActivityCreate() {
-        if (contact.type == Contact.TYPE_ROOM) {
+        if (!contact.isUser) {
             viewModelScope.launch(ioDispatcher) {
                 if (ContactDao.get(contactUid) == null) {
                     ChatRepo.sendJoinLeaveRoom(contactUid, true)
@@ -333,7 +383,7 @@ class ChatViewModel(var contact: Contact) : ViewModel() {
     }
 
     fun onActivityDestroy() {
-        if (contact.type == Contact.TYPE_ROOM) {
+        if (!contact.isUser) {
             viewModelScope.launch(ioDispatcher) {
                 if (ContactDao.get(contactUid) == null) {
                     ChatRepo.sendJoinLeaveRoom(contactUid, false)

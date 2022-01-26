@@ -54,7 +54,7 @@ data class Message(
         mediaPath: String = "",
         receiverUid: String = "",
         user: User,
-        chatType: Byte= CHAT_TYPE_PV
+        chatType: Byte = CHAT_TYPE_PV
     ) : this(
         uid, type, transfer, time, text, extraTextSize, mediaPath, receiverUid,
         user.uid, user.rank, user.score, user.loginTime, user.name, user.bio, user.gender,
@@ -91,13 +91,21 @@ data class Message(
 
         const val CHAT_TYPE_PV: Byte = 1
         const val CHAT_TYPE_ROOM: Byte = 2
+        const val CHAT_TYPE_PV_ROOM: Byte = 3
+
     }
 
     val isChatMessage
         get() = type != TYPE_DETAILS && type != TYPE_PROFILE && type != TYPE_TYPING
 
-    val isPvMessage
+    val isPv
         get() = chatType == CHAT_TYPE_PV
+
+    val isRoom
+        get() = chatType == CHAT_TYPE_ROOM
+
+    val isPvRoom
+        get() = chatType == CHAT_TYPE_PV_ROOM
 
     fun setAndGetTextSizes(sp1: Int): Pair<Float, Int> {
         var textSize = ((TEXT_SIZE_SP + extraTextSize) * sp1).toFloat()

@@ -18,7 +18,10 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collect
+import org.apache.commons.collections4.queue.CircularFifoQueue
 import java.util.*
+import kotlin.collections.ArrayDeque
+import kotlin.collections.HashMap
 
 @ExperimentalCoroutinesApi
 class MainViewModel(application: Application) : AndroidViewModel(application) {
@@ -39,6 +42,21 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _roomCreatedFlow = MutableSharedFlow<Event>(extraBufferCapacity = 1)
     val roomCreatedFlow = _roomCreatedFlow.asSharedFlow()
+
+    companion object {
+        private const val PUBLIC_ROOM_MESSAGES_CAPACITY = 200
+
+        val publicRoomsMessageMap = HashMap<String, CircularFifoQueue<Message>>()
+
+        fun addPublicRoomUnreadMessage(roomUid: String, message: Message) {
+            var messages = publicRoomsMessageMap[roomUid]
+            if (messages == null) {
+                messages = CircularFifoQueue(PUBLIC_ROOM_MESSAGES_CAPACITY)
+                publicRoomsMessageMap[roomUid] = messages
+            }
+            messages.add(message)
+        }
+    }
 
     init {
         UserLive.value = UserDao.get(User.CURRENT_USER_ID)

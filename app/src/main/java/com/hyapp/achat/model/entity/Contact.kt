@@ -58,6 +58,7 @@ data class Contact(
     companion object {
         const val TYPE_USER: Byte = 1
         const val TYPE_ROOM: Byte = 2
+        const val TYPE_PV_ROOM: Byte = 3
 
         const val TIME_ONLINE: Long = 0
     }
@@ -66,6 +67,12 @@ data class Contact(
         return User(name, bio, gender, avatars, onlineTime, uid, rank, score, loginTime)
     }
 
+    val isUser
+        get() = type == TYPE_USER
+
     val isRoom
-        get() = type == TYPE_ROOM
+        get() = type == TYPE_ROOM || type == TYPE_PV_ROOM
+
+    val isPvRoom
+        get() = type == TYPE_PV_ROOM
 }

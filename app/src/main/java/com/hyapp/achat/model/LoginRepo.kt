@@ -8,15 +8,18 @@ import com.hyapp.achat.model.objectbox.ContactDao
 import com.hyapp.achat.model.objectbox.MessageDao
 import com.hyapp.achat.model.objectbox.ObjectBox
 import com.hyapp.achat.model.objectbox.UserDao
+import com.hyapp.achat.viewmodel.MainViewModel
 import com.hyapp.achat.viewmodel.service.SocketService
 import io.socket.client.Socket
 import io.socket.emitter.Emitter
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 
+@ExperimentalCoroutinesApi
 object LoginRepo {
 
     private val _loggedState = MutableSharedFlow<User>(extraBufferCapacity = 1)
@@ -44,6 +47,7 @@ object LoginRepo {
 
     suspend fun onLogoutGuest() {
         withContext(Dispatchers.Default) {
+            MainViewModel.publicRoomsMessageMap.clear()
             Preferences.instance().putLogged(false)
             Preferences.instance().deleteALl()
             ContactDao.removeALl()

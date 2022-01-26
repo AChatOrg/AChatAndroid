@@ -77,7 +77,7 @@
     <string name="determine_what_gender_can_join_the_room">Determine what gender can join the room</string>
     <string name="create_room">Create room</string>
     <string name="mixed">Mixed</string>
-    <string name="new_room">New Room</string>
+    <string name="new_public_room">New Public Room</string>
     <string name="created">created</string>
     <string name="only_s_can_join_this_room">Only %1$s can join this room.</string>
     <string name="room_gender_doest_match_your_gender">Room gender does not match your gender</string>

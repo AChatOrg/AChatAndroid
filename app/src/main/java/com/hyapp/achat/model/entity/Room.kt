@@ -9,7 +9,9 @@ data class Room(
 
     var uid: String = "",
     var memberCount: Int = 0,
-    var createTime: Long = 0
+    var createTime: Long = 0,
+
+    var isPv: Boolean = false
 
 ) {
     companion object {

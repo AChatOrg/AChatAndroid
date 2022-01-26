@@ -2,16 +2,19 @@ package com.hyapp.achat.model
 
 import com.hyapp.achat.Config
 import com.hyapp.achat.model.entity.ConnLive
+import com.hyapp.achat.viewmodel.MainViewModel
 import com.hyapp.achat.viewmodel.service.SocketService
 import io.socket.client.IO
 import io.socket.client.Socket
 import io.socket.emitter.Emitter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import java.net.URISyntaxException
 import kotlin.coroutines.CoroutineContext
 
+@ExperimentalCoroutinesApi
 class IOSocket(loginJson: String) : CoroutineScope {
 
     var options: IO.Options = IO.Options.builder()
