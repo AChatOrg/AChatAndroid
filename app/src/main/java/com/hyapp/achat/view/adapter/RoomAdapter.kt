@@ -27,6 +27,8 @@ class RoomAdapter(private val context: Context) :
     val onlineStr = context.getString(R.string.online)
 
     companion object {
+        const val PAYLOAD_BIO: Byte = 1
+
         val DIFF_CALLBACK: DiffUtil.ItemCallback<Room> = object : DiffUtil.ItemCallback<Room>() {
             override fun areItemsTheSame(
                 oldItem: Room, newItem: Room
@@ -38,6 +40,17 @@ class RoomAdapter(private val context: Context) :
                 oldItem: Room, newItem: Room
             ): Boolean {
                 return oldItem == newItem
+            }
+
+            override fun getChangePayload(oldItem: Room, newItem: Room): Any? {
+                return when {
+                    oldItem.memberCount != newItem.memberCount -> {
+                        PAYLOAD_BIO
+                    }
+                    else -> {
+                        null
+                    }
+                }
             }
         }
     }
@@ -58,20 +71,22 @@ class RoomAdapter(private val context: Context) :
         holder.bind(getItem(position))
     }
 
+    override fun onBindViewHolder(holder: Holder, position: Int, payloads: List<Any?>) {
+        if (payloads.isEmpty()) {
+            onBindViewHolder(holder, position)
+        } else {
+            holder.bind(getItem(position), payloads)
+        }
+    }
+
     inner class Holder(private val binding: ItemRoomBinding) :
         RecyclerView.ViewHolder(binding.root), View.OnClickListener {
 
-        @SuppressLint("SetTextI18n")
         fun bind(room: Room) {
             binding.room = room
             binding.executePendingBindings()
 
-            binding.bio.text =
-                "${UiUtils.formatNum(room.memberCount.toLong())} " + membersStr + ", ${
-                    UiUtils.formatNum(
-                        room.onlineMemberCount.toLong()
-                    )
-                } " + onlineStr
+            setBio(room)
 
             binding.avatar.setAvatars(room.avatars)
 
@@ -80,6 +95,24 @@ class RoomAdapter(private val context: Context) :
                 UserConsts.GENDER_FEMALE -> binding.genderCircle.setBackgroundResource(R.drawable.gender_circle_user_female_bg)
                 UserConsts.GENDER_MIXED -> binding.genderCircle.setBackgroundResource(R.drawable.gender_circle_user_mixed_bg)
             }
+        }
+
+        open fun bind(room: Room, payloads: List<Any?>) {
+            for (payload in payloads) {
+                when (payload as Byte) {
+                    PAYLOAD_BIO -> setBio(room)
+                }
+            }
+        }
+
+        @SuppressLint("SetTextI18n")
+        private fun setBio(room: Room) {
+            binding.bio.text =
+                "${UiUtils.formatNum(room.memberCount.toLong())} " + membersStr + ", ${
+                    UiUtils.formatNum(
+                        room.onlineMemberCount.toLong()
+                    )
+                } " + onlineStr
         }
 
         override fun onClick(v: View) {

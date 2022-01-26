@@ -18,6 +18,8 @@ public interface Config {
     String ON_USER_LEFT = "userLeft";
     String ON_ROOM_CREATE = "roomCreate";
     String ON_ROOM_DELETE = "roomDelete";
+    String ON_ROOM_MEMBER_ADDED = "roomMemberAdded";
+    String ON_ROOM_MEMBER_REMOVED = "roomMemberRemoved";
 
     /*On People*/
     String ON_USERS = "users";

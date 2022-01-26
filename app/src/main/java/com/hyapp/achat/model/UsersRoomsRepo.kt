@@ -18,12 +18,14 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.callbackFlow
 
+@ExperimentalCoroutinesApi
 object UsersRoomsRepo {
 
     const val USER_CAME: Byte = 1
     const val USER_LEFT: Byte = 2
     const val ROOM_CREATE: Byte = 3
     const val ROOM_DELETE: Byte = 4
+    const val ROOM_MEMBER_ADDED: Byte = 5
 
     private val _flow = MutableSharedFlow<Pair<Byte, Any>>(extraBufferCapacity = 1)
     val flow = _flow.asSharedFlow()
@@ -33,6 +35,7 @@ object UsersRoomsRepo {
         socket.on(Config.ON_USER_LEFT, onUserLeft)
         socket.on(Config.ON_ROOM_CREATE, onRoomCreate)
         socket.on(Config.ON_ROOM_DELETE, onRoomDelete)
+        socket.on(Config.ON_ROOM_MEMBER_ADDED, onRoomMemberAdded)
     }
 
     @ExperimentalCoroutinesApi
@@ -109,7 +112,6 @@ object UsersRoomsRepo {
         _flow.tryEmit(Pair(ROOM_DELETE, room))
     }
 
-    @ExperimentalCoroutinesApi
     fun requestCreateRoom(room: Room): Flow<Boolean> = callbackFlow {
         SocketService.ioSocket?.socket?.let { socket ->
             val json = GsonBuilder()
@@ -124,4 +126,12 @@ object UsersRoomsRepo {
         }
         awaitClose { SocketService.ioSocket?.socket?.off(Config.ON_CREATE_ROOM) }
     }
+
+    private val onRoomMemberAdded = Emitter.Listener { args ->
+        val roomUid = args[0].toString()
+        val memberCount = args[1].toString().toInt()
+        _flow.tryEmit(Pair(ROOM_MEMBER_ADDED, Pair(roomUid, memberCount)))
+        ChatRepo.addUserJoinedMessage(roomUid, args[2].toString())
+    }
+
 }

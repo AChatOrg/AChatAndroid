@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.hyapp.achat.App
 import com.hyapp.achat.Config
+import com.hyapp.achat.R
 import com.hyapp.achat.model.entity.*
 import com.hyapp.achat.model.gson.UserDeserializer
 import com.hyapp.achat.model.objectbox.ContactDao
@@ -174,6 +175,28 @@ object ChatRepo {
 
     fun sendJoinLeaveRoom(roomUid: String, isJoinOrLeave: Boolean) {
         SocketService.ioSocket?.socket?.emit(Config.ON_JOIN_LEAVE_ROOM, roomUid, isJoinOrLeave)
+    }
+
+    fun addUserJoinedMessage(roomUid: String, nameUser: String) {
+        _messageFlow.tryEmit(
+            Pair(
+                MESSAGE_RECEIVE,
+                Message(
+                    uid = UUID.randomUUID().toString(),
+                    type = Message.TYPE_DETAILS,
+                    chatType = Message.CHAT_TYPE_ROOM,
+                    text = String.format(App.context.getString(R.string.s_joined_room), nameUser),
+                    receiverUid = roomUid
+                ).also { message ->
+                    MainViewModel.addPublicRoomUnreadMessage(roomUid, message)
+                    ContactDao.get(roomUid)?.let {
+                        it.message = message.text
+                        ContactDao.put(it)
+                        _contactFlow.tryEmit(Pair(CONTACT_UPDATE, it))
+                    }
+                }
+            )
+        )
     }
 
     private fun setupAndPutContact(contact: Contact, message: Message) {

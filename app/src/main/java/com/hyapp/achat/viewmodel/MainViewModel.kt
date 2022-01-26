@@ -132,6 +132,25 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                                 _roomsLive.value = Resource.success(it)
                             }
                         }
+                        UsersRoomsRepo.ROOM_MEMBER_ADDED -> {
+                            val p = pair.second as Pair<String, Int>
+                            updateRoom(p.first, p.second)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun updateRoom(roomUid: String, memberCount: Int) {
+        viewModelScope.launch(ioDispatcher) {
+            _roomsLive.value?.data?.let { list ->
+                for (i in 0 until list.size) {
+                    val room = list[i]
+                    if (room.uid == roomUid) {
+                        list[i] = room.copy(memberCount = memberCount)
+                        _roomsLive.postValue(Resource.update(list, 0))
+                        return@launch
                     }
                 }
             }

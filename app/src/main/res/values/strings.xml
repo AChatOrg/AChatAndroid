@@ -81,4 +81,5 @@
     <string name="created">created</string>
     <string name="only_s_can_join_this_room">Only %1$s can join this room.</string>
     <string name="room_gender_doest_match_your_gender">Room gender does not match your gender</string>
+    <string name="s_joined_room">%1$s joined the room</string>
 </resources>
