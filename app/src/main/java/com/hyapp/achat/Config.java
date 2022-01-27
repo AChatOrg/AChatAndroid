@@ -20,6 +20,7 @@ public interface Config {
     String ON_ROOM_DELETE = "roomDelete";
     String ON_ROOM_MEMBER_ADDED = "roomMemberAdded";
     String ON_ROOM_MEMBER_REMOVED = "roomMemberRemoved";
+    String ON_ROOM_ONLINE_MEMBER_COUNT = "roomOnlineMemberCount";
 
     /*On People*/
     String ON_USERS = "users";

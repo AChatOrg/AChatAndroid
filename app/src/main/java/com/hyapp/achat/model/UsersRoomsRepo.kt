@@ -41,6 +41,7 @@ object UsersRoomsRepo {
         socket.on(Config.ON_ROOM_DELETE, onRoomDelete)
         socket.on(Config.ON_ROOM_MEMBER_ADDED, onRoomMemberAdded)
         socket.on(Config.ON_ROOM_MEMBER_REMOVED, onRoomMemberRemoved)
+        socket.on(Config.ON_ROOM_ONLINE_MEMBER_COUNT, onRoomOnlineMemberCount)
     }
 
     @ExperimentalCoroutinesApi
@@ -161,5 +162,12 @@ object UsersRoomsRepo {
             }
         }
         awaitClose { SocketService.ioSocket?.socket?.off(Config.ON_REQUEST_ROOM_MEMBER_COUNT) }
+    }
+
+    private val onRoomOnlineMemberCount = Emitter.Listener { args ->
+        val roomUid = args[0].toString()
+        val memberCount = args[1].toString().toInt()
+        val onlineMemberCount = args[2].toString().toInt()
+        _flow.tryEmit(Pair(ROOM_MEMBER_COUNT, Triple(roomUid, memberCount, onlineMemberCount)))
     }
 }
