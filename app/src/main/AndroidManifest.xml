@@ -19,6 +19,12 @@
         android:theme="@style/Theme.AChat"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".view.ProfileActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:exported="true"
+            android:hardwareAccelerated="true"
+            android:windowSoftInputMode="adjustResize|adjustNothing" />
+        <activity
             android:name=".view.ChatActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="true"

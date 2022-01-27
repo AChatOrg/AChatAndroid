@@ -82,6 +82,7 @@ class ChatActivity : EventActivity() {
         observeConnectivity()
         observeContact()
         viewModel.onActivityCreate()
+        binding.back.setOnClickListener { onBackPressed() }
     }
 
     override fun onDestroy() {

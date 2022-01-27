@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="user"
+            type="com.hyapp.achat.model.entity.User" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <com.facebook.drawee.view.SimpleDraweeView
+            android:id="@+id/avatar"
+            android:layout_width="54dp"
+            android:layout_height="54dp"
+            android:layout_margin="10dp"
+            android:background="@drawable/avatar_54"
+            app:actualImageScaleType="centerCrop"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:roundAsCircle="true" />
+
+        <TextView
+            android:id="@+id/onlineTime"
+            android:layout_width="wrap_content"
+            android:layout_height="16dp"
+            android:background="@drawable/last_online_contact_bg_grey"
+            android:fontFamily="@font/iran_sans_light"
+            android:gravity="center"
+            android:minWidth="16dp"
+            android:paddingLeft="3.5dp"
+            android:paddingTop="2dp"
+            android:paddingRight="3.5dp"
+            android:textSize="8sp"
+            app:layout_constraintBottom_toBottomOf="@+id/avatar"
+            app:layout_constraintEnd_toEndOf="@+id/avatar"
+            tools:ignore="SmallSp"
+            tools:text="3d" />
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:ellipsize="end"
+            android:fontFamily="@font/iran_sans_medium"
+            android:gravity="center"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:text="@{user.name}"
+            android:textAlignment="gravity"
+            android:textSize="@dimen/text_12"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/avatar"
+            tools:text="Ali Ahmadi" />
+
+        <TextView
+            android:id="@+id/rank"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="3dp"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:textAlignment="gravity"
+            android:textSize="@dimen/text_10"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/name"
+            tools:text="Manager"
+            tools:textColor="@color/rank_manager" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

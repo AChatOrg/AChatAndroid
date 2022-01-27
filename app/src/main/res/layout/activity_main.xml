@@ -17,7 +17,7 @@
             android:focusableInTouchMode="true">
 
             <com.facebook.drawee.view.SimpleDraweeView
-                android:id="@+id/lastOnlineAvatar"
+                android:id="@+id/userAvatar"
                 android:layout_width="36dp"
                 android:layout_height="36dp"
                 android:layout_marginStart="@dimen/margin_16"
@@ -40,9 +40,9 @@
                 android:fontFamily="@font/iran_sans_bold"
                 android:text="@string/app_name"
                 android:textSize="@dimen/text_20"
-                app:layout_constraintBottom_toBottomOf="@+id/lastOnlineAvatar"
-                app:layout_constraintStart_toEndOf="@+id/lastOnlineAvatar"
-                app:layout_constraintTop_toTopOf="@+id/lastOnlineAvatar" />
+                app:layout_constraintBottom_toBottomOf="@+id/userAvatar"
+                app:layout_constraintStart_toEndOf="@+id/userAvatar"
+                app:layout_constraintTop_toTopOf="@+id/userAvatar" />
 
             <com.hyapp.achat.view.component.SearchEditText
                 android:id="@+id/searchEditText"
@@ -67,7 +67,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/lastOnlineAvatar" />
+                app:layout_constraintTop_toBottomOf="@+id/userAvatar" />
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/addFab"
@@ -94,7 +94,7 @@
                 android:layout_marginTop="@dimen/margin_10"
                 android:background="@color/grey_15"
                 android:visibility="invisible"
-                app:layout_constraintTop_toBottomOf="@+id/lastOnlineAvatar" />
+                app:layout_constraintTop_toBottomOf="@+id/userAvatar" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

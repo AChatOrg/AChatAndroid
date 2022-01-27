@@ -15,7 +15,7 @@ import com.facebook.drawee.view.SimpleDraweeView
 import com.hyapp.achat.R
 import com.hyapp.achat.model.entity.Contact
 import com.hyapp.achat.model.entity.Message
-import com.hyapp.achat.model.entity.utils.PersonUtils
+import com.hyapp.achat.model.entity.UserConsts
 import com.hyapp.achat.view.component.GroupAvatarView
 import com.hyapp.achat.view.component.emojiview.view.AXEmojiTextView
 import com.hyapp.achat.view.utils.UiUtils
@@ -193,7 +193,7 @@ class MessageAdapter(val context: Context, val recyclerView: RecyclerView) :
                 avatar.setAvatars(contact.avatars)
                 onlineTime.visibility = View.GONE
             }
-            val pair = PersonUtils.rankInt2rankStrResAndColor(contact.rank)
+            val pair = UserConsts.rankInt2rankStrResAndColor(contact.rank)
             rank.setText(pair.first)
             rank.setTextColor(pair.second)
         }

@@ -83,4 +83,15 @@
     <string name="room_gender_doest_match_your_gender">Room gender does not match your gender</string>
     <string name="s_joined_room">%1$s joined the room</string>
     <string name="s_left_room">%1$s left the room</string>
+    <string name="likes">Likes</string>
+    <string name="score">Score</string>
+    <string name="views">Views</string>
+    <string name="friends">Friends</string>
+    <string name="lastViewers">Last viewers</string>
+    <string name="proflie">Profile</string>
+    <string name="not_found">Not found</string>
+    <string name="like">Like</string>
+    <string name="report">Report</string>
+    <string name="block">Block</string>
+    <string name="settings">Settings</string>
 </resources>

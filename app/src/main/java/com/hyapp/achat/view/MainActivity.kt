@@ -8,9 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.tabs.TabLayout
 import com.hyapp.achat.R
 import com.hyapp.achat.databinding.ActivityMainBinding
-import com.hyapp.achat.model.entity.ConnLive
-import com.hyapp.achat.model.entity.ContactList
-import com.hyapp.achat.model.entity.Resource
+import com.hyapp.achat.model.entity.*
 import com.hyapp.achat.view.adapter.ContactAdapter
 import com.hyapp.achat.view.component.AbstractTabSelectedListener
 import com.hyapp.achat.view.fragment.RoomsFragment
@@ -70,6 +68,12 @@ class MainActivity : EventActivity() {
     private fun init() {
         viewModel = ViewModelProvider(this)[MainViewModel::class.java]
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        binding.userAvatar.setOnClickListener {
+            ProfileActivity.start(
+                this,
+                UserLive.value ?: User()
+            )
+        }
     }
 
     private fun setupContacts() {

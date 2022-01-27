@@ -1,0 +1,288 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context=".view.ProfileActivity">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?actionBarSize"
+            android:theme="?actionBarPopupTheme"
+            app:popupTheme="@style/ThemeOverlay.MaterialComponents.Light"
+            app:title="Profile"
+            app:titleTextAppearance="@style/Toolbar.title" />
+
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipeRefreshLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    app:layout_scrollFlags="scroll">
+
+                    <com.facebook.drawee.view.SimpleDraweeView
+                        android:id="@+id/avatar"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:layout_marginTop="16dp"
+                        app:actualImageScaleType="centerCrop"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="0.5"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:placeholderImage="@drawable/avatar_profile"
+                        app:placeholderImageScaleType="centerCrop"
+                        app:roundAsCircle="true"
+                        app:roundingBorderColor="@color/grey_15"
+                        app:roundingBorderPadding="1px"
+                        app:roundingBorderWidth="1px" />
+
+                    <TextView
+                        android:id="@+id/onlineTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="24dp"
+                        android:layout_marginEnd="3dp"
+                        android:layout_marginRight="3dp"
+                        android:layout_marginBottom="2dp"
+                        android:background="@drawable/last_online_profile_bg_grey"
+                        android:fontFamily="@font/iran_sans_light"
+                        android:gravity="center"
+                        android:minWidth="24dp"
+                        android:paddingLeft="5dp"
+                        android:paddingTop="2.6dp"
+                        android:paddingRight="5dp"
+                        android:textSize="10sp"
+                        app:layout_constraintBottom_toBottomOf="@+id/avatar"
+                        app:layout_constraintEnd_toEndOf="@+id/avatar"
+                        tools:ignore="SmallSp"
+                        tools:text="7h" />
+
+                    <TextView
+                        android:id="@+id/name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:fontFamily="@font/iran_sans_bold"
+                        android:gravity="center"
+                        android:paddingLeft="32dp"
+                        android:paddingRight="32dp"
+                        android:textSize="24sp"
+                        app:layout_constraintEnd_toEndOf="@+id/avatar"
+                        app:layout_constraintStart_toStartOf="@+id/avatar"
+                        app:layout_constraintTop_toBottomOf="@+id/avatar"
+                        tools:text="Hussein Y" />
+
+                    <TextView
+                        android:id="@+id/rank"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:fontFamily="@font/iran_sans_medium"
+                        android:textColor="@color/green_40"
+                        android:textSize="@dimen/text_12"
+                        app:layout_constraintEnd_toEndOf="@+id/name"
+                        app:layout_constraintStart_toStartOf="@+id/name"
+                        app:layout_constraintTop_toBottomOf="@+id/name"
+                        tools:text="Manager" />
+
+                    <TextView
+                        android:id="@+id/bio"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:fontFamily="@font/iran_sans_medium"
+                        android:gravity="center"
+                        android:paddingLeft="32dp"
+                        android:paddingRight="32dp"
+                        android:textColor="@color/grey_35"
+                        android:textSize="14sp"
+                        app:layout_constraintEnd_toEndOf="@+id/name"
+                        app:layout_constraintStart_toStartOf="@+id/name"
+                        app:layout_constraintTop_toBottomOf="@id/rank"
+                        tools:text="25 years old Borujen" />
+
+                    <TextView
+                        android:id="@+id/viewsCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:fontFamily="sans-serif"
+                        android:gravity="center"
+                        android:maxLines="1"
+                        android:singleLine="true"
+                        android:textAlignment="gravity"
+                        android:textSize="@dimen/text_16"
+                        android:textStyle="bold"
+                        app:layout_constrainedWidth="true"
+                        app:layout_constraintBaseline_toBaselineOf="@+id/likesCount"
+                        app:layout_constraintEnd_toEndOf="@+id/views"
+                        app:layout_constraintHorizontal_bias="0.5"
+                        app:layout_constraintStart_toStartOf="@+id/views"
+                        app:layout_constraintVertical_chainStyle="packed"
+                        tools:text="12K" />
+
+                    <TextView
+                        android:id="@+id/views"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="24dp"
+                        android:layout_marginLeft="24dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginRight="8dp"
+                        android:gravity="center"
+                        android:minWidth="72dp"
+                        android:text="@string/views"
+                        android:textSize="@dimen/text_14"
+                        app:layout_constraintBaseline_toBaselineOf="@+id/likes"
+                        app:layout_constraintEnd_toStartOf="@+id/likes"
+                        app:layout_constraintHorizontal_bias="0.5"
+                        app:layout_constraintHorizontal_chainStyle="packed"
+                        app:layout_constraintStart_toStartOf="parent" />
+
+
+                    <TextView
+                        android:id="@+id/likesCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="24dp"
+                        android:ellipsize="end"
+                        android:fontFamily="sans-serif"
+                        android:gravity="center"
+                        android:maxLines="1"
+                        android:singleLine="true"
+                        android:textAlignment="gravity"
+                        android:textSize="@dimen/text_16"
+                        android:textStyle="bold"
+                        app:layout_constrainedWidth="true"
+                        app:layout_constraintEnd_toEndOf="@+id/likes"
+                        app:layout_constraintStart_toStartOf="@+id/likes"
+                        app:layout_constraintTop_toBottomOf="@+id/bio"
+                        tools:text="137" />
+
+                    <TextView
+                        android:id="@+id/likes"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginEnd="8dp"
+                        android:layout_marginRight="8dp"
+                        android:gravity="center"
+                        android:minWidth="72dp"
+                        android:text="@string/likes"
+                        android:textSize="@dimen/text_14"
+                        app:layout_constraintEnd_toStartOf="@+id/friends"
+                        app:layout_constraintHorizontal_bias="0.5"
+                        app:layout_constraintStart_toEndOf="@+id/views"
+                        app:layout_constraintTop_toBottomOf="@+id/likesCount" />
+
+
+                    <TextView
+                        android:id="@+id/friendsCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ellipsize="end"
+                        android:fontFamily="sans-serif"
+                        android:gravity="center"
+                        android:maxLines="1"
+                        android:singleLine="true"
+                        android:textAlignment="gravity"
+                        android:textSize="@dimen/text_16"
+                        android:textStyle="bold"
+                        app:layout_constrainedWidth="true"
+                        app:layout_constraintBaseline_toBaselineOf="@+id/likesCount"
+                        app:layout_constraintEnd_toEndOf="@+id/friends"
+                        app:layout_constraintStart_toStartOf="@+id/friends"
+                        tools:text="30" />
+
+                    <TextView
+                        android:id="@+id/friends"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_marginLeft="8dp"
+                        android:layout_marginEnd="24dp"
+                        android:layout_marginRight="24dp"
+                        android:gravity="center"
+                        android:maxLines="1"
+                        android:minWidth="72dp"
+                        android:singleLine="true"
+                        android:text="@string/friends"
+                        android:textSize="@dimen/text_14"
+                        app:layout_constraintBaseline_toBaselineOf="@+id/likes"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="0.5"
+                        app:layout_constraintStart_toEndOf="@+id/likes" />
+
+
+                    <TextView
+                        android:id="@+id/friendsTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginLeft="16dp"
+                        android:layout_marginTop="24dp"
+                        android:text="@string/friends"
+                        android:textColor="@color/grey_30"
+                        android:textSize="@dimen/text_14"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/likes" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recyclerViewFriends"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/friendsTitle" />
+
+                    <TextView
+                        android:id="@+id/viewersTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginLeft="16dp"
+                        android:layout_marginTop="24dp"
+                        android:text="@string/lastViewers"
+                        android:textColor="@color/grey_30"
+                        android:textSize="@dimen/text_14"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/recyclerViewFriends" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recyclerViewViewers"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/viewersTitle" />
+
+                    <com.google.android.material.progressindicator.LinearProgressIndicator
+                        android:id="@+id/progressBar"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="top"
+                        android:indeterminate="true"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:trackCornerRadius="100dp"
+                        app:trackThickness="2dp" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </ScrollView>
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+    </LinearLayout>
+</layout>

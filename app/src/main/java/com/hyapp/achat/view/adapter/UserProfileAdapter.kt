@@ -10,35 +10,45 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.hyapp.achat.R
-import com.hyapp.achat.databinding.ItemUserBinding
+import com.hyapp.achat.databinding.ItemUserProfileBinding
 import com.hyapp.achat.model.entity.Contact
 import com.hyapp.achat.model.entity.User
 import com.hyapp.achat.model.entity.UserConsts
-import com.hyapp.achat.view.ChatActivity.Companion.start
+import com.hyapp.achat.view.ProfileActivity
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
-class UserAdapter(private val context: Context) : ListAdapter<User, UserAdapter.Holder>(DIFF_CALLBACK) {
+@ExperimentalCoroutinesApi
+class UserProfileAdapter(private val context: Context) :
+    ListAdapter<User, UserProfileAdapter.Holder>(DIFF_CALLBACK) {
 
     companion object {
         val DIFF_CALLBACK: DiffUtil.ItemCallback<User> = object : DiffUtil.ItemCallback<User>() {
             override fun areItemsTheSame(
-                    oldItem: User, newItem: User): Boolean {
+                oldItem: User, newItem: User
+            ): Boolean {
                 return oldItem.uid == newItem.uid
             }
 
             override fun areContentsTheSame(
-                    oldItem: User, newItem: User): Boolean {
+                oldItem: User, newItem: User
+            ): Boolean {
                 return oldItem == newItem
             }
         }
     }
 
-    override fun submitList(list: MutableList<User>?) {
+    override fun submitList(list: List<User>?) {
         if (list != null)
             super.submitList(ArrayList(list))
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
-        val binding: ItemUserBinding = DataBindingUtil.inflate(LayoutInflater.from(context), R.layout.item_user, parent, false)
+        val binding: ItemUserProfileBinding = DataBindingUtil.inflate(
+            LayoutInflater.from(context),
+            R.layout.item_user_profile,
+            parent,
+            false
+        )
         binding.lifecycleOwner = context as LifecycleOwner
         return Holder(binding)
     }
@@ -47,16 +57,16 @@ class UserAdapter(private val context: Context) : ListAdapter<User, UserAdapter.
         holder.bind(getItem(position))
     }
 
-    inner class Holder(private val binding: ItemUserBinding) : RecyclerView.ViewHolder(binding.root), View.OnClickListener {
+    inner class Holder(private val binding: ItemUserProfileBinding) :
+        RecyclerView.ViewHolder(binding.root), View.OnClickListener {
         fun bind(user: User) {
+
             binding.user = user
             binding.executePendingBindings()
+
             val avatars: List<String> = user.avatars
             binding.avatar.setImageURI(if (avatars.isNotEmpty()) avatars[0] else null)
-            when (user.gender) {
-                UserConsts.GENDER_MALE -> binding.genderCircle.setBackgroundResource(R.drawable.gender_circle_user_male_bg)
-                UserConsts.GENDER_FEMALE -> binding.genderCircle.setBackgroundResource(R.drawable.gender_circle_user_female_bg)
-            }
+
             val pair = UserConsts.rankInt2rankStrResAndColor(user.rank)
             binding.rank.setText(pair.first)
             binding.rank.setTextColor(pair.second)
@@ -64,7 +74,7 @@ class UserAdapter(private val context: Context) : ListAdapter<User, UserAdapter.
 
         override fun onClick(v: View) {
             val user = getItem(adapterPosition)
-            start(context, Contact(user!!))
+            ProfileActivity.start(context, user)
         }
 
         init {

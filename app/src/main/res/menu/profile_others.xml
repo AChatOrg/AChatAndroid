@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/like"
+        android:icon="@drawable/action_like_outline"
+        android:title="@string/like"
+        app:iconTint="@color/black"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/report"
+        android:title="@string/report"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/block"
+        android:title="@string/block"
+        app:showAsAction="never" />
+
+</menu>

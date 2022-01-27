@@ -1,5 +1,6 @@
 package com.hyapp.achat.model
 
+import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import com.hyapp.achat.App
@@ -8,6 +9,7 @@ import com.hyapp.achat.R
 import com.hyapp.achat.model.entity.Room
 import com.hyapp.achat.model.entity.SortedList
 import com.hyapp.achat.model.entity.User
+import com.hyapp.achat.model.entity.UserInfo
 import com.hyapp.achat.model.gson.RoomDeserializer
 import com.hyapp.achat.model.gson.UserDeserializer
 import com.hyapp.achat.model.objectbox.ContactDao
@@ -30,6 +32,9 @@ object UsersRoomsRepo {
     const val ROOM_CREATE: Byte = 3
     const val ROOM_DELETE: Byte = 4
     const val ROOM_MEMBER_COUNT: Byte = 5
+
+    const val USER_INFO_MSG_SUCCESS="success"
+    const val USER_INFO_MSG_NOT_FOUND="notFound"
 
     private val _flow = MutableSharedFlow<Pair<Byte, Any>>(extraBufferCapacity = 1)
     val flow = _flow.asSharedFlow()
@@ -169,5 +174,18 @@ object UsersRoomsRepo {
         val memberCount = args[1].toString().toInt()
         val onlineMemberCount = args[2].toString().toInt()
         _flow.tryEmit(Pair(ROOM_MEMBER_COUNT, Triple(roomUid, memberCount, onlineMemberCount)))
+    }
+
+    fun requestUserInfo(userUid: String): Flow<Pair<String, UserInfo>> = callbackFlow {
+        SocketService.ioSocket?.socket?.let { socket ->
+            socket.emit(Config.ON_REQUEST_USER_INFO, userUid)
+            socket.on(Config.ON_REQUEST_USER_INFO) { args ->
+                socket.off(Config.ON_REQUEST_USER_INFO)
+                val message = args[0].toString()
+                val userInfo = Gson().fromJson(args[1].toString(), UserInfo::class.java)
+                trySend(Pair(message, userInfo))
+            }
+        }
+        awaitClose { SocketService.ioSocket?.socket?.off(Config.ON_REQUEST_USER_INFO) }
     }
 }

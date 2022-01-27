@@ -7,11 +7,22 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.util.TypedValue;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
+
+import androidx.annotation.FontRes;
+import androidx.core.content.res.ResourcesCompat;
+
+import com.hyapp.achat.view.component.CustomTypefaceSpan;
 
 import java.util.Map;
 import java.util.NavigableMap;
@@ -104,5 +115,26 @@ public class UiUtils {
         long truncated = value / (divideBy / 10);
         boolean hasDecimal = truncated < 100 && (truncated / 10d) != (truncated / 10);
         return hasDecimal ? (truncated / 10d) + suffix : (truncated / 10) + suffix;
+    }
+
+    public static void setMenuFont(Context context, Menu menu, @FontRes int fontRes) {
+        for (int i = 0; i < menu.size(); i++) {
+            MenuItem menuItem = menu.getItem(i);
+            SubMenu subMenu = menuItem.getSubMenu();
+            if (subMenu != null && subMenu.size() > 0) {
+                for (int j = 0; j < subMenu.size(); j++) {
+                    MenuItem subMenuItem = subMenu.getItem(j);
+                    applyFontToMenuItem(context, subMenuItem, fontRes);
+                }
+            }
+            applyFontToMenuItem(context, menuItem, fontRes);
+        }
+    }
+
+    public static void applyFontToMenuItem(Context context, MenuItem menuItem, @FontRes int fontRes) {
+        Typeface font = ResourcesCompat.getFont(context, fontRes);
+        SpannableString mNewTitle = new SpannableString(menuItem.getTitle());
+        mNewTitle.setSpan(new CustomTypefaceSpan("", font), 0, mNewTitle.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+        menuItem.setTitle(mNewTitle);
     }
 }
