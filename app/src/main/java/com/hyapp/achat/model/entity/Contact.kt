@@ -75,4 +75,18 @@ data class Contact(
 
     val isPvRoom
         get() = type == TYPE_PV_ROOM
+
+    fun same(c: Contact): Boolean {
+        return message == c.message
+                && messageTime == c.messageTime
+                && messageDelivery == c.messageDelivery
+                && notifCount == c.notifCount
+                && onlineTime == c.onlineTime
+                && mediaPath == c.mediaPath
+                && name == c.name
+                && gender == c.gender
+                && avatars == c.avatars
+                && type == c.type
+                && rank == c.rank
+    }
 }

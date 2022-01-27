@@ -20,7 +20,9 @@ import com.hyapp.achat.model.entity.Contact
 import com.hyapp.achat.model.entity.Message
 import com.hyapp.achat.view.ChatActivity
 import com.hyapp.achat.viewmodel.utils.TimeUtils
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
+@ExperimentalCoroutinesApi
 class ContactAdapter(private val context: Context) :
     ListAdapter<Contact, ContactAdapter.Holder>(DIFF_CALLBACK) {
 
@@ -38,7 +40,7 @@ class ContactAdapter(private val context: Context) :
                 }
 
                 override fun areContentsTheSame(oldItem: Contact, newItem: Contact): Boolean {
-                    return oldItem == newItem
+                    return oldItem.same(newItem)
                 }
 
                 override fun getChangePayload(oldItem: Contact, newItem: Contact): Any? {

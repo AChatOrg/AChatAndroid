@@ -2,12 +2,16 @@ package com.hyapp.achat.model
 
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
+import com.hyapp.achat.App
 import com.hyapp.achat.Config
+import com.hyapp.achat.R
 import com.hyapp.achat.model.entity.Room
 import com.hyapp.achat.model.entity.SortedList
 import com.hyapp.achat.model.entity.User
 import com.hyapp.achat.model.gson.RoomDeserializer
 import com.hyapp.achat.model.gson.UserDeserializer
+import com.hyapp.achat.model.objectbox.ContactDao
+import com.hyapp.achat.view.utils.UiUtils
 import com.hyapp.achat.viewmodel.service.SocketService
 import io.socket.client.Socket
 import io.socket.emitter.Emitter
@@ -25,7 +29,7 @@ object UsersRoomsRepo {
     const val USER_LEFT: Byte = 2
     const val ROOM_CREATE: Byte = 3
     const val ROOM_DELETE: Byte = 4
-    const val ROOM_MEMBER_ADDED: Byte = 5
+    const val ROOM_MEMBER_COUNT: Byte = 5
 
     private val _flow = MutableSharedFlow<Pair<Byte, Any>>(extraBufferCapacity = 1)
     val flow = _flow.asSharedFlow()
@@ -36,6 +40,7 @@ object UsersRoomsRepo {
         socket.on(Config.ON_ROOM_CREATE, onRoomCreate)
         socket.on(Config.ON_ROOM_DELETE, onRoomDelete)
         socket.on(Config.ON_ROOM_MEMBER_ADDED, onRoomMemberAdded)
+        socket.on(Config.ON_ROOM_MEMBER_REMOVED, onRoomMemberRemoved)
     }
 
     @ExperimentalCoroutinesApi
@@ -130,8 +135,31 @@ object UsersRoomsRepo {
     private val onRoomMemberAdded = Emitter.Listener { args ->
         val roomUid = args[0].toString()
         val memberCount = args[1].toString().toInt()
-        _flow.tryEmit(Pair(ROOM_MEMBER_ADDED, Pair(roomUid, memberCount)))
-        ChatRepo.addUserJoinedMessage(roomUid, args[2].toString())
+        val nameUser = args[2].toString()
+        val onlineMemberCount = args[3].toString().toInt()
+        _flow.tryEmit(Pair(ROOM_MEMBER_COUNT, Triple(roomUid, memberCount, onlineMemberCount)))
+        ChatRepo.addUserJoinedMessage(roomUid, nameUser)
     }
 
+    private val onRoomMemberRemoved = Emitter.Listener { args ->
+        val roomUid = args[0].toString()
+        val memberCount = args[1].toString().toInt()
+        val nameUser = args[2].toString()
+        val onlineMemberCount = args[3].toString().toInt()
+        _flow.tryEmit(Pair(ROOM_MEMBER_COUNT, Triple(roomUid, memberCount, onlineMemberCount)))
+        ChatRepo.addUserLeftMessage(roomUid, nameUser)
+    }
+
+    fun requestRoomMemberCount(roomUid: String): Flow<Pair<Int, Int>> = callbackFlow {
+        SocketService.ioSocket?.socket?.let { socket ->
+            socket.emit(Config.ON_REQUEST_ROOM_MEMBER_COUNT, roomUid)
+            socket.on(Config.ON_REQUEST_ROOM_MEMBER_COUNT) { args ->
+                socket.off(Config.ON_REQUEST_ROOM_MEMBER_COUNT)
+                val memberCount = args[0].toString().toInt()
+                val onlineMemberCount = args[1].toString().toInt()
+                trySend(Pair(memberCount, onlineMemberCount))
+            }
+        }
+        awaitClose { SocketService.ioSocket?.socket?.off(Config.ON_REQUEST_ROOM_MEMBER_COUNT) }
+    }
 }

@@ -2,7 +2,6 @@ package com.hyapp.achat.model
 
 import com.hyapp.achat.Config
 import com.hyapp.achat.model.entity.ConnLive
-import com.hyapp.achat.viewmodel.MainViewModel
 import com.hyapp.achat.viewmodel.service.SocketService
 import io.socket.client.IO
 import io.socket.client.Socket
@@ -46,8 +45,7 @@ class IOSocket(loginJson: String) : CoroutineScope {
     private val onConnect = Emitter.Listener { args ->
         ConnLive.singleton().postValue(ConnLive.Status.CONNECTED)
 
-        launch { ChatRepo.sendWaitingsMessages() }
-        launch { ChatRepo.sendReadsMessages() }
+        launch { ChatRepo.sendOffline() }
         launch { ChatRepo.sendOnlineTimeContactsRequest() }
     }
 

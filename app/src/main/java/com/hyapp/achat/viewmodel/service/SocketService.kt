@@ -13,7 +13,9 @@ import com.hyapp.achat.model.Preferences
 import com.hyapp.achat.model.entity.ConnLive
 import com.hyapp.achat.viewmodel.Notifs
 import com.hyapp.achat.viewmodel.utils.NetUtils
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
+@ExperimentalCoroutinesApi
 class SocketService : Service() {
 
     companion object {

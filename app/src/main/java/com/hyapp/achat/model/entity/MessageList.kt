@@ -137,9 +137,11 @@ class MessageList : LinkedList<Message>() {
             if (get(i).uid == message.uid) {
                 for (j in i downTo 0) {
                     val m = get(j)
-                    if (m.isChatMessage && m.transfer == Message.TRANSFER_SEND && m.delivery != Message.DELIVERY_READ) {
-                        set(j, m.copy(delivery = message.delivery))
-                    } else break
+                    if (m.isChatMessage && m.transfer == Message.TRANSFER_SEND) {
+                        if (m.delivery != Message.DELIVERY_READ) {
+                            set(j, m.copy(delivery = message.delivery))
+                        } else break
+                    }
                 }
                 return true
             }

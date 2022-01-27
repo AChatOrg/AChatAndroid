@@ -34,6 +34,7 @@ class MessageAdapter(val context: Context, val recyclerView: RecyclerView) :
         const val PAYLOAD_BUBBLE: Byte = 0
         const val PAYLOAD_DELIVERY: Byte = 1
         const val PAYLOAD_ONLINE_TIME: Byte = 2
+        const val PAYLOAD_BIO: Byte = 3
 
         val DIFF_CALLBACK: DiffUtil.ItemCallback<Message> =
             object : DiffUtil.ItemCallback<Message>() {
@@ -55,6 +56,9 @@ class MessageAdapter(val context: Context, val recyclerView: RecyclerView) :
                         }
                         oldItem.senderOnlineTime != newItem.senderOnlineTime -> {
                             PAYLOAD_ONLINE_TIME
+                        }
+                        oldItem.senderBio != newItem.senderBio -> {
+                            PAYLOAD_BIO
                         }
                         else -> {
                             null
@@ -116,7 +120,7 @@ class MessageAdapter(val context: Context, val recyclerView: RecyclerView) :
                     context
                 ).inflate(R.layout.item_message_details, parent, false)
             )
-            Message.TRANSFER_RECEIVE + Message.TYPE_PROFILE -> return SingleProfileHolder(
+            Message.TRANSFER_RECEIVE + Message.TYPE_PROFILE -> return ProfileHolder(
                 LayoutInflater.from(context).inflate(R.layout.item_message_profile, parent, false)
             )
         }
@@ -170,33 +174,18 @@ class MessageAdapter(val context: Context, val recyclerView: RecyclerView) :
     }
 
     @Suppress("LeakingThis")
-    abstract inner class ProfileHolder(itemView: View) : Holder(itemView), View.OnClickListener {
+    inner class ProfileHolder(itemView: View) : Holder(itemView), View.OnClickListener {
         private val name: TextView = itemView.findViewById(R.id.name)
-        private val description: TextView = itemView.findViewById(R.id.description)
-
-        override fun bind(message: Message) {
-            name.text = message.senderName
-            description.text = message.senderBio
-        }
-
-        override fun onClick(v: View) {
-            //todo go to profile page
-        }
-
-        init {
-            itemView.setOnClickListener(this)
-        }
-    }
-
-    inner class SingleProfileHolder(itemView: View) : ProfileHolder(itemView) {
+        private val bio: TextView = itemView.findViewById(R.id.description)
         private val avatar: GroupAvatarView = itemView.findViewById(R.id.avatar)
         private val rank: TextView = itemView.findViewById(R.id.rank)
         private val onlineTime: TextView = itemView.findViewById(R.id.lastOnline)
 
         override fun bind(message: Message) {
-            super.bind(message)
+            name.text = message.senderName
+            bio.text = message.senderBio
             val contact = message.getContact()
-            if (contact.type == Contact.TYPE_USER) {
+            if (message.isPv) {
                 avatar.setAvatars(contact.avatars)
                 setOnlineTime(message.senderOnlineTime)
                 onlineTime.visibility = View.VISIBLE
@@ -214,6 +203,8 @@ class MessageAdapter(val context: Context, val recyclerView: RecyclerView) :
             for (payload in payloads) {
                 when (payload as Byte) {
                     PAYLOAD_ONLINE_TIME -> setOnlineTime(message.senderOnlineTime)
+                    PAYLOAD_BIO -> bio.text = message.senderBio
+
                 }
             }
         }
@@ -227,6 +218,14 @@ class MessageAdapter(val context: Context, val recyclerView: RecyclerView) :
                     TimeUtils.timeAgoShort(System.currentTimeMillis() - time)
                 onlineTime.setBackgroundResource(R.drawable.last_online_profile_bg_grey)
             }
+        }
+
+        override fun onClick(v: View) {
+            //todo go to profile page
+        }
+
+        init {
+            itemView.setOnClickListener(this)
         }
     }
 

@@ -2,13 +2,18 @@ package com.hyapp.achat.viewmodel
 
 import android.text.format.DateUtils
 import androidx.lifecycle.*
+import com.hyapp.achat.App
+import com.hyapp.achat.R
 import com.hyapp.achat.model.ChatRepo
 import com.hyapp.achat.model.Preferences
+import com.hyapp.achat.model.UsersRoomsRepo
 import com.hyapp.achat.model.entity.*
 import com.hyapp.achat.model.objectbox.ContactDao
 import com.hyapp.achat.model.objectbox.MessageDao
 import com.hyapp.achat.model.objectbox.UserDao
 import com.hyapp.achat.view.EventActivity
+import com.hyapp.achat.view.utils.UiUtils
+import com.hyapp.achat.viewmodel.service.SocketService
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 import java.util.*
@@ -57,6 +62,9 @@ class ChatViewModel(var contact: Contact) : ViewModel() {
             else -> Message.CHAT_TYPE_PV_ROOM
         }
 
+    private val membersStr = App.context.getString(R.string.members)
+    private val onlineStr = App.context.getString(R.string.online)
+
     init {
         _contactLive.value = contact
         contactUid = contact.uid
@@ -66,6 +74,8 @@ class ChatViewModel(var contact: Contact) : ViewModel() {
             loadPublicRoomMessages()
         }
         observeMessage()
+        observeUserRoom()
+        requestRoomMemberCount()
     }
 
     private fun loadPublicRoomMessages() {
@@ -85,6 +95,7 @@ class ChatViewModel(var contact: Contact) : ViewModel() {
                     uid = PROFILE_MESSAGE_UID,
                     type = Message.TYPE_PROFILE,
                     user = contact.getUser(),
+                    chatType = messageChatType
                 )
             )
             _messagesLive.postValue(
@@ -92,7 +103,7 @@ class ChatViewModel(var contact: Contact) : ViewModel() {
                     messageList,
                     0,
                     false,
-                    pagedCount == 1
+                    true
                 )
             )
         }
@@ -110,6 +121,7 @@ class ChatViewModel(var contact: Contact) : ViewModel() {
                         uid = PROFILE_MESSAGE_UID,
                         type = Message.TYPE_PROFILE,
                         user = contact.getUser(),
+                        chatType = messageChatType
                     )
                 )
                 _messagesLive.postValue(Resource.addPaging(messageList, 1, false, false))
@@ -161,6 +173,7 @@ class ChatViewModel(var contact: Contact) : ViewModel() {
                         uid = PROFILE_MESSAGE_UID,
                         type = Message.TYPE_PROFILE,
                         user = contact.getUser(),
+                        chatType = messageChatType
                     )
                 )
             }
@@ -177,7 +190,7 @@ class ChatViewModel(var contact: Contact) : ViewModel() {
     }
 
     fun loadUnreadMessages() {
-        if (contact.isUser || contact.isPvRoom) {
+        if (!contact.isRoom) {
             viewModelScope.launch(ioDispatcher) {
                 ensureActive()
                 _messagesLive.value?.data?.let { list ->
@@ -227,9 +240,44 @@ class ChatViewModel(var contact: Contact) : ViewModel() {
                     }
                     ChatRepo.MESSAGE_ONLINE_TIME -> {
                         if (pair.second.receiverUid == contact.uid) {
-                            updateOnlineTime(pair.second.time)
+                            updateContact(onlineTime = pair.second.time)
                         }
                     }
+                }
+            }
+        }
+    }
+
+    private fun observeUserRoom() {
+        viewModelScope.launch {
+            launch {
+                UsersRoomsRepo.flow.collect { pair ->
+                    when (pair.first) {
+                        UsersRoomsRepo.ROOM_MEMBER_COUNT -> {
+                            val p = pair.second as Triple<String, Int, Int>
+                            val roomUid = p.first
+                            if (roomUid == contactUid) {
+                                val memberCount = p.second
+                                val onlineMemberCount = p.third
+                                updateContact(
+                                    memberCount = memberCount,
+                                    onlineMemberCount = onlineMemberCount
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun requestRoomMemberCount() {
+        if (!contact.isUser) {
+            viewModelScope.launch {
+                UsersRoomsRepo.requestRoomMemberCount(contactUid).collect { pair ->
+                    val memberCount = pair.first
+                    val onlineMemberCount = pair.second
+                    updateContact(memberCount = memberCount, onlineMemberCount = onlineMemberCount)
                 }
             }
         }
@@ -242,7 +290,7 @@ class ChatViewModel(var contact: Contact) : ViewModel() {
             contact.uid, currentUser ?: User(), messageChatType
         )
 
-        if (message.isRoom)
+        if (message.isRoom && SocketService.ioSocket?.socket?.connected() == true)
             message.delivery = Message.DELIVERY_READ
 
         addMessage(message, false)
@@ -330,13 +378,34 @@ class ChatViewModel(var contact: Contact) : ViewModel() {
         ChatRepo.sendTyping(contactUid, contact.isRoom || contact.isPvRoom)
     }
 
-    private fun updateOnlineTime(time: Long) {
-        contact.onlineTime = time
+    private fun updateContact(
+        onlineTime: Long? = null,
+        memberCount: Int? = null,
+        onlineMemberCount: Int? = null,
+        avatars: List<String>? = null
+    ) {
+        if (onlineTime != null)
+            contact.onlineTime = onlineTime
+
+        if (memberCount != null && onlineMemberCount != null)
+
+            contact.bio =
+                "${UiUtils.formatNum(memberCount.toLong())} " + membersStr + ", ${
+                    UiUtils.formatNum(onlineMemberCount.toLong())
+                } " + onlineStr
+
+        if (avatars != null)
+            contact.avatars = avatars
+
         _contactLive.value = contact
         _messagesLive.value?.data?.let {
             val first = it.first
             if (first.type == Message.TYPE_PROFILE) {
-                it[0] = first.copy(senderOnlineTime = contact.onlineTime)
+                it[0] = first.copy(
+                    senderOnlineTime = contact.onlineTime,
+                    senderBio = contact.bio,
+                    senderAvatars = contact.avatars
+                )
                 _messagesLive.value = Resource.update(it, 0)
             }
         }
@@ -354,7 +423,7 @@ class ChatViewModel(var contact: Contact) : ViewModel() {
         refreshOnlineTimeJob = viewModelScope.launch {
             while (isActivityStarted) {
                 delay(60000)
-                updateOnlineTime(if (contact.onlineTime != Contact.TIME_ONLINE) contact.onlineTime + 1 else contact.onlineTime)
+                updateContact(onlineTime = if (contact.onlineTime != Contact.TIME_ONLINE) contact.onlineTime + 1 else contact.onlineTime)
             }
         }
         if (contact.isRoom) {

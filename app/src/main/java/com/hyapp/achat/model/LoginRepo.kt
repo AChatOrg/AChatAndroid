@@ -1,8 +1,13 @@
 package com.hyapp.achat.model
 
+import android.content.Intent
 import com.google.gson.GsonBuilder
+import com.google.gson.reflect.TypeToken
+import com.hyapp.achat.App
 import com.hyapp.achat.Config
+import com.hyapp.achat.model.entity.SortedList
 import com.hyapp.achat.model.entity.User
+import com.hyapp.achat.model.event.ActionEvent
 import com.hyapp.achat.model.gson.UserDeserializer
 import com.hyapp.achat.model.objectbox.ContactDao
 import com.hyapp.achat.model.objectbox.MessageDao
@@ -14,9 +19,13 @@ import io.socket.client.Socket
 import io.socket.emitter.Emitter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.withContext
+import org.greenrobot.eventbus.EventBus
 import org.json.JSONObject
 
 @ExperimentalCoroutinesApi
@@ -45,14 +54,27 @@ object LoginRepo {
         }
     }
 
-    suspend fun onLogoutGuest() {
-        withContext(Dispatchers.Default) {
-            MainViewModel.publicRoomsMessageMap.clear()
-            Preferences.instance().putLogged(false)
-            Preferences.instance().deleteALl()
-            ContactDao.removeALl()
-            MessageDao.removeALl()
-            UserDao.removeALl()
+    @ExperimentalCoroutinesApi
+    fun requestLogout() {
+        SocketService.ioSocket?.socket?.let {
+            it.emit(Config.ON_LOGOUT)
+            it.on(Config.ON_LOGOUT) { args ->
+                it.off(Config.ON_LOGOUT)
+
+                val logged = args[0].toString().toBoolean()
+
+                if (logged) {
+                    App.context.stopService(Intent(App.context, SocketService::class.java))
+                    EventBus.getDefault().post(ActionEvent(ActionEvent.ACTION_EXIT_APP))
+
+                    MainViewModel.publicRoomsMessageMap.clear()
+                    Preferences.instance().putLogged(false)
+                    Preferences.instance().deleteALl()
+                    ContactDao.removeALl()
+                    MessageDao.removeALl()
+                    UserDao.removeALl()
+                }
+            }
         }
     }
 }

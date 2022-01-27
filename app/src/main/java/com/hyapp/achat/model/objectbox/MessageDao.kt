@@ -132,9 +132,9 @@ object MessageDao {
     }
 
     @JvmStatic
-    fun waitings(senderUi: String): List<Message> {
+    fun waitings(currUserUid: String): List<Message> {
         return ObjectBox.store.boxFor(Message::class.java).query(
-            Message_.senderUid.equal(senderUi, QueryBuilder.StringOrder.CASE_SENSITIVE)
+            Message_.senderUid.equal(currUserUid, QueryBuilder.StringOrder.CASE_SENSITIVE)
                 .and(Message_.delivery.equal(Message.DELIVERY_WAITING.toInt()))
         )
             .build()
@@ -142,9 +142,9 @@ object MessageDao {
     }
 
     @JvmStatic
-    fun allSentUnReads(receiverUi: String): List<Message> {
+    fun allSentUnReads(currUserUid: String): List<Message> {
         return ObjectBox.store.boxFor(Message::class.java).query(
-            Message_.receiverUid.equal(receiverUi, QueryBuilder.StringOrder.CASE_SENSITIVE)
+            Message_.receiverUid.equal(currUserUid, QueryBuilder.StringOrder.CASE_SENSITIVE)
                 .and(Message_.delivery.equal(Message.DELIVERY_SENT.toInt()))
         )
             .build()

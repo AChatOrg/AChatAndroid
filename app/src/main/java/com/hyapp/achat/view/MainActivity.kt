@@ -152,6 +152,8 @@ class MainActivity : EventActivity() {
             ConnLive.Status.CONNECTED -> {
                 binding.title.setText(R.string.app_name)
                 resetUsersRoomsTitle()
+                viewModel.reloadUsers()
+                viewModel.reloadRooms()
             }
             ConnLive.Status.DISCONNECTED -> {
                 binding.title.setText(R.string.disconnected)

@@ -20,7 +20,6 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.collect
 import org.apache.commons.collections4.queue.CircularFifoQueue
 import java.util.*
-import kotlin.collections.ArrayDeque
 import kotlin.collections.HashMap
 
 @ExperimentalCoroutinesApi
@@ -63,10 +62,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         val context = getApplication<Application>().applicationContext
         SocketService.start(context, Preferences.instance().loginInfo)
         loadContacts()
-        reloadUsers()
-        reloadRooms()
         observeContacts()
-        observeUsers()
+        observeUsersRooms()
     }
 
     private fun loadContacts() {
@@ -103,7 +100,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    private fun observeUsers() {
+    private fun observeUsersRooms() {
         viewModelScope.launch {
             launch {
                 UsersRoomsRepo.flow.collect { pair ->
@@ -132,9 +129,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                                 _roomsLive.value = Resource.success(it)
                             }
                         }
-                        UsersRoomsRepo.ROOM_MEMBER_ADDED -> {
-                            val p = pair.second as Pair<String, Int>
-                            updateRoom(p.first, p.second)
+                        UsersRoomsRepo.ROOM_MEMBER_COUNT -> {
+                            val p = pair.second as Triple<String, Int, Int>
+                            val roomUid = p.first
+                            val memberCount = p.second
+                            val onlineMemberCount = p.third
+                            updateRoom(roomUid, memberCount, onlineMemberCount)
                         }
                     }
                 }
@@ -142,13 +142,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    private fun updateRoom(roomUid: String, memberCount: Int) {
+    private fun updateRoom(roomUid: String, memberCount: Int, onlineMemberCount: Int) {
         viewModelScope.launch(ioDispatcher) {
             _roomsLive.value?.data?.let { list ->
                 for (i in 0 until list.size) {
                     val room = list[i]
                     if (room.uid == roomUid) {
-                        list[i] = room.copy(memberCount = memberCount)
+                        list[i] = room.copy(
+                            memberCount = memberCount,
+                            onlineMemberCount = onlineMemberCount
+                        )
                         _roomsLive.postValue(Resource.update(list, 0))
                         return@launch
                     }

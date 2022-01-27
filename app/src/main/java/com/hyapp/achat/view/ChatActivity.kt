@@ -40,8 +40,10 @@ import com.hyapp.achat.view.component.sticker.a18StickerProvider
 import com.hyapp.achat.view.utils.UiUtils
 import com.hyapp.achat.viewmodel.ChatViewModel
 import com.hyapp.achat.viewmodel.utils.TimeUtils
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import java.util.*
 
+@ExperimentalCoroutinesApi
 class ChatActivity : EventActivity() {
 
     companion object {
@@ -484,7 +486,7 @@ class ChatActivity : EventActivity() {
             binding.run {
                 name.text = cont.name
                 bio.text = cont.bio
-                if (cont.type == Contact.TYPE_USER) {
+                if (cont.isUser) {
                     avatar.setAvatars(cont.avatars)
                     if (cont.onlineTime == Contact.TIME_ONLINE) {
                         onlineTime.text = ""

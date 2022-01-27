@@ -25,9 +25,10 @@ public interface Config {
     String ON_USERS = "users";
     String ON_ROOMS = "rooms";
     String ON_CREATE_ROOM = "createRoom";
+    String ON_REQUEST_ROOM_MEMBER_COUNT = "requestRoomMemberCount";
 
     /*On Pv Chat*/
-    String ON_MESSAGE = "message";
+    String ON_MESSAGE = "msg";
     String ON_MESSAGE_SENT = "msgSent";
     String ON_MSG_RECEIVED = "msgReceived";
     String ON_MSG_READ = "msgRead";

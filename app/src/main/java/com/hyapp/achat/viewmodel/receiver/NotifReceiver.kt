@@ -17,11 +17,13 @@ import com.hyapp.achat.viewmodel.Notifs
 import com.hyapp.achat.viewmodel.service.SocketService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import org.greenrobot.eventbus.EventBus
 import java.util.*
 import kotlin.coroutines.CoroutineContext
 
+@ExperimentalCoroutinesApi
 class NotifReceiver : BroadcastReceiver(), CoroutineScope {
 
     override val coroutineContext: CoroutineContext
@@ -39,11 +41,7 @@ class NotifReceiver : BroadcastReceiver(), CoroutineScope {
     }
 
     private fun handleExitApp(context: Context) {
-        launch {
-            LoginRepo.onLogoutGuest()
-        }
-        context.stopService(Intent(context, SocketService::class.java))
-        EventBus.getDefault().post(ActionEvent(ActionEvent.ACTION_EXIT_APP))
+        LoginRepo.requestLogout()
     }
 
     private fun handleReplyMessage(intent: Intent) {

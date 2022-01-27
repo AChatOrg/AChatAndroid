@@ -68,49 +68,73 @@ object ChatRepo {
             mutex.withLock {
 
                 val contact = ContactDao.get(cont.uid) ?: cont
+
                 if (cont.isUser || cont.isPvRoom)
                     contact.messageDelivery = Message.DELIVERY_WAITING
                 else
                     contact.messageDelivery = Message.DELIVERY_READ
+
                 setupAndPutContact(contact, message)
 
-                if (message.isPv || message.isPvRoom) {
+                if (!message.isRoom) {
                     message.id = MessageDao.put(message.apply { id = 0 })
                     Preferences.instance().incrementContactMessagesCount(contact.uid)
                 } else {
                     MainViewModel.addPublicRoomUnreadMessage(contact.uid, message)
                 }
 
-                SocketService.ioSocket?.socket?.emit(Config.ON_MESSAGE, Gson().toJson(message))
-            }
-        }
-    }
-
-    suspend fun sendWaitingsMessages() {
-        withContext(ioDispatcher) {
-            ensureActive()
-            (UserLive.value ?: UserDao.get(User.CURRENT_USER_ID))?.let {
-                val messages = MessageDao.waitings(it.uid)
-                for (message in messages) {
-                    val json = Gson().toJson(message)
-                    SocketService.ioSocket?.socket?.emit(Config.ON_MESSAGE, json)
+                SocketService.ioSocket?.socket?.let {
+                    if (it.connected()) {
+                        it.emit(Config.ON_MESSAGE, Gson().toJson(message))
+                    }
                 }
             }
         }
     }
 
-    suspend fun sendReadsMessages() {
+    suspend fun sendOffline() {
         withContext(ioDispatcher) {
             ensureActive()
-            (UserLive.value ?: UserDao.get(User.CURRENT_USER_ID))?.let {
-                val messages = MessageDao.allSentUnReads(it.uid)
-                for (message in messages) {
-                    SocketService.ioSocket?.socket?.emit(
-                        Config.ON_MSG_READ,
-                        message.uid,
-                        message.senderUid
-                    )
+            mutex.withLock {
+                (UserLive.value ?: UserDao.get(User.CURRENT_USER_ID))?.let {
+                    var messages = MessageDao.waitings(it.uid)
+                    for (message in messages) {
+                        SocketService.ioSocket?.socket?.let { socket ->
+                            if (socket.connected()) {
+                                socket.emit(Config.ON_MESSAGE, Gson().toJson(message))
+                            }
+                        }
+                    }
+                    messages = MessageDao.allSentUnReads(it.uid)
+                    for (message in messages) {
+                        SocketService.ioSocket?.socket?.let { socket ->
+                            if (socket.connected()) {
+                                socket.emit(
+                                    Config.ON_MSG_READ,
+                                    message.uid,
+                                    message.senderUid
+                                )
+                            }
+                        }
+                    }
                 }
+            }
+        }
+    }
+
+    suspend fun sendOnlineTimeContactsRequest() {
+        withContext(ioDispatcher) {
+            ensureActive()
+            mutex.withLock {
+                val contacts = ContactDao.all()
+                val list = ArrayList<String>()
+                for (contact in contacts) {
+                    list.add(contact.uid)
+                }
+                SocketService.ioSocket?.socket?.emit(
+                    Config.ON_ONLINE_TIME_CONTACTS,
+                    JSONArray(list)
+                )
             }
         }
     }
@@ -129,12 +153,16 @@ object ChatRepo {
                     }
                     MessageDao.put(changedMessages)
                     Notifs.remove(App.context, contact.id.toInt())
-                    SocketService.ioSocket?.socket?.emit(
-                        Config.ON_MSG_READ,
-                        changedMessages[0].uid,
-                        contact.uid,
-                        changedMessages[0].chatType
-                    )
+                    SocketService.ioSocket?.socket?.let { socket ->
+                        if (socket.connected()) {
+                            socket.emit(
+                                Config.ON_MSG_READ,
+                                changedMessages[0].uid,
+                                contact.uid,
+                                changedMessages[0].chatType
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -162,17 +190,6 @@ object ChatRepo {
         SocketService.ioSocket?.socket?.emit(Config.ON_ONLINE_TIME, isOnline)
     }
 
-    suspend fun sendOnlineTimeContactsRequest() {
-        withContext(ioDispatcher) {
-            val contacts = ContactDao.all()
-            val list = ArrayList<String>()
-            for (contact in contacts) {
-                list.add(contact.uid)
-            }
-            SocketService.ioSocket?.socket?.emit(Config.ON_ONLINE_TIME_CONTACTS, JSONArray(list))
-        }
-    }
-
     fun sendJoinLeaveRoom(roomUid: String, isJoinOrLeave: Boolean) {
         SocketService.ioSocket?.socket?.emit(Config.ON_JOIN_LEAVE_ROOM, roomUid, isJoinOrLeave)
     }
@@ -197,6 +214,32 @@ object ChatRepo {
                 }
             )
         )
+    }
+
+    fun addUserLeftMessage(roomUid: String, nameUser: String) {
+        _messageFlow.tryEmit(
+            Pair(
+                MESSAGE_RECEIVE,
+                Message(
+                    uid = UUID.randomUUID().toString(),
+                    type = Message.TYPE_DETAILS,
+                    chatType = Message.CHAT_TYPE_ROOM,
+                    text = String.format(App.context.getString(R.string.s_left_room), nameUser),
+                    receiverUid = roomUid
+                ).also { message ->
+                    MainViewModel.addPublicRoomUnreadMessage(roomUid, message)
+                    ContactDao.get(roomUid)?.let {
+                        it.message = message.text
+                        ContactDao.put(it)
+                        _contactFlow.tryEmit(Pair(CONTACT_UPDATE, it))
+                    }
+                }
+            )
+        )
+    }
+
+    fun emitContactToViewModel(contact: Contact) {
+        _contactFlow.tryEmit(Pair(CONTACT_UPDATE, contact))
     }
 
     private fun setupAndPutContact(contact: Contact, message: Message) {
@@ -285,7 +328,7 @@ object ChatRepo {
 
             _messageFlow.tryEmit(Pair(MESSAGE_READ, message))
 
-            if (message.isPv || message.isPvRoom) {
+            if (!message.isRoom) {
                 MessageDao.markAllSentAsReadUntil(message)
                 SocketService.ioSocket?.socket?.emit(
                     Config.ON_MSG_READ_RECEIVED,
@@ -306,9 +349,9 @@ object ChatRepo {
     }
 
     private val onTyping = Emitter.Listener { args ->
-        if (args.size < 2) {//if isRoom
+        if (args.size < 2) {//if isPv
             ContactDao.get(args[0].toString())?.let {
-                _contactFlow.tryEmit(Pair(CONTACT_TYPING, it))
+                _contactFlow.tryEmit(Pair(CONTACT_TYPING, it.apply { typingName = "" }))
                 _messageFlow.tryEmit(
                     Pair(
                         MESSAGE_TYPING,
