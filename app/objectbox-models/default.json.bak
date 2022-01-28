@@ -96,7 +96,7 @@
     },
     {
       "id": "2:7262915003648557870",
-      "lastPropertyId": "21:8595874104176518939",
+      "lastPropertyId": "22:7317676651528543696",
       "name": "Message",
       "properties": [
         {
@@ -205,13 +205,18 @@
           "id": "21:8595874104176518939",
           "name": "senderOnlineTime",
           "type": 6
+        },
+        {
+          "id": "22:7317676651528543696",
+          "name": "chatType",
+          "type": 2
         }
       ],
       "relations": []
     },
     {
       "id": "3:5127457045923489447",
-      "lastPropertyId": "10:4911287811215167773",
+      "lastPropertyId": "11:1423226302291220404",
       "name": "User",
       "properties": [
         {
@@ -266,6 +271,11 @@
           "name": "id",
           "type": 6,
           "flags": 129
+        },
+        {
+          "id": "11:1423226302291220404",
+          "name": "username",
+          "type": 9
         }
       ],
       "relations": []

@@ -1,25 +1,41 @@
 package com.hyapp.achat.viewmodel
 
+import android.content.Intent
 import androidx.lifecycle.*
 import com.hyapp.achat.App
+import com.hyapp.achat.model.LoginRepo
+import com.hyapp.achat.model.Preferences
 import com.hyapp.achat.model.UsersRoomsRepo
 import com.hyapp.achat.model.entity.Event
 import com.hyapp.achat.model.entity.Resource
 import com.hyapp.achat.model.entity.User
 import com.hyapp.achat.model.entity.UserInfo
+import com.hyapp.achat.model.event.ActionEvent
+import com.hyapp.achat.model.objectbox.ContactDao
+import com.hyapp.achat.model.objectbox.MessageDao
+import com.hyapp.achat.model.objectbox.UserDao
+import com.hyapp.achat.viewmodel.service.SocketService
 import com.hyapp.achat.viewmodel.utils.NetUtils
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.*
+import org.greenrobot.eventbus.EventBus
 
 @ExperimentalCoroutinesApi
 class ProfileViewModel(val user: User) : ViewModel() {
+
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 
     private val _userLive = MutableLiveData<User>()
     val userLive = _userLive as LiveData<User>
 
     private val _userInfoLive = MutableLiveData<Resource<UserInfo>>()
     val userInfoLive = _userInfoLive as LiveData<Resource<UserInfo>>
+
+    enum class LikeStatus { ERROR, LIKED, DISLIKED }
+
+    private val _likeFlow = MutableSharedFlow<Pair<LikeStatus, Long>>(extraBufferCapacity = 1)
+    val likeFlow = _likeFlow.asSharedFlow()
 
     init {
         _userLive.value = user
@@ -51,6 +67,60 @@ class ProfileViewModel(val user: User) : ViewModel() {
         }
     }
 
+    fun requestLikeUser() {
+        if (!NetUtils.isNetConnected(App.context)) {
+            _likeFlow.tryEmit(Pair(LikeStatus.ERROR, 0))
+        } else {
+            viewModelScope.launch {
+                UsersRoomsRepo.requestLikeUser(user.uid).collect { pair ->
+                    _likeFlow.tryEmit(pair)
+                }
+            }
+        }
+    }
+
+    fun isCurrUserNotifEnabled(): Boolean {
+        return Preferences.instance().isCurrUserNotifEnabled
+    }
+
+    fun setCurrUserNotif(enabled: Boolean) {
+        Preferences.instance().setCurrUserNotif(enabled)
+    }
+
+    fun setUserNotif(enabled: Boolean) {
+        Preferences.instance().setUserNotif(user.uid, enabled)
+    }
+
+    fun isUserNotifEnabled(): Boolean {
+        return Preferences.instance().isUserNotifEnabled(user.uid)
+    }
+
+    fun requestLogout(): Flow<Resource<Boolean>> = callbackFlow {
+        trySend(Resource.loading(null))
+        if (!NetUtils.isNetConnected(App.context)) {
+            trySend(Resource.error(Event.MSG_NET, null))
+        } else {
+            viewModelScope.launch {
+                LoginRepo.requestLogout().collect { loggedOut ->
+                    if (loggedOut) {
+                        App.context.stopService(Intent(App.context, SocketService::class.java))
+                        withContext(ioDispatcher) {
+                            MainViewModel.publicRoomsMessageMap.clear()
+                            Preferences.instance().putLogged(false)
+                            Preferences.instance().deleteALl()
+                            ContactDao.removeALl()
+                            MessageDao.removeALl()
+                            UserDao.removeALl()
+                        }
+                        trySend(Resource.success(true))
+                    } else {
+                        trySend(Resource.error(Event.MSG_ERROR, null))
+                    }
+                }
+            }
+        }
+        awaitClose {  }
+    }
 
     class Factory(private var user: User) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {

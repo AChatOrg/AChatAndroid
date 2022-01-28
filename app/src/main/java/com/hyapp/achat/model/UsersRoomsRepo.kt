@@ -3,17 +3,14 @@ package com.hyapp.achat.model
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
-import com.hyapp.achat.App
 import com.hyapp.achat.Config
-import com.hyapp.achat.R
 import com.hyapp.achat.model.entity.Room
 import com.hyapp.achat.model.entity.SortedList
 import com.hyapp.achat.model.entity.User
 import com.hyapp.achat.model.entity.UserInfo
 import com.hyapp.achat.model.gson.RoomDeserializer
 import com.hyapp.achat.model.gson.UserDeserializer
-import com.hyapp.achat.model.objectbox.ContactDao
-import com.hyapp.achat.view.utils.UiUtils
+import com.hyapp.achat.viewmodel.ProfileViewModel
 import com.hyapp.achat.viewmodel.service.SocketService
 import io.socket.client.Socket
 import io.socket.emitter.Emitter
@@ -33,8 +30,8 @@ object UsersRoomsRepo {
     const val ROOM_DELETE: Byte = 4
     const val ROOM_MEMBER_COUNT: Byte = 5
 
-    const val USER_INFO_MSG_SUCCESS="success"
-    const val USER_INFO_MSG_NOT_FOUND="notFound"
+    const val USER_INFO_MSG_SUCCESS = "success"
+    const val USER_INFO_MSG_NOT_FOUND = "notFound"
 
     private val _flow = MutableSharedFlow<Pair<Byte, Any>>(extraBufferCapacity = 1)
     val flow = _flow.asSharedFlow()
@@ -187,5 +184,22 @@ object UsersRoomsRepo {
             }
         }
         awaitClose { SocketService.ioSocket?.socket?.off(Config.ON_REQUEST_USER_INFO) }
+    }
+
+    fun requestLikeUser(userUid: String): Flow<Pair<ProfileViewModel.LikeStatus, Long>> = callbackFlow {
+        SocketService.ioSocket?.socket?.let { socket ->
+            socket.emit(Config.ON_REQUEST_LIKE_USER, userUid)
+            socket.on(Config.ON_REQUEST_LIKE_USER) { args ->
+                socket.off(Config.ON_REQUEST_LIKE_USER)
+                val likeResult = args[0].toString().toInt()
+                val likesCount = args[1].toString().toLong()
+                when (likeResult) {
+                    1 -> trySend(Pair(ProfileViewModel.LikeStatus.LIKED, likesCount))
+                    -1 -> trySend(Pair(ProfileViewModel.LikeStatus.DISLIKED, likesCount))
+                    0 -> trySend(Pair(ProfileViewModel.LikeStatus.ERROR, likesCount))
+                }
+            }
+        }
+        awaitClose { SocketService.ioSocket?.socket?.off(Config.ON_REQUEST_LIKE_USER) }
     }
 }

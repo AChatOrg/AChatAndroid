@@ -46,6 +46,30 @@ open class EventActivity : AppCompatActivity() {
         alert(titleRes, getString(messageRes), cancelable, listener)
     }
 
+    fun yesNoAlert(
+        @StringRes titleRes: Int,
+        message: String,
+        cancelable: Boolean = true,
+        listener: DialogInterface.OnClickListener? = null
+    ) {
+        AlertDialog.Builder(this, R.style.RoundedCornersDialog)
+            .setTitle(titleRes)
+            .setMessage(message)
+            .setPositiveButton(R.string.yes, listener)
+            .setNegativeButton(R.string.no, null)
+            .setCancelable(cancelable)
+            .show()
+    }
+
+    fun yesNoAlert(
+        @StringRes titleRes: Int,
+        @StringRes messageRes: Int,
+        cancelable: Boolean = true,
+        listener: DialogInterface.OnClickListener? = null
+    ) {
+        yesNoAlert(titleRes, getString(messageRes), cancelable, listener)
+    }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onExitApp(event: ActionEvent) {
         if (event.action == ActionEvent.ACTION_EXIT_APP) {

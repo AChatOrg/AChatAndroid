@@ -14,9 +14,18 @@
             android:layout_width="match_parent"
             android:layout_height="?actionBarSize"
             android:theme="?actionBarPopupTheme"
+            app:contentInsetStartWithNavigation="0dp"
             app:popupTheme="@style/ThemeOverlay.MaterialComponents.Light"
             app:title="Profile"
             app:titleTextAppearance="@style/Toolbar.title" />
+
+        <View
+            android:id="@+id/toolbarDivider"
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:layout_marginTop="8dp"
+            android:background="@color/grey_15"
+            android:visibility="invisible" />
 
         <com.hyapp.achat.view.component.VerticalSwipeRefreshLayout
             android:id="@+id/swipeRefreshLayout"
@@ -24,6 +33,7 @@
             android:layout_height="match_parent">
 
             <ScrollView
+                android:id="@+id/scrollView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical">

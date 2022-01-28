@@ -35,6 +35,8 @@ data class Message(
     var senderAvatars: List<String> = mutableListOf(),
     var senderOnlineTime: Long = UserConsts.TIME_ONLINE,
 
+    var senderUsername: String = "unknown",
+
     var chatType: Byte = CHAT_TYPE_PV,
 
     var delivery: Byte = DELIVERY_WAITING,
@@ -58,7 +60,7 @@ data class Message(
     ) : this(
         uid, type, transfer, time, text, extraTextSize, mediaPath, receiverUid,
         user.uid, user.rank, user.score, user.loginTime, user.name, user.bio, user.gender,
-        user.avatars, user.onlineTime, chatType
+        user.avatars, user.onlineTime, user.username, chatType
     )
 
     companion object {
@@ -136,7 +138,7 @@ data class Message(
         return Contact(
             Contact.TYPE_USER,
             senderName, senderBio, senderGender, senderAvatars, senderOnlineTime,
-            senderUid, senderRank, senderScore, senderLoginTime,
+            senderUid, senderRank, senderScore, senderLoginTime, senderUsername,
             text, time, mediaPath
         )
     }

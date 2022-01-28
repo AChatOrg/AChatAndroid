@@ -98,4 +98,8 @@
     <string name="notifications">Notifications</string>
     <string name="logout">Logout</string>
     <string name="edit">Edit</string>
+    <string name="check_your_connection">Check your connection</string>
+    <string name="are_you_sure_logout_guest">Logging out will delete your entire chat history and membership from all rooms, are you sure you want to logout?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 </resources>

@@ -2,10 +2,12 @@ package com.hyapp.achat.model.entity
 
 data class UserInfo(
 
-    var viewsCount: String = "0",
-    var likesCount: String = "0",
-    var friendsCount: String = "0",
+    var viewsCount: Long = 0,
+    var likesCount: Long = 0,
+    var friendsCount: Int = 0,
 
     var friendList: List<User> = mutableListOf(),
-    var viewerList: List<User> = mutableListOf()
+    var viewerList: List<User> = mutableListOf(),
+
+    var likedByMe: Boolean = false
 )

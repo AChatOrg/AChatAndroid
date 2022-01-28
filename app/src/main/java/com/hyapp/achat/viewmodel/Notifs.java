@@ -18,6 +18,7 @@ import androidx.core.app.RemoteInput;
 import androidx.core.graphics.drawable.IconCompat;
 
 import com.hyapp.achat.R;
+import com.hyapp.achat.model.Preferences;
 import com.hyapp.achat.model.entity.Contact;
 import com.hyapp.achat.model.entity.Message;
 import com.hyapp.achat.view.ChatActivity;
@@ -79,115 +80,113 @@ public class Notifs {
     public static Notification getSocketNotif(Context context) {
         PendingIntent enterIntent = PendingIntent.getActivity(context, 0, new Intent(context, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
 
-        Intent intent = new Intent(context, NotifReceiver.class);
-
-        intent.setAction(ACTION_EXIT);
-        PendingIntent exitIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
         return new NotificationCompat.Builder(context, Notifs.CHANNEL_SOCKET)
                 .setContentTitle(context.getString(R.string.you_are_connected))
                 .setContentText(context.getString(R.string.tap_to_enter))
                 .setSmallIcon(R.drawable.action_add_chat)
                 .setContentIntent(enterIntent)
-                .addAction(R.drawable.action_exit, context.getString(R.string.exit), exitIntent)
                 .build();
     }
 
     @SuppressLint("UnspecifiedImmutableFlag")
     public static void notifyMessage(Context context, Message message, Contact contact) {
-        Intent receiverIntent = new Intent(context, ChatActivity.class);
-        receiverIntent.putExtra(ChatActivity.EXTRA_CONTACT, contact);
-        receiverIntent.setData((Uri.parse("custom://" + System.currentTimeMillis())));
-        PendingIntent enterIntent = PendingIntent.getActivity(context, 0, receiverIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        if (Preferences.instance().isCurrUserNotifEnabled()) {
+            if (Preferences.instance().isUserNotifEnabled(contact.getUid())) {
+                Intent receiverIntent = new Intent(context, ChatActivity.class);
+                receiverIntent.putExtra(ChatActivity.EXTRA_CONTACT, contact);
+                receiverIntent.setData((Uri.parse("custom://" + System.currentTimeMillis())));
+                PendingIntent enterIntent = PendingIntent.getActivity(context, 0, receiverIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, Notifs.CHANNEL_MESSAGING)
-                .setSmallIcon(R.drawable.action_add_chat)
-                .setContentIntent(enterIntent)
-                .setAutoCancel(true);
+                NotificationCompat.Builder builder = new NotificationCompat.Builder(context, Notifs.CHANNEL_MESSAGING)
+                        .setSmallIcon(R.drawable.action_add_chat)
+                        .setContentIntent(enterIntent)
+                        .setAutoCancel(true);
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            builder.setCategory(Notification.CATEGORY_MESSAGE);
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            Person.Builder personBuilder = new Person.Builder().setName(contact.getName());
-            if (!contact.getAvatars().isEmpty()) {
-                personBuilder.setIcon(IconCompat.createWithContentUri(contact.getAvatars().get(0)));
-            }
-            Person person = personBuilder.build();
-            NotificationCompat.MessagingStyle.Message styleMessage =
-                    new NotificationCompat.MessagingStyle.Message(message.getText(), message.getTime(), person);
-            NotificationCompat.MessagingStyle style = new NotificationCompat.MessagingStyle(person)
-                    .addMessage(styleMessage)
-                    .addMessage(styleMessage)
-                    .addMessage(styleMessage)
-                    .addHistoricMessage(styleMessage)
-                    .setGroupConversation(false);
-
-            builder.setStyle(style);
-        } else {
-            builder.setWhen(message.getTime());
-            builder.setContentTitle(contact.getName());
-            builder.setContentText(message.getText());
-            if (!contact.getAvatars().isEmpty()) {
-                try {
-                    URL url = new URL(contact.getAvatars().get(0));
-                    Bitmap image = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-                    builder.setLargeIcon(image);
-                } catch (IOException ignored) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    builder.setCategory(Notification.CATEGORY_MESSAGE);
                 }
-            }
-        }
 
-        CharSequence replyLabel = context.getString(R.string.reply);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    Person.Builder personBuilder = new Person.Builder().setName(contact.getName());
+                    if (!contact.getAvatars().isEmpty()) {
+                        personBuilder.setIcon(IconCompat.createWithContentUri(contact.getAvatars().get(0)));
+                    }
+                    Person person = personBuilder.build();
+                    NotificationCompat.MessagingStyle.Message styleMessage =
+                            new NotificationCompat.MessagingStyle.Message(message.getText(), message.getTime(), person);
+                    NotificationCompat.MessagingStyle style = new NotificationCompat.MessagingStyle(person)
+                            .addMessage(styleMessage)
+                            .addMessage(styleMessage)
+                            .addMessage(styleMessage)
+                            .addHistoricMessage(styleMessage)
+                            .setGroupConversation(false);
 
-        RemoteInput remoteInput = new RemoteInput.Builder(KEY_REPLY_MESSAGE)
-                .setLabel(replyLabel)
-                .build();
+                    builder.setStyle(style);
+                } else {
+                    builder.setWhen(message.getTime());
+                    builder.setContentTitle(contact.getName());
+                    builder.setContentText(message.getText());
+                    if (!contact.getAvatars().isEmpty()) {
+                        try {
+                            URL url = new URL(contact.getAvatars().get(0));
+                            Bitmap image = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+                            builder.setLargeIcon(image);
+                        } catch (IOException ignored) {
+                        }
+                    }
+                }
 
-        receiverIntent = new Intent(context, NotifReceiver.class);
-        receiverIntent.setAction(ACTION_REPLY_MESSAGE);
-        receiverIntent.putExtra(NotifReceiver.EXTRA_CONTACT, contact);
-        receiverIntent.putExtra(NotifReceiver.EXTRA_MESSAGE, message);
-        receiverIntent.setData((Uri.parse("custom://" + System.currentTimeMillis())));
+                CharSequence replyLabel = context.getString(R.string.reply);
 
-        PendingIntent replyPendingIntent = PendingIntent.getBroadcast(context,
-                (int) contact.getId(),
-                receiverIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
+                RemoteInput remoteInput = new RemoteInput.Builder(KEY_REPLY_MESSAGE)
+                        .setLabel(replyLabel)
+                        .build();
 
-        NotificationCompat.Action replyAction = new NotificationCompat.Action
-                .Builder(R.drawable.action_reply, replyLabel, replyPendingIntent)
-                .addRemoteInput(remoteInput)
-                .setSemanticAction(NotificationCompat.Action.SEMANTIC_ACTION_REPLY)
-                .setShowsUserInterface(false)
-                .build();
+                receiverIntent = new Intent(context, NotifReceiver.class);
+                receiverIntent.setAction(ACTION_REPLY_MESSAGE);
+                receiverIntent.putExtra(NotifReceiver.EXTRA_CONTACT, contact);
+                receiverIntent.putExtra(NotifReceiver.EXTRA_MESSAGE, message);
+                receiverIntent.setData((Uri.parse("custom://" + System.currentTimeMillis())));
 
-        receiverIntent = new Intent(context, NotifReceiver.class);
-        receiverIntent.setAction(ACTION_MARK_MESSAGE_AS_READ);
-        receiverIntent.putExtra(NotifReceiver.EXTRA_MESSAGE, message);
-        receiverIntent.setData((Uri.parse("custom://" + System.currentTimeMillis())));
+                PendingIntent replyPendingIntent = PendingIntent.getBroadcast(context,
+                        (int) contact.getId(),
+                        receiverIntent,
+                        PendingIntent.FLAG_UPDATE_CURRENT);
 
-        PendingIntent markMessageAsReadPendingIntent = PendingIntent.getBroadcast(context, 0, receiverIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                NotificationCompat.Action replyAction = new NotificationCompat.Action
+                        .Builder(R.drawable.action_reply, replyLabel, replyPendingIntent)
+                        .addRemoteInput(remoteInput)
+                        .setSemanticAction(NotificationCompat.Action.SEMANTIC_ACTION_REPLY)
+                        .setShowsUserInterface(false)
+                        .build();
 
-        NotificationCompat.Action markAsReadAction = new NotificationCompat.Action
-                .Builder(R.drawable.msg_read_contact, context.getString(R.string.mark_as_read), markMessageAsReadPendingIntent)
-                .setSemanticAction(NotificationCompat.Action.SEMANTIC_ACTION_MARK_AS_READ)
-                .setShowsUserInterface(false)
-                .build();
+                receiverIntent = new Intent(context, NotifReceiver.class);
+                receiverIntent.setAction(ACTION_MARK_MESSAGE_AS_READ);
+                receiverIntent.putExtra(NotifReceiver.EXTRA_MESSAGE, message);
+                receiverIntent.setData((Uri.parse("custom://" + System.currentTimeMillis())));
 
-        NotificationCompat.Action wearableReplyAction = new NotificationCompat.Action.Builder(R.drawable.action_reply, replyLabel, replyPendingIntent)
-                .addRemoteInput(remoteInput)
-                .build();
+                PendingIntent markMessageAsReadPendingIntent = PendingIntent.getBroadcast(context, 0, receiverIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        NotificationCompat.WearableExtender extender = new NotificationCompat.WearableExtender();
-        extender.addAction(wearableReplyAction);
-        extender.addAction(markAsReadAction);
+                NotificationCompat.Action markAsReadAction = new NotificationCompat.Action
+                        .Builder(R.drawable.msg_read_contact, context.getString(R.string.mark_as_read), markMessageAsReadPendingIntent)
+                        .setSemanticAction(NotificationCompat.Action.SEMANTIC_ACTION_MARK_AS_READ)
+                        .setShowsUserInterface(false)
+                        .build();
+
+                NotificationCompat.Action wearableReplyAction = new NotificationCompat.Action.Builder(R.drawable.action_reply, replyLabel, replyPendingIntent)
+                        .addRemoteInput(remoteInput)
+                        .build();
+
+                NotificationCompat.WearableExtender extender = new NotificationCompat.WearableExtender();
+                extender.addAction(wearableReplyAction);
+                extender.addAction(markAsReadAction);
 
 //        builder.addAction(replyAction);
 //        builder.addAction(markAsReadAction);
 //        builder.extend(extender);
 
-        notificationManager(context).notify((int) contact.getId(), builder.build());
+                notificationManager(context).notify((int) contact.getId(), builder.build());
+            }
+        }
     }
 }

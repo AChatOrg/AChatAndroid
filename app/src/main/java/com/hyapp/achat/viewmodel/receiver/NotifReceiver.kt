@@ -33,15 +33,10 @@ class NotifReceiver : BroadcastReceiver(), CoroutineScope {
         val action = intent.action
         if (action != null) {
             when (action) {
-                Notifs.ACTION_EXIT -> handleExitApp(context)
                 Notifs.ACTION_REPLY_MESSAGE -> handleReplyMessage(intent)
                 Notifs.ACTION_MARK_MESSAGE_AS_READ -> handleMarkMessageAsRead(intent)
             }
         }
-    }
-
-    private fun handleExitApp(context: Context) {
-        LoginRepo.requestLogout()
     }
 
     private fun handleReplyMessage(intent: Intent) {

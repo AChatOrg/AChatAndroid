@@ -95,7 +95,7 @@ class ChatViewModel(var contact: Contact) : ViewModel() {
                     uid = PROFILE_MESSAGE_UID,
                     type = Message.TYPE_PROFILE,
                     user = contact.getUser(),
-                    chatType = messageChatType
+                    chatType = messageChatType,
                 )
             )
             _messagesLive.postValue(

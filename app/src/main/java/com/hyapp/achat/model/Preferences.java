@@ -30,8 +30,9 @@ public class Preferences {
     public static final String BIO_SET = "bioSet";
 
     public static final String LOGIN_INFO = "loginEvent";
-
     public static final String CONTACT_MESSAGES_COUNT = "CMC";
+    public static final String OTHER_USER_NOTIFICATIONS = "OUN";
+    public static final String CURR_USER_NOTIFICATIONS = "CUN";
 
     private static Preferences instance;
 
@@ -131,5 +132,25 @@ public class Preferences {
 
     public long getContactMessagesCount(String contactUid) {
         return preferences.getLong(CONTACT_MESSAGES_COUNT + contactUid, 0);
+    }
+
+    public void setUserNotif(String userUid, boolean enabled) {
+        SharedPreferences.Editor writer = preferences.edit();
+        writer.putBoolean(OTHER_USER_NOTIFICATIONS + userUid, enabled);
+        writer.apply();
+    }
+
+    public boolean isUserNotifEnabled(String userUid) {
+        return preferences.getBoolean(OTHER_USER_NOTIFICATIONS + userUid, true);
+    }
+
+    public void setCurrUserNotif(boolean enabled) {
+        SharedPreferences.Editor writer = preferences.edit();
+        writer.putBoolean(CURR_USER_NOTIFICATIONS, enabled);
+        writer.apply();
+    }
+
+    public boolean isCurrUserNotifEnabled() {
+        return preferences.getBoolean(CURR_USER_NOTIFICATIONS, true);
     }
 }

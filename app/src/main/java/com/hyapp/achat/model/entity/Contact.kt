@@ -27,6 +27,8 @@ data class Contact(
     var score: Int = 0,
     var loginTime: Long = 0,
 
+    var username: String = "unknown",
+
     var message: String = "",
     var messageTime: Long = 0,
     var mediaPath: String = "",
@@ -41,8 +43,17 @@ data class Contact(
 ) : UserConsts(), Parcelable {
 
     constructor(user: User) : this(
-        TYPE_USER, user.name, user.bio, user.gender,
-        user.avatars, user.onlineTime, user.uid, user.rank, user.score, user.loginTime
+        TYPE_USER,
+        user.name,
+        user.bio,
+        user.gender,
+        user.avatars,
+        user.onlineTime,
+        user.uid,
+        user.rank,
+        user.score,
+        user.loginTime,
+        user.username
     )
 
     constructor(room: Room, membersStr: String, onlineStr: String) : this(
@@ -64,7 +75,18 @@ data class Contact(
     }
 
     fun getUser(): User {
-        return User(name, bio, gender, avatars, onlineTime, uid, rank, score, loginTime)
+        return User(
+            name,
+            bio,
+            gender,
+            avatars,
+            onlineTime,
+            uid,
+            rank,
+            score,
+            loginTime,
+            username = username
+        )
     }
 
     val isUser

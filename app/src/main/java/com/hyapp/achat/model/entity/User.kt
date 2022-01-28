@@ -24,7 +24,9 @@ data class User(
     var loginTime: Long = 0,
 
     @Id(assignable = true)
-    var id: Long = 0
+    var id: Long = 0,
+
+    var username: String = "unknown"
 
 ) : UserConsts(), Parcelable {
 
@@ -43,4 +45,7 @@ data class User(
             return if (u1.loginTime > u2.loginTime) return 1 else 0
         }
     }
+
+    val isGuest
+        get() = rank == RANK_GUEST
 }
