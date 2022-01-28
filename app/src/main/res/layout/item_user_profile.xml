@@ -16,32 +16,15 @@
 
         <com.facebook.drawee.view.SimpleDraweeView
             android:id="@+id/avatar"
-            android:layout_width="54dp"
-            android:layout_height="54dp"
+            android:layout_width="46dp"
+            android:layout_height="46dp"
             android:layout_margin="10dp"
-            android:background="@drawable/avatar_54"
+            android:background="@drawable/avatar_46"
             app:actualImageScaleType="centerCrop"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:roundAsCircle="true" />
-
-        <TextView
-            android:id="@+id/onlineTime"
-            android:layout_width="wrap_content"
-            android:layout_height="16dp"
-            android:background="@drawable/last_online_contact_bg_grey"
-            android:fontFamily="@font/iran_sans_light"
-            android:gravity="center"
-            android:minWidth="16dp"
-            android:paddingLeft="3.5dp"
-            android:paddingTop="2dp"
-            android:paddingRight="3.5dp"
-            android:textSize="8sp"
-            app:layout_constraintBottom_toBottomOf="@+id/avatar"
-            app:layout_constraintEnd_toEndOf="@+id/avatar"
-            tools:ignore="SmallSp"
-            tools:text="3d" />
 
         <TextView
             android:id="@+id/name"

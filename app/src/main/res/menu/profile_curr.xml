@@ -3,9 +3,18 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/settings"
-        android:icon="@drawable/ic_action_settings"
-        android:title="@string/settings"
+        android:id="@+id/edit"
+        android:icon="@drawable/action_edit"
+        android:title="@string/edit"
+        app:actionLayout="@layout/layout_action_edit"
+        app:iconTint="@color/black"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/logout"
+        android:icon="@drawable/action_logout"
+        android:title="@string/logout"
+        app:actionLayout="@layout/layout_action_logout"
         app:iconTint="@color/black"
         app:showAsAction="ifRoom" />
 

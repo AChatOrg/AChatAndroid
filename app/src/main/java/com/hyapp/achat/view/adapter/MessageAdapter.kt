@@ -16,10 +16,12 @@ import com.hyapp.achat.R
 import com.hyapp.achat.model.entity.Contact
 import com.hyapp.achat.model.entity.Message
 import com.hyapp.achat.model.entity.UserConsts
+import com.hyapp.achat.view.ProfileActivity
 import com.hyapp.achat.view.component.GroupAvatarView
 import com.hyapp.achat.view.component.emojiview.view.AXEmojiTextView
 import com.hyapp.achat.view.utils.UiUtils
 import com.hyapp.achat.viewmodel.utils.TimeUtils
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 
 class MessageAdapter(val context: Context, val recyclerView: RecyclerView) :
@@ -173,6 +175,7 @@ class MessageAdapter(val context: Context, val recyclerView: RecyclerView) :
         open fun bind(message: Message, payloads: List<Any?>) {}
     }
 
+    @ExperimentalCoroutinesApi
     @Suppress("LeakingThis")
     inner class ProfileHolder(itemView: View) : Holder(itemView), View.OnClickListener {
         private val name: TextView = itemView.findViewById(R.id.name)
@@ -221,7 +224,8 @@ class MessageAdapter(val context: Context, val recyclerView: RecyclerView) :
         }
 
         override fun onClick(v: View) {
-            //todo go to profile page
+            val message = getItem(adapterPosition)
+            ProfileActivity.start(context, message.getContact().getUser())
         }
 
         init {

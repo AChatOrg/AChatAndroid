@@ -18,7 +18,7 @@
             app:title="Profile"
             app:titleTextAppearance="@style/Toolbar.title" />
 
-        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        <com.hyapp.achat.view.component.VerticalSwipeRefreshLayout
             android:id="@+id/swipeRefreshLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -109,7 +109,7 @@
                         android:paddingLeft="32dp"
                         android:paddingRight="32dp"
                         android:textColor="@color/grey_35"
-                        android:textSize="14sp"
+                        android:textSize="@dimen/text_14"
                         app:layout_constraintEnd_toEndOf="@+id/name"
                         app:layout_constraintStart_toStartOf="@+id/name"
                         app:layout_constraintTop_toBottomOf="@id/rank"
@@ -228,6 +228,58 @@
                         app:layout_constraintHorizontal_bias="0.5"
                         app:layout_constraintStart_toEndOf="@+id/likes" />
 
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/voiceCall"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:background="@drawable/action_bg"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:padding="6dp"
+                        android:src="@drawable/ic_action_voice_call"
+                        app:layout_constraintBottom_toBottomOf="@+id/videoCall"
+                        app:layout_constraintEnd_toEndOf="@+id/views"
+                        app:layout_constraintStart_toStartOf="@+id/views"
+                        app:layout_constraintTop_toTopOf="@+id/videoCall"
+                        app:tint="?colorPrimary" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/videoCall"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_marginTop="24dp"
+                        android:background="@drawable/action_bg"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:padding="6dp"
+                        android:src="@drawable/ic_action_video_call"
+                        app:layout_constraintEnd_toEndOf="@+id/likes"
+                        app:layout_constraintStart_toStartOf="@+id/likes"
+                        app:layout_constraintTop_toBottomOf="@+id/likes"
+                        app:tint="?colorPrimary" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/chat"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:background="@drawable/action_bg"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:padding="6dp"
+                        android:src="@drawable/action_chat"
+                        app:layout_constraintBottom_toBottomOf="@+id/videoCall"
+                        app:layout_constraintEnd_toEndOf="@+id/friends"
+                        app:layout_constraintStart_toStartOf="@+id/friends"
+                        app:layout_constraintTop_toTopOf="@+id/videoCall"
+                        app:tint="?colorPrimary" />
+
+                    <View
+                        android:id="@+id/friendsDivider"
+                        android:layout_width="match_parent"
+                        android:layout_height="12dp"
+                        android:layout_marginTop="32dp"
+                        android:background="@color/grey_02"
+                        app:layout_constraintTop_toBottomOf="@id/videoCall" />
 
                     <TextView
                         android:id="@+id/friendsTitle"
@@ -235,20 +287,36 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:layout_marginLeft="16dp"
-                        android:layout_marginTop="24dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginEnd="16dp"
+                        android:layout_marginRight="16dp"
                         android:text="@string/friends"
                         android:textColor="@color/grey_30"
                         android:textSize="@dimen/text_14"
+                        app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/likes" />
+                        app:layout_constraintTop_toBottomOf="@id/friendsDivider" />
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/recyclerViewFriends"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="100dp"
+                        android:layout_marginBottom="16dp"
+                        android:clipToPadding="false"
+                        android:paddingLeft="5dp"
+                        android:paddingRight="5dp"
+                        app:layout_constraintBottom_toTopOf="@id/viewersDivider"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/friendsTitle" />
+
+                    <View
+                        android:id="@+id/viewersDivider"
+                        android:layout_width="match_parent"
+                        android:layout_height="12dp"
+                        android:layout_marginTop="16dp"
+                        android:background="@color/grey_02"
+                        app:layout_constraintTop_toBottomOf="@id/recyclerViewFriends" />
 
                     <TextView
                         android:id="@+id/viewersTitle"
@@ -256,20 +324,76 @@
                         android:layout_height="wrap_content"
                         android:layout_marginStart="16dp"
                         android:layout_marginLeft="16dp"
-                        android:layout_marginTop="24dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginEnd="16dp"
+                        android:layout_marginRight="16dp"
                         android:text="@string/lastViewers"
                         android:textColor="@color/grey_30"
                         android:textSize="@dimen/text_14"
+                        app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/recyclerViewFriends" />
+                        app:layout_constraintTop_toBottomOf="@id/viewersDivider" />
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/recyclerViewViewers"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="100dp"
+                        android:layout_marginBottom="16dp"
+                        android:clipToPadding="false"
+                        android:paddingLeft="5dp"
+                        android:paddingRight="5dp"
+                        app:layout_constraintBottom_toTopOf="@id/notifDivider"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/viewersTitle" />
+
+                    <View
+                        android:id="@+id/notifDivider"
+                        android:layout_width="match_parent"
+                        android:layout_height="12dp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginBottom="32dp"
+                        android:background="@color/grey_02"
+                        app:layout_constraintTop_toBottomOf="@id/recyclerViewViewers" />
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/notifsIcon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginLeft="16dp"
+                        app:layout_constraintBottom_toBottomOf="@id/notifsSwitch"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="@id/notifsSwitch"
+                        app:srcCompat="@drawable/ic_action_notif_fill" />
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/notifsSwitch"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginLeft="16dp"
+                        android:layout_marginTop="16dp"
+                        android:layout_marginEnd="24dp"
+                        android:layout_marginRight="24dp"
+                        android:layout_marginBottom="8dp"
+                        android:text="@string/notifications"
+                        android:textSize="@dimen/text_16"
+                        app:layout_constraintBottom_toTopOf="@id/mediaDivider"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/notifsIcon"
+                        app:layout_constraintTop_toBottomOf="@id/notifDivider" />
+
+                    <View
+                        android:id="@+id/mediaDivider"
+                        android:layout_width="match_parent"
+                        android:layout_height="12dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginBottom="32dp"
+                        android:background="@color/grey_02"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/notifsSwitch" />
+
 
                     <com.google.android.material.progressindicator.LinearProgressIndicator
                         android:id="@+id/progressBar"
@@ -281,8 +405,14 @@
                         app:trackCornerRadius="100dp"
                         app:trackThickness="2dp" />
 
+                    <androidx.constraintlayout.widget.Group
+                        android:id="@+id/currUserGroup"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        app:constraint_referenced_ids="mediaDivider, notifsIcon, notifsSwitch"/>
+
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </ScrollView>
-        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+        </com.hyapp.achat.view.component.VerticalSwipeRefreshLayout>
     </LinearLayout>
 </layout>

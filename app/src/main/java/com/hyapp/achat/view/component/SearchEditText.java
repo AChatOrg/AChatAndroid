@@ -56,7 +56,7 @@ public class SearchEditText extends AppCompatEditText implements View.OnFocusCha
         setLines(1);
         setTypeface(ResourcesCompat.getFont(context, R.font.iran_sans_regular));
         setOnFocusChangeListener(this);
-        setBackgroundResource(R.drawable.toolbar_action_bg);
+        setBackgroundResource(R.drawable.action_bg);
         setClickable(true);
         setFocusable(true);
         setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
@@ -102,7 +102,7 @@ public class SearchEditText extends AppCompatEditText implements View.OnFocusCha
             setText("");
             setPadding(dp6, 0, dp6, 0);
             setCompoundDrawablesTint(Color.BLACK);
-            setBackgroundResource(R.drawable.toolbar_action_bg);
+            setBackgroundResource(R.drawable.action_bg);
         }
     }
 

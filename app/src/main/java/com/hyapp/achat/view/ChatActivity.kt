@@ -73,6 +73,7 @@ class ChatActivity : EventActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         init()
+        setupContact()
         setupRecyclerView()
         setupSendButton()
         setupMessageEditText()
@@ -118,6 +119,13 @@ class ChatActivity : EventActivity() {
             ChatViewModel.Factory(contact)
         )[ChatViewModel::class.java]
         layoutTransition = (binding.root as ViewGroup).layoutTransition
+    }
+
+    private fun setupContact() {
+        val contactOnclick = OnClickListener { ProfileActivity.start(this, contact.getUser()) }
+        binding.avatar.setOnClickListener(contactOnclick)
+        binding.name.setOnClickListener(contactOnclick)
+        binding.bio.setOnClickListener(contactOnclick)
     }
 
     private fun setupRecyclerView() {

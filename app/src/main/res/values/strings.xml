@@ -94,4 +94,8 @@
     <string name="report">Report</string>
     <string name="block">Block</string>
     <string name="settings">Settings</string>
+    <string name="comming_soon">Comming soon</string>
+    <string name="notifications">Notifications</string>
+    <string name="logout">Logout</string>
+    <string name="edit">Edit</string>
 </resources>
