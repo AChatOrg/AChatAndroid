@@ -24,15 +24,6 @@ class EditProfileViewModel(val user: User) : ViewModel() {
         const val EMPTY_NEW_PASS: Byte = 2
     }
 
-    class Factory(private var user: User) : ViewModelProvider.Factory {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            if (modelClass.isAssignableFrom(EditProfileViewModel::class.java)) {
-                return EditProfileViewModel(user) as T
-            }
-            throw IllegalArgumentException("Unknown ViewModel class")
-        }
-    }
-
     fun requestChangePassword(currPassword: String, newPassword: String): Flow<Resource<Byte>> =
         callbackFlow {
 
@@ -70,5 +61,15 @@ class EditProfileViewModel(val user: User) : ViewModel() {
             }
         }
         awaitClose()
+    }
+
+
+    class Factory(private var user: User) : ViewModelProvider.Factory {
+        override fun <T : ViewModel> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(EditProfileViewModel::class.java)) {
+                return EditProfileViewModel(user) as T
+            }
+            throw IllegalArgumentException("Unknown ViewModel class")
+        }
     }
 }

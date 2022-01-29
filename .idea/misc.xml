@@ -39,6 +39,7 @@
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/drawable/round_bottom_sheet_bg.xml" value="0.2169230769230769" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/drawable/toolbar_action_bg.xml" value="0.2203125" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/drawable/toolbar_action_bg_light.xml" value="0.2203125" />
+        <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/activity_avatar.xml" value="0.2" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/activity_chat.xml" value="0.33" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/activity_edit_profile.xml" value="0.25" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/activity_guest_login.xml" value="0.25" />
@@ -82,6 +83,7 @@
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/layout_users_rooms.xml" value="0.14673913043478262" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/likeview.xml" value="0.1933876811594203" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/recycler_view.xml" value="0.16576086956521738" />
+        <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/menu/avatar.xml" value="0.20416666666666666" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/menu/profile.xml" value="0.20416666666666666" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/menu/profile_curr.xml" value="0.20364583333333333" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/menu/profile_others.xml" value="0.20364583333333333" />

@@ -53,7 +53,6 @@ class ProfileActivity : EventActivity() {
     private lateinit var likeButton: LikeButton
     private lateinit var notifOptionsMenuItem: MenuItem
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         init()
@@ -65,6 +64,7 @@ class ProfileActivity : EventActivity() {
         observeUserInfo()
         setupCurrUserNotif()
         binding.swipeRefreshLayout.setOnRefreshListener { viewModel.requestUserInfo() }
+        binding.avatar.setOnClickListener { AvatarActivity.start(this, user) }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

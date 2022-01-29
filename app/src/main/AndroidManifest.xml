@@ -19,6 +19,11 @@
         android:theme="@style/Theme.AChat"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".view.AvatarActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:exported="true"
+            android:hardwareAccelerated="true"/>
+        <activity
             android:name=".view.EditProfileActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="true"
@@ -28,8 +33,7 @@
             android:name=".view.ProfileActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="true"
-            android:hardwareAccelerated="true"
-            android:windowSoftInputMode="adjustResize|adjustNothing" />
+            android:hardwareAccelerated="true" />
         <activity
             android:name=".view.ChatActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"

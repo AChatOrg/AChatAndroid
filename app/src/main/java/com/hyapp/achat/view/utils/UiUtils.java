@@ -1,5 +1,6 @@
 package com.hyapp.achat.view.utils;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -18,10 +19,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 
 import androidx.annotation.FontRes;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.core.content.res.ResourcesCompat;
 
 import com.hyapp.achat.view.component.CustomTypefaceSpan;
@@ -157,5 +161,24 @@ public class UiUtils {
 
     public interface OnListDialogChoose {
         void onChoose(CharSequence value);
+    }
+
+
+    public static void setPopupMenuFont(Context context, PopupMenu popupMenu, int fontRes) {
+        Menu menu = popupMenu.getMenu();
+        for (int i = 0; i < menu.size(); i++) {
+            MenuItem mi = menu.getItem(i);
+            SpannableString mNewTitle = new SpannableString(mi.getTitle());
+            mNewTitle.setSpan(new CustomTypefaceSpan("", ResourcesCompat.getFont(context, fontRes)), 0, mNewTitle.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+            mi.setTitle(mNewTitle);
+        }
+    }
+
+    public static void setStatusBarColor(Activity activity, int color) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Window window = activity.getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.setStatusBarColor(color);
+        }
     }
 }
