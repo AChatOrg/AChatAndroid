@@ -24,6 +24,10 @@
         <item name="android:textColor">@android:color/black</item>
         <item name="linkColor">@color/link</item>
         <item name="bottomSheetDialogTheme">@style/BottomSheetDialogTheme</item>
+
+        <item name="android:windowContentTransitions" tools:ignore="NewApi">true</item>
+        <item name="android:windowAllowEnterTransitionOverlap" tools:ignore="NewApi">true</item>
+        <item name="android:windowAllowReturnTransitionOverlap" tools:ignore="NewApi">true</item>
     </style>
 
     <style name="RoundedCornersDialog" parent="Theme.MaterialComponents.Light.Dialog">

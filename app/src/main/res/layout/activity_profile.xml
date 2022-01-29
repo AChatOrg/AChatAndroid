@@ -44,22 +44,17 @@
                     android:layout_marginBottom="8dp"
                     app:layout_scrollFlags="scroll">
 
-                    <com.facebook.drawee.view.SimpleDraweeView
+                    <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/avatar"
                         android:layout_width="100dp"
                         android:layout_height="100dp"
                         android:layout_marginTop="16dp"
-                        app:actualImageScaleType="centerCrop"
+                        android:transitionName="@string/transition_avatar"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintHorizontal_bias="0.5"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
-                        app:placeholderImage="@drawable/avatar_profile"
-                        app:placeholderImageScaleType="centerCrop"
-                        app:roundAsCircle="true"
-                        app:roundingBorderColor="@color/grey_15"
-                        app:roundingBorderPadding="1px"
-                        app:roundingBorderWidth="1px" />
+                        tools:src="@drawable/avatar_profile" />
 
                     <TextView
                         android:id="@+id/onlineTime"
@@ -419,7 +414,7 @@
                         android:id="@+id/currUserGroup"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
-                        app:constraint_referenced_ids="mediaDivider, notifsIcon, notifsSwitch"/>
+                        app:constraint_referenced_ids="mediaDivider, notifsIcon, notifsSwitch" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </ScrollView>

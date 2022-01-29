@@ -297,8 +297,7 @@ class MessageAdapter(val context: Context, val recyclerView: RecyclerView) :
                     if (bubble == Message.BUBBLE_SINGLE || bubble == Message.BUBBLE_END) {
                         avatar?.visibility = View.VISIBLE
                         time.visibility = View.VISIBLE
-                        val avatars = message.senderAvatars
-                        avatar?.setImageURI(if (avatars.isNotEmpty()) avatars[0] else null)
+                        avatar?.setImageURI(message.firstSenderAvatar)
                     } else {
                         avatar?.visibility = View.GONE
                         time.visibility = View.GONE

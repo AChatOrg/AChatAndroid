@@ -98,6 +98,10 @@ data class Contact(
     val isPvRoom
         get() = type == TYPE_PV_ROOM
 
+
+    val firstAvatar
+        get() = if (avatars.isNotEmpty()) avatars[0] else ""
+
     fun same(c: Contact): Boolean {
         return message == c.message
                 && messageTime == c.messageTime

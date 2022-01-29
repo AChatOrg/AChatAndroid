@@ -118,4 +118,5 @@
     <string name="password_changed">Password changed</string>
     <string name="you_did_not_make_change">You did not make any changes.</string>
     <string name="profile_changed">Profile changed</string>
+    <string name="transition_avatar">transition_avatar</string>
 </resources>

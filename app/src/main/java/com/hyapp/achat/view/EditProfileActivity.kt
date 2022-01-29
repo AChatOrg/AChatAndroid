@@ -70,8 +70,7 @@ class EditProfileActivity : EventActivity() {
     }
 
     private fun setupUser() {
-        val avatars: List<String> = user.avatars
-        binding.avatar.setImageURI(if (avatars.isNotEmpty()) avatars[0] else null)
+        binding.avatar.setImageURI(user.firstAvatar)
         binding.nameEditText.setText(user.name)
         binding.bioEditText.setText(user.bio)
         binding.genderEditText.setText(if (user.isMale) R.string.male else R.string.female)

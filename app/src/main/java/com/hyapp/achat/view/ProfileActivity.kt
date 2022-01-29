@@ -1,9 +1,12 @@
 package com.hyapp.achat.view
 
+import android.app.Activity
+import android.app.ActivityOptions
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.PorterDuff
+import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -26,6 +29,48 @@ import com.hyapp.achat.viewmodel.utils.TimeUtils
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import com.facebook.binaryresource.FileBinaryResource
+
+import com.facebook.imagepipeline.core.ImagePipelineFactory
+
+import com.facebook.binaryresource.BinaryResource
+
+import com.facebook.imagepipeline.cache.DefaultCacheKeyFactory
+
+import com.facebook.cache.common.CacheKey
+
+import com.facebook.imagepipeline.request.ImageRequest
+import java.io.File
+import com.facebook.datasource.DataSources
+
+import com.facebook.imagepipeline.image.CloseableImage
+
+import com.facebook.common.references.CloseableReference
+import com.facebook.datasource.DataSource
+import com.facebook.drawee.backends.pipeline.Fresco
+import com.facebook.imagepipeline.common.ResizeOptions
+
+import com.facebook.imagepipeline.request.ImageRequestBuilder
+
+import com.facebook.imagepipeline.core.ImagePipeline
+
+import com.facebook.datasource.DataSubscriber
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
+import android.os.Build
+import android.transition.TransitionInflater
+import android.widget.ImageView
+import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
+import com.facebook.common.executors.UiThreadImmediateExecutorService
+
+import com.facebook.imagepipeline.image.CloseableBitmap
+
+import com.facebook.datasource.BaseDataSubscriber
+import com.hyapp.achat.view.component.AbstractTransitionListener
+
 
 @ExperimentalCoroutinesApi
 class ProfileActivity : EventActivity() {
@@ -33,10 +78,19 @@ class ProfileActivity : EventActivity() {
     companion object {
         private const val EXTRA_USER = "extraUser"
 
-        fun start(context: Context, user: User) {
+        fun start(context: Context, user: User, transitionImage: ImageView? = null) {
             val intent = Intent(context, ProfileActivity::class.java)
             intent.putExtra(EXTRA_USER, user)
-            context.startActivity(intent)
+            if (transitionImage != null && context is Activity && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                val options = ActivityOptions.makeSceneTransitionAnimation(
+                    context,
+                    transitionImage,
+                    context.getString(R.string.transition_avatar)
+                )
+                context.startActivity(intent, options.toBundle())
+            } else {
+                context.startActivity(intent)
+            }
         }
     }
 
@@ -64,7 +118,9 @@ class ProfileActivity : EventActivity() {
         observeUserInfo()
         setupCurrUserNotif()
         binding.swipeRefreshLayout.setOnRefreshListener { viewModel.requestUserInfo() }
-        binding.avatar.setOnClickListener { AvatarActivity.start(this, user) }
+        binding.avatar.setOnClickListener {
+            AvatarActivity.start(this, user, binding.avatar)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -268,8 +324,11 @@ class ProfileActivity : EventActivity() {
     private fun setupUser(user: User) {
         binding.run {
             toolbar.title = user.username
-            val avatars: List<String> = user.avatars
-            avatar.setImageURI(if (avatars.isNotEmpty()) avatars[0] else null)
+            Glide.with(this@ProfileActivity)
+                .load(user.firstAvatar)
+                .circleCrop()
+                .placeholder(R.drawable.avatar_profile)
+                .into(avatar)
             name.text = user.name
             bio.text = user.bio
             val pair = UserConsts.rankInt2rankStrResAndColor(user.rank)

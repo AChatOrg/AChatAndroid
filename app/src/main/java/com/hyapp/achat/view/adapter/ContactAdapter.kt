@@ -202,8 +202,7 @@ class ContactAdapter(private val context: Context) :
         }
 
         private fun setAvatar(contact: Contact) {
-            val avatars = contact.avatars
-            binding.avatarDraweeView.setImageURI(if (avatars.isNotEmpty()) avatars[0] else null)
+            binding.avatarDraweeView.setImageURI(contact.firstAvatar)
         }
 
         private fun setOnlineTime(contact: Contact) {

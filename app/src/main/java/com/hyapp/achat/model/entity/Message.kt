@@ -109,6 +109,10 @@ data class Message(
     val isPvRoom
         get() = chatType == CHAT_TYPE_PV_ROOM
 
+
+    val firstSenderAvatar
+        get() = if (senderAvatars.isNotEmpty()) senderAvatars[0] else ""
+
     fun setAndGetTextSizes(sp1: Int): Pair<Float, Int> {
         var textSize = ((TEXT_SIZE_SP + extraTextSize) * sp1).toFloat()
         var emojiSize = ((TEXT_SIZE_SP + 3 + extraTextSize) * sp1).toFloat()

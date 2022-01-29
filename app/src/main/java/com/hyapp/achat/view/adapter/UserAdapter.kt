@@ -51,8 +51,7 @@ class UserAdapter(private val context: Context) : ListAdapter<User, UserAdapter.
         fun bind(user: User) {
             binding.user = user
             binding.executePendingBindings()
-            val avatars: List<String> = user.avatars
-            binding.avatar.setImageURI(if (avatars.isNotEmpty()) avatars[0] else null)
+            binding.avatar.setImageURI(user.firstAvatar)
             when (user.gender) {
                 UserConsts.GENDER_MALE -> binding.genderCircle.setBackgroundResource(R.drawable.gender_circle_user_male_bg)
                 UserConsts.GENDER_FEMALE -> binding.genderCircle.setBackgroundResource(R.drawable.gender_circle_user_female_bg)

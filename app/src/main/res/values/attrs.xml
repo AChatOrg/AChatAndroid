@@ -10,37 +10,37 @@
     <attr name="emojiSize" format="dimension" />
 
     <declare-styleable name="AXEmojiEditText">
-        <attr name="emojiSize"/>
+        <attr name="emojiSize" />
     </declare-styleable>
 
     <declare-styleable name="AXEmojiTextView">
-        <attr name="emojiSize"/>
+        <attr name="emojiSize" />
     </declare-styleable>
 
     <declare-styleable name="AXEmojiButton">
-        <attr name="emojiSize"/>
+        <attr name="emojiSize" />
     </declare-styleable>
 
     <declare-styleable name="AXEmojiMultiAutoCompleteTextView">
-        <attr name="emojiSize"/>
+        <attr name="emojiSize" />
     </declare-styleable>
 
     <declare-styleable name="AXEmojiCheckbox">
-        <attr name="emojiSize"/>
+        <attr name="emojiSize" />
     </declare-styleable>
 
     <declare-styleable name="AXEmojiRadioButton">
-        <attr name="emojiSize"/>
+        <attr name="emojiSize" />
     </declare-styleable>
 
     <declare-styleable name="LikeButton">
-        <attr name="icon_size" format="dimension|reference"/>
+        <attr name="icon_size" format="dimension|reference" />
         <attr name="like_drawable" format="reference" />
         <attr name="unlike_drawable" format="reference" />
         <attr name="dots_primary_color" format="color|reference" />
         <attr name="dots_secondary_color" format="color|reference" />
-        <attr name="liked" format="boolean"/>
-        <attr name="is_enabled" format="boolean"/>
-        <attr name="anim_scale_factor" format="float"/>
+        <attr name="liked" format="boolean" />
+        <attr name="is_enabled" format="boolean" />
+        <attr name="anim_scale_factor" format="float" />
     </declare-styleable>
 </resources>

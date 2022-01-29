@@ -9,7 +9,8 @@ class PhotoPagerAdapter(fragmentActivity: FragmentActivity?, private val paths: 
     FragmentStateAdapter(
         fragmentActivity!!
     ) {
-    private val itemCount: Int
+    private val itemCount: Int = paths.size
+
     override fun createFragment(position: Int): Fragment {
         val path = paths[position]
         return PhotoFragment.newInstance(path)
@@ -19,7 +20,4 @@ class PhotoPagerAdapter(fragmentActivity: FragmentActivity?, private val paths: 
         return itemCount
     }
 
-    init {
-        itemCount = paths.size
-    }
 }

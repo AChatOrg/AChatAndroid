@@ -5,6 +5,7 @@ import androidx.core.view.GravityCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
 import com.google.android.material.tabs.TabLayout
 import com.hyapp.achat.R
 import com.hyapp.achat.databinding.ActivityMainBinding
@@ -72,7 +73,8 @@ class MainActivity : EventActivity() {
         binding.userAvatar.setOnClickListener {
             ProfileActivity.start(
                 this,
-                UserLive.value ?: User()
+                UserLive.value ?: User(),
+                binding.userAvatar
             )
         }
     }
@@ -93,8 +95,11 @@ class MainActivity : EventActivity() {
 
     private fun observeUser() {
         UserLive.observe(this) {
-            val avatars: List<String> = it.avatars
-            binding.userAvatar.setImageURI(if (avatars.isNotEmpty()) avatars[0] else null)
+            Glide.with(this@MainActivity)
+                .load(it.firstAvatar)
+                .circleCrop()
+                .placeholder(R.drawable.avatar_profile)
+                .into(binding.userAvatar)
         }
     }
 
