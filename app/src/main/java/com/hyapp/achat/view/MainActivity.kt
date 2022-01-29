@@ -35,6 +35,7 @@ class MainActivity : EventActivity() {
         setupUsersRooms()
         observeUsersRoomsSize()
         observeConnectivity()
+        observeUser()
         setupFab()
     }
 
@@ -88,6 +89,13 @@ class MainActivity : EventActivity() {
         viewModel.contactsLive.observe(
             this,
             { contactList: ContactList? -> contactAdapter.submitList(contactList) })
+    }
+
+    private fun observeUser() {
+        UserLive.observe(this) {
+            val avatars: List<String> = it.avatars
+            binding.userAvatar.setImageURI(if (avatars.isNotEmpty()) avatars[0] else null)
+        }
     }
 
     private fun setupUsersRooms() {

@@ -19,9 +19,7 @@ import com.hyapp.achat.databinding.FragmentUsersRoomsBinding;
 import com.hyapp.achat.model.entity.Event;
 import com.hyapp.achat.model.entity.Room;
 import com.hyapp.achat.model.entity.SortedList;
-import com.hyapp.achat.model.entity.User;
 import com.hyapp.achat.view.adapter.RoomAdapter;
-import com.hyapp.achat.view.adapter.UserAdapter;
 import com.hyapp.achat.viewmodel.MainViewModel;
 
 public class RoomsFragment extends Fragment {
@@ -95,7 +93,7 @@ public class RoomsFragment extends Fragment {
 
     private void setupNewRoom() {
         binding.addRoomFab.setOnClickListener(v -> {
-            NewRoomBottomSheetFragment bottomSheet = new NewRoomBottomSheetFragment();
+            NewRoomBottomSheet bottomSheet = new NewRoomBottomSheet();
             bottomSheet.show(requireActivity().getSupportFragmentManager(), "newRoom");
         });
     }

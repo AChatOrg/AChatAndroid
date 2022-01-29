@@ -15,9 +15,8 @@ import com.hyapp.achat.view.EventActivity
 import com.hyapp.achat.viewmodel.service.SocketService
 import com.hyapp.achat.viewmodel.utils.NetUtils
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.*
 import org.apache.commons.collections4.queue.CircularFifoQueue
 import java.util.*
 import kotlin.collections.HashMap
@@ -38,9 +37,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private var stopTypingJob: Job? = null
     private var refreshOnlineTimeJob: Job? = null
-
-    private val _roomCreatedFlow = MutableSharedFlow<Event>(extraBufferCapacity = 1)
-    val roomCreatedFlow = _roomCreatedFlow.asSharedFlow()
 
     companion object {
         private const val PUBLIC_ROOM_MESSAGES_CAPACITY = 200
@@ -117,6 +113,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                                 _usersLive.value = Resource.success(it)
                             }
                         }
+                        UsersRoomsRepo.USER_UPDATE -> {
+                            val user = pair.second as User
+                            updateUser(user)
+                        }
                         UsersRoomsRepo.ROOM_CREATE -> {
                             roomsLive.value?.data?.let {
                                 it.add(pair.second as Room)
@@ -153,6 +153,21 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                             onlineMemberCount = onlineMemberCount
                         )
                         _roomsLive.postValue(Resource.update(list, 0))
+                        return@launch
+                    }
+                }
+            }
+        }
+    }
+
+    private fun updateUser(user: User) {
+        viewModelScope.launch(ioDispatcher) {
+            _usersLive.value?.data?.let { list ->
+                for (i in 0 until list.size) {
+                    val u = list[i]
+                    if (u.uid == user.uid) {
+                        list[i] = user
+                        _usersLive.postValue(Resource.update(list, 0))
                         return@launch
                     }
                 }
@@ -220,27 +235,27 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         refreshOnlineTimeJob?.cancel()
     }
 
-    fun createRoom(name: String, gender: Byte) {
+    fun createRoom(name: String, gender: Byte): Flow<Event> = callbackFlow{
         val context = getApplication<Application>().applicationContext
         if (!NetUtils.isNetConnected(context)) {
-            _roomCreatedFlow.tryEmit(Event(Event.Status.ERROR, Event.MSG_NET))
+            trySend(Event(Event.Status.ERROR, Event.MSG_NET))
         } else {
             val nameTrim = name.trim()
             if (nameTrim.isEmpty()) {
-                _roomCreatedFlow.tryEmit(Event(Event.Status.ERROR, Event.MSG_EMPTY))
+                trySend(Event(Event.Status.ERROR, Event.MSG_EMPTY))
             } else {
                 UserLive.value?.let { user ->
                     if (gender != UserConsts.GENDER_MIXED && user.gender != gender) {
-                        _roomCreatedFlow.tryEmit(Event(Event.Status.ERROR, Event.MSG_GENDER))
+                        trySend(Event(Event.Status.ERROR, Event.MSG_MATCH))
                     } else {
-                        _roomCreatedFlow.tryEmit(Event(Event.Status.LOADING))
+                        trySend(Event(Event.Status.LOADING))
                         val room = Room(nameTrim, 0, gender, emptyList(), "", 0)
                         viewModelScope.launch {
                             UsersRoomsRepo.requestCreateRoom(room).collect { isSuccess ->
                                 if (isSuccess) {
-                                    _roomCreatedFlow.tryEmit(Event(Event.Status.SUCCESS))
+                                    trySend(Event(Event.Status.SUCCESS))
                                 } else {
-                                    _roomCreatedFlow.tryEmit(Event(Event.Status.ERROR))
+                                    trySend(Event(Event.Status.ERROR))
                                 }
                             }
                         }
@@ -248,5 +263,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 }
             }
         }
+        awaitClose()
     }
 }

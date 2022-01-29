@@ -26,19 +26,12 @@ class ProfileViewModel(val user: User) : ViewModel() {
 
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 
-    private val _userLive = MutableLiveData<User>()
-    val userLive = _userLive as LiveData<User>
-
     private val _userInfoLive = MutableLiveData<Resource<UserInfo>>()
     val userInfoLive = _userInfoLive as LiveData<Resource<UserInfo>>
 
     enum class LikeStatus { ERROR, LIKED, DISLIKED }
 
-    private val _likeFlow = MutableSharedFlow<Pair<LikeStatus, Long>>(extraBufferCapacity = 1)
-    val likeFlow = _likeFlow.asSharedFlow()
-
     init {
-        _userLive.value = user
         requestUserInfo()
     }
 
@@ -67,16 +60,17 @@ class ProfileViewModel(val user: User) : ViewModel() {
         }
     }
 
-    fun requestLikeUser() {
+    fun requestLikeUser() :Flow<Pair<LikeStatus, Long>> = callbackFlow{
         if (!NetUtils.isNetConnected(App.context)) {
-            _likeFlow.tryEmit(Pair(LikeStatus.ERROR, 0))
+            trySend(Pair(LikeStatus.ERROR, 0))
         } else {
             viewModelScope.launch {
                 UsersRoomsRepo.requestLikeUser(user.uid).collect { pair ->
-                    _likeFlow.tryEmit(pair)
+                    trySend(pair)
                 }
             }
         }
+        awaitClose()
     }
 
     fun isCurrUserNotifEnabled(): Boolean {
@@ -119,7 +113,7 @@ class ProfileViewModel(val user: User) : ViewModel() {
                 }
             }
         }
-        awaitClose {  }
+        awaitClose()
     }
 
     class Factory(private var user: User) : ViewModelProvider.Factory {

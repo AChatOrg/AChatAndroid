@@ -10,6 +10,7 @@ import com.hyapp.achat.model.entity.User
 import com.hyapp.achat.model.entity.UserInfo
 import com.hyapp.achat.model.gson.RoomDeserializer
 import com.hyapp.achat.model.gson.UserDeserializer
+import com.hyapp.achat.model.objectbox.ContactDao
 import com.hyapp.achat.viewmodel.ProfileViewModel
 import com.hyapp.achat.viewmodel.service.SocketService
 import io.socket.client.Socket
@@ -26,9 +27,10 @@ object UsersRoomsRepo {
 
     const val USER_CAME: Byte = 1
     const val USER_LEFT: Byte = 2
-    const val ROOM_CREATE: Byte = 3
-    const val ROOM_DELETE: Byte = 4
-    const val ROOM_MEMBER_COUNT: Byte = 5
+    const val USER_UPDATE: Byte = 3
+    const val ROOM_CREATE: Byte = 4
+    const val ROOM_DELETE: Byte = 5
+    const val ROOM_MEMBER_COUNT: Byte = 6
 
     const val USER_INFO_MSG_SUCCESS = "success"
     const val USER_INFO_MSG_NOT_FOUND = "notFound"
@@ -44,6 +46,7 @@ object UsersRoomsRepo {
         socket.on(Config.ON_ROOM_MEMBER_ADDED, onRoomMemberAdded)
         socket.on(Config.ON_ROOM_MEMBER_REMOVED, onRoomMemberRemoved)
         socket.on(Config.ON_ROOM_ONLINE_MEMBER_COUNT, onRoomOnlineMemberCount)
+        socket.on(Config.ON_USER_EDIT, onUserEdit)
     }
 
     @ExperimentalCoroutinesApi
@@ -186,20 +189,50 @@ object UsersRoomsRepo {
         awaitClose { SocketService.ioSocket?.socket?.off(Config.ON_REQUEST_USER_INFO) }
     }
 
-    fun requestLikeUser(userUid: String): Flow<Pair<ProfileViewModel.LikeStatus, Long>> = callbackFlow {
-        SocketService.ioSocket?.socket?.let { socket ->
-            socket.emit(Config.ON_REQUEST_LIKE_USER, userUid)
-            socket.on(Config.ON_REQUEST_LIKE_USER) { args ->
-                socket.off(Config.ON_REQUEST_LIKE_USER)
-                val likeResult = args[0].toString().toInt()
-                val likesCount = args[1].toString().toLong()
-                when (likeResult) {
-                    1 -> trySend(Pair(ProfileViewModel.LikeStatus.LIKED, likesCount))
-                    -1 -> trySend(Pair(ProfileViewModel.LikeStatus.DISLIKED, likesCount))
-                    0 -> trySend(Pair(ProfileViewModel.LikeStatus.ERROR, likesCount))
+    fun requestLikeUser(userUid: String): Flow<Pair<ProfileViewModel.LikeStatus, Long>> =
+        callbackFlow {
+            SocketService.ioSocket?.socket?.let { socket ->
+                socket.emit(Config.ON_REQUEST_LIKE_USER, userUid)
+                socket.on(Config.ON_REQUEST_LIKE_USER) { args ->
+                    socket.off(Config.ON_REQUEST_LIKE_USER)
+                    val likeResult = args[0].toString().toInt()
+                    val likesCount = args[1].toString().toLong()
+                    when (likeResult) {
+                        1 -> trySend(Pair(ProfileViewModel.LikeStatus.LIKED, likesCount))
+                        -1 -> trySend(Pair(ProfileViewModel.LikeStatus.DISLIKED, likesCount))
+                        0 -> trySend(Pair(ProfileViewModel.LikeStatus.ERROR, likesCount))
+                    }
                 }
             }
+            awaitClose { SocketService.ioSocket?.socket?.off(Config.ON_REQUEST_LIKE_USER) }
         }
-        awaitClose { SocketService.ioSocket?.socket?.off(Config.ON_REQUEST_LIKE_USER) }
+
+    fun requestEditProfile(user: User): Flow<Pair<Boolean, User>> = callbackFlow {
+        SocketService.ioSocket?.socket?.let { socket ->
+            socket.emit(Config.ON_REQUEST_EDIT_PROFILE, Gson().toJson(user))
+            socket.on(Config.ON_REQUEST_EDIT_PROFILE) { args ->
+                socket.off(Config.ON_REQUEST_EDIT_PROFILE)
+                val status = args[0].toString().toBoolean()
+                val u = GsonBuilder()
+                    .registerTypeAdapter(User::class.java, UserDeserializer())
+                    .create()
+                    .fromJson(args[1].toString(), User::class.java)
+                trySend(Pair(status, u))
+            }
+        }
+        awaitClose { SocketService.ioSocket?.socket?.off(Config.ON_REQUEST_EDIT_PROFILE) }
+    }
+
+    private val onUserEdit = Emitter.Listener { args ->
+        val user = GsonBuilder()
+            .registerTypeAdapter(User::class.java, UserDeserializer())
+            .create()
+            .fromJson(args[0].toString(), User::class.java)
+        ContactDao.get(user.uid)?.let {
+            it.setUser(user)
+            ContactDao.put(it)
+            ChatRepo.emitContactToViewModel(it)
+        }
+        _flow.tryEmit(Pair(USER_UPDATE, user))
     }
 }

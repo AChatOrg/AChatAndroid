@@ -10,7 +10,7 @@
     <string name="login">Login</string>
     <string name="login_guest">Login guest</string>
     <string name="already_a_member">Already a member?</string>
-    <string name="username_required">Username (required)</string>
+    <string name="name_required">Name (required)</string>
     <string name="biography_optional">Biography (optional)</string>
     <string name="male">Male</string>
     <string name="female">Female</string>
@@ -102,4 +102,20 @@
     <string name="are_you_sure_logout_guest">Logging out will delete your entire chat history and membership from all rooms, are you sure you want to logout?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="edit_profile">Edit Profile</string>
+    <string name="add_profile_picture">Add profile picture</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="biography">Biography</string>
+    <string name="save">Save</string>
+    <string name="name">Name</string>
+    <string name="gender">Gender</string>
+    <string name="new_password">New password</string>
+    <string name="curr_password">Current password</string>
+    <string name="repeat_new_password">Repeat new password</string>
+    <string name="change_password">Change Password</string>
+    <string name="wrong_password">Wrong password</string>
+    <string name="password_changed">Password changed</string>
+    <string name="you_did_not_make_change">You did not make any changes.</string>
+    <string name="profile_changed">Profile changed</string>
 </resources>

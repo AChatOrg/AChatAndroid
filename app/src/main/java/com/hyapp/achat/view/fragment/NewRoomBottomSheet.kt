@@ -1,29 +1,21 @@
 package com.hyapp.achat.view.fragment
 
-import android.content.DialogInterface
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import android.view.LayoutInflater
-import android.view.ViewGroup
 import android.os.Bundle
-import androidx.databinding.DataBindingUtil
-import com.hyapp.achat.R
-import android.content.DialogInterface.OnShowListener
-import android.content.Intent
-import android.os.Handler
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.animation.AnimationUtils
-import com.google.android.material.bottomsheet.BottomSheetDialog
-import android.widget.FrameLayout
 import android.widget.Toast
-import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.Lifecycle
+import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.hyapp.achat.R
 import com.hyapp.achat.databinding.BottomSheetNewRoomBinding
 import com.hyapp.achat.model.entity.Event
-import com.hyapp.achat.view.MainActivity
+import com.hyapp.achat.model.entity.UserConsts
 import com.hyapp.achat.view.utils.UiUtils
 import com.hyapp.achat.viewmodel.MainViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -31,7 +23,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 @ExperimentalCoroutinesApi
-class NewRoomBottomSheetFragment : BottomSheetDialogFragment() {
+class NewRoomBottomSheet : BottomSheetDialogFragment() {
 
     private lateinit var viewModel: MainViewModel
 
@@ -45,7 +37,6 @@ class NewRoomBottomSheetFragment : BottomSheetDialogFragment() {
         viewModel = ViewModelProvider(requireActivity())[MainViewModel::class.java]
         binding =
             DataBindingUtil.inflate(inflater, R.layout.bottom_sheet_new_room, container, false)
-        binding.viewModel = viewModel
         return binding.root
     }
 
@@ -60,13 +51,20 @@ class NewRoomBottomSheetFragment : BottomSheetDialogFragment() {
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED)
             }
         }
-        subscribeCreated()
+        setupButton()
     }
 
-    private fun subscribeCreated() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.roomCreatedFlow.collect { event ->
+    private fun setupButton() {
+        binding.btnCreate.setOnClickListener {
+            lifecycleScope.launch {
+                viewModel.createRoom(
+                    binding.editTextName.text.toString(),
+                    when {
+                        binding.radioBtnMixed.isChecked -> UserConsts.GENDER_MIXED
+                        binding.radioBtnMale.isChecked -> UserConsts.GENDER_MALE
+                        else -> UserConsts.GENDER_FEMALE
+                    }
+                ).collect { event ->
                     when (event.status) {
                         Event.Status.SUCCESS -> {
                             binding.progressBar.visibility = View.GONE
@@ -106,7 +104,7 @@ class NewRoomBottomSheetFragment : BottomSheetDialogFragment() {
                 R.string.no_network_connection,
                 Toast.LENGTH_LONG
             ).show()
-            Event.MSG_GENDER -> Toast.makeText(
+            Event.MSG_MATCH -> Toast.makeText(
                 requireContext(),
                 R.string.room_gender_doest_match_your_gender,
                 Toast.LENGTH_LONG

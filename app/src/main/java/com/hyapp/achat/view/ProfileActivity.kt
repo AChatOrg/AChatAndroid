@@ -11,10 +11,8 @@ import android.view.View
 import android.widget.Toast
 import androidx.core.content.res.ResourcesCompat
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.hyapp.achat.R
 import com.hyapp.achat.databinding.ActivityProfileBinding
@@ -60,12 +58,11 @@ class ProfileActivity : EventActivity() {
         super.onCreate(savedInstanceState)
         init()
         setupToolbar()
-        observeUser()
         setupFriends()
         setupViewers()
         setupChatButtons()
+        observeUser()
         observeUserInfo()
-        subscribeLikeEvent()
         setupCurrUserNotif()
         binding.swipeRefreshLayout.setOnRefreshListener { viewModel.requestUserInfo() }
     }
@@ -84,13 +81,13 @@ class ProfileActivity : EventActivity() {
                 override fun liked(likeButton: LikeButton?) {
                     isLiked = true
                     setLike(isLiked)
-                    viewModel.requestLikeUser()
+                    likeUser()
                 }
 
                 override fun unLiked(likeButton: LikeButton?) {
                     isLiked = false
                     setLike(isLiked)
-                    viewModel.requestLikeUser()
+                    likeUser()
                 }
             })
             setLike(isLiked)
@@ -106,6 +103,31 @@ class ProfileActivity : EventActivity() {
         return true
     }
 
+    private fun likeUser() {
+        lifecycleScope.launch {
+            viewModel.requestLikeUser().collect { pair ->
+                when (pair.first) {
+                    ProfileViewModel.LikeStatus.LIKED -> {
+                        setLike(true)
+                        binding.likesCount.text = UiUtils.formatNum(pair.second)
+                    }
+                    ProfileViewModel.LikeStatus.DISLIKED -> {
+                        setLike(false)
+                        binding.likesCount.text = UiUtils.formatNum(pair.second)
+                    }
+                    ProfileViewModel.LikeStatus.ERROR -> {
+                        Toast.makeText(
+                            this@ProfileActivity,
+                            R.string.check_your_connection,
+                            Toast.LENGTH_LONG
+                        ).show()
+                        setLike(!isLiked)
+                    }
+                }
+            }
+        }
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.notif) {
             isUserNotifEnabled = !isUserNotifEnabled
@@ -116,6 +138,10 @@ class ProfileActivity : EventActivity() {
                     R.string.logout,
                     R.string.are_you_sure_logout_guest
                 ) { p, p1 -> logout() }
+            }
+        } else if (item.itemId == R.id.edit) {
+            if (isCurrUser) {
+                EditProfileActivity.start(this, user)
             }
         }
         return true
@@ -128,7 +154,8 @@ class ProfileActivity : EventActivity() {
                     Resource.Status.SUCCESS -> {
                         binding.progressBar.visibility = View.GONE
                         val intent = Intent(this@ProfileActivity, LoginGuestActivity::class.java)
-                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        intent.flags =
+                            Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                         startActivity(intent)
                     }
                     Resource.Status.ERROR -> {
@@ -238,52 +265,23 @@ class ProfileActivity : EventActivity() {
         binding.recyclerViewViewers.adapter = viewersAdapter
     }
 
-    private fun observeUser() {
-        viewModel.userLive.observe(this) {
-            binding.run {
-                toolbar.title = it.username
-                val avatars: List<String> = it.avatars
-                avatar.setImageURI(if (avatars.isNotEmpty()) avatars[0] else null)
-                name.text = it.name
-                bio.text = it.bio
-                val pair = UserConsts.rankInt2rankStrResAndColor(it.rank)
-                rank.setText(pair.first)
-                rank.setTextColor(pair.second)
-                if (it.onlineTime == Contact.TIME_ONLINE) {
-                    onlineTime.text = ""
-                    onlineTime.setBackgroundResource(R.drawable.last_online_profile_bg_green)
-                } else {
-                    onlineTime.text =
-                        TimeUtils.timeAgoShort(System.currentTimeMillis() - user.onlineTime)
-                    onlineTime.setBackgroundResource(R.drawable.last_online_profile_bg_grey)
-                }
-            }
-        }
-    }
-
-    private fun subscribeLikeEvent() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.likeFlow.collect { pair ->
-                    when (pair.first) {
-                        ProfileViewModel.LikeStatus.LIKED -> {
-                            setLike(true)
-                            binding.likesCount.text = UiUtils.formatNum(pair.second)
-                        }
-                        ProfileViewModel.LikeStatus.DISLIKED -> {
-                            setLike(false)
-                            binding.likesCount.text = UiUtils.formatNum(pair.second)
-                        }
-                        ProfileViewModel.LikeStatus.ERROR -> {
-                            Toast.makeText(
-                                this@ProfileActivity,
-                                R.string.check_your_connection,
-                                Toast.LENGTH_LONG
-                            ).show()
-                            setLike(!isLiked)
-                        }
-                    }
-                }
+    private fun setupUser(user: User) {
+        binding.run {
+            toolbar.title = user.username
+            val avatars: List<String> = user.avatars
+            avatar.setImageURI(if (avatars.isNotEmpty()) avatars[0] else null)
+            name.text = user.name
+            bio.text = user.bio
+            val pair = UserConsts.rankInt2rankStrResAndColor(user.rank)
+            rank.setText(pair.first)
+            rank.setTextColor(pair.second)
+            if (user.onlineTime == Contact.TIME_ONLINE) {
+                onlineTime.text = ""
+                onlineTime.setBackgroundResource(R.drawable.last_online_profile_bg_green)
+            } else {
+                onlineTime.text =
+                    TimeUtils.timeAgoShort(System.currentTimeMillis() - user.onlineTime)
+                onlineTime.setBackgroundResource(R.drawable.last_online_profile_bg_grey)
             }
         }
     }
@@ -295,6 +293,16 @@ class ProfileActivity : EventActivity() {
             viewModel.setCurrUserNotif(
                 checked
             )
+        }
+    }
+
+    private fun observeUser() {
+        if (isCurrUser) {
+            UserLive.observe(this) {
+                setupUser(it)
+            }
+        } else {
+            setupUser(user)
         }
     }
 

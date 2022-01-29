@@ -29,6 +29,8 @@ public interface Config {
     String ON_REQUEST_ROOM_MEMBER_COUNT = "requestRoomMemberCount";
     String ON_REQUEST_USER_INFO = "requestUserInfo";
     String ON_REQUEST_LIKE_USER = "requestLikeUser";
+    String ON_REQUEST_EDIT_PROFILE = "requestEditProfile";
+    String ON_USER_EDIT = "userEdit";
 
     /*On Pv Chat*/
     String ON_MESSAGE = "msg";

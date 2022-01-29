@@ -20,6 +20,8 @@ import android.view.SubMenu;
 import android.view.View;
 
 import androidx.annotation.FontRes;
+import androidx.annotation.StringRes;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.res.ResourcesCompat;
 
 import com.hyapp.achat.view.component.CustomTypefaceSpan;
@@ -136,5 +138,24 @@ public class UiUtils {
         SpannableString mNewTitle = new SpannableString(menuItem.getTitle());
         mNewTitle.setSpan(new CustomTypefaceSpan("", font), 0, mNewTitle.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
         menuItem.setTitle(mNewTitle);
+    }
+
+    public static void showListDialog(Context context, @StringRes int title, @StringRes int[] itemsRes, int checkedItemIndex, OnListDialogChoose onListDialogChoose) {
+        CharSequence[] items = new CharSequence[itemsRes.length];
+        for (int i = 0; i < itemsRes.length; i++) {
+            items[i] = context.getString(itemsRes[i]);
+        }
+        AlertDialog.Builder alt_bld = new AlertDialog.Builder(context);
+        alt_bld.setTitle(title);
+        alt_bld.setSingleChoiceItems(items, checkedItemIndex, (dialog, item) -> {
+            onListDialogChoose.onChoose(items[item]);
+            dialog.dismiss();
+        });
+        AlertDialog alert = alt_bld.create();
+        alert.show();
+    }
+
+    public interface OnListDialogChoose {
+        void onChoose(CharSequence value);
     }
 }

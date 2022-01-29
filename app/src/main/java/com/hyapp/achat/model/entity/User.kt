@@ -48,4 +48,7 @@ data class User(
 
     val isGuest
         get() = rank == RANK_GUEST
+
+    val isMale
+        get() = gender == GENDER_MALE
 }

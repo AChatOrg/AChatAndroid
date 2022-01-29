@@ -111,4 +111,17 @@ data class Contact(
                 && type == c.type
                 && rank == c.rank
     }
+
+    fun setUser(user: User) {
+        name = user.name
+        bio = user.bio
+        gender = user.gender
+        avatars = user.avatars
+        onlineTime = user.onlineTime
+        uid = user.uid
+        rank = user.rank
+        score = user.score
+        loginTime = user.loginTime
+        username = user.username
+    }
 }

@@ -15,7 +15,7 @@ open class Event(
         const val MSG_EXIST = "exist"
         const val MSG_NET = "net"
         const val MSG_ERROR = "error"
-        const val MSG_GENDER = "gender"
+        const val MSG_MATCH = "match"
 
     }
 }
