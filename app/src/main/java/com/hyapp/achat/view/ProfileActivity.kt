@@ -14,12 +14,14 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.facebook.common.activitylistener.ActivityListenerManager.register
 import com.hyapp.achat.R
 import com.hyapp.achat.databinding.ActivityProfileBinding
 import com.hyapp.achat.model.entity.*
 import com.hyapp.achat.view.adapter.UserProfileAdapter
 import com.hyapp.achat.view.component.like.LikeButton
 import com.hyapp.achat.view.component.like.OnLikeListener
+import com.hyapp.achat.view.fragment.RegisterBottomSheet
 import com.hyapp.achat.view.utils.UiUtils
 import com.hyapp.achat.viewmodel.ProfileViewModel
 import com.hyapp.achat.viewmodel.utils.TimeUtils
@@ -63,8 +65,31 @@ class ProfileActivity : EventActivity() {
         observeUser()
         observeUserInfo()
         setupCurrUserNotif()
+        setupMainButton()
         binding.swipeRefreshLayout.setOnRefreshListener { viewModel.requestUserInfo() }
         binding.avatar.setOnClickListener { AvatarActivity.start(this, user) }
+    }
+
+    private fun setupMainButton() {
+        if (isCurrUser) {
+            if (user.isGuest) {
+                binding.mainButton.setText(R.string.register)
+                binding.mainButton.setOnClickListener {
+                    val bottomSheet = RegisterBottomSheet()
+                    bottomSheet.show(supportFragmentManager, "register")
+                }
+            } else {
+                binding.mainButton.setText(R.string.rank_upgrade)
+                binding.mainButton.setOnClickListener {
+
+                }
+            }
+        } else {
+            binding.mainButton.setText(R.string.friend_request)
+            binding.mainButton.setOnClickListener {
+
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

@@ -31,6 +31,7 @@ public interface Config {
     String ON_REQUEST_LIKE_USER = "requestLikeUser";
     String ON_REQUEST_EDIT_PROFILE = "requestEditProfile";
     String ON_USER_EDIT = "userEdit";
+    String ON_REQUEST_CHECK_USERNAME = "requestCheckUsername";
 
     /*On Pv Chat*/
     String ON_MESSAGE = "msg";

@@ -56,7 +56,7 @@ public class RationaleDialog {
 
         text.setText(message);
 
-        return new AlertDialog.Builder(context, R.style.RoundedCornersDialog)
+        return new AlertDialog.Builder(context)
                 .setView(view);
     }
 

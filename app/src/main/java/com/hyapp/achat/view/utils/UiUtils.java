@@ -1,6 +1,7 @@
 package com.hyapp.achat.view.utils;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -14,6 +15,7 @@ import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,6 +30,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.core.content.res.ResourcesCompat;
 
+import com.hyapp.achat.R;
 import com.hyapp.achat.view.component.CustomTypefaceSpan;
 
 import java.util.Map;
@@ -157,6 +160,7 @@ public class UiUtils {
         });
         AlertDialog alert = alt_bld.create();
         alert.show();
+        setupDialogStyle(alert, context);
     }
 
     public interface OnListDialogChoose {
@@ -180,5 +184,13 @@ public class UiUtils {
             window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
             window.setStatusBarColor(color);
         }
+    }
+
+    public static void setupDialogStyle(Dialog dialog, Context context) {
+        dialog.getWindow().setBackgroundDrawableResource(R.drawable.rect_round_white_8dp);
+        dialog.getWindow().setLayout(
+                (int) (context.getResources().getDisplayMetrics().widthPixels * 0.85F),
+                dialog.getWindow().getAttributes().height
+        );
     }
 }

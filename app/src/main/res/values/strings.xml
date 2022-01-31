@@ -118,4 +118,11 @@
     <string name="password_changed">Password changed</string>
     <string name="you_did_not_make_change">You did not make any changes.</string>
     <string name="profile_changed">Profile changed</string>
+    <string name="register">Register</string>
+    <string name="rank_upgrade">Rank upgrade</string>
+    <string name="friend_request">Friend Request</string>
+    <string name="successfully_registered">Successfully registered</string>
+    <string name="invalid_username">Invalid username</string>
+    <string name="username_exist">Username already exist</string>
+    <string name="username_available">Username available</string>
 </resources>

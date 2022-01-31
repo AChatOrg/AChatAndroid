@@ -19,11 +19,6 @@ import kotlinx.coroutines.flow.collect
 @ExperimentalCoroutinesApi
 class EditProfileViewModel(val user: User) : ViewModel() {
 
-    companion object {
-        const val EMPTY_CURR_PASS: Byte = 1
-        const val EMPTY_NEW_PASS: Byte = 2
-    }
-
     fun requestChangePassword(currPassword: String, newPassword: String): Flow<Resource<Byte>> =
         callbackFlow {
 

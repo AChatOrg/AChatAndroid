@@ -41,7 +41,6 @@ object LoginRepo {
         }
     }
 
-    @ExperimentalCoroutinesApi
     fun requestLogout(): Flow<Boolean> = callbackFlow {
         SocketService.ioSocket?.socket?.let {
             if (it.connected()) {
@@ -56,5 +55,26 @@ object LoginRepo {
             }
         }
         awaitClose { SocketService.ioSocket?.socket?.off(Config.ON_LOGOUT) }
+    }
+
+    fun requestUsernameExist(username: CharSequence): Flow<Boolean> = callbackFlow {
+        SocketService.ioSocket?.socket?.let {
+            if (it.connected()) {
+                it.emit(Config.ON_REQUEST_CHECK_USERNAME, username)
+                it.on(Config.ON_REQUEST_CHECK_USERNAME) { args ->
+                    it.off(Config.ON_REQUEST_CHECK_USERNAME)
+                    val exist = args[0].toString().toBoolean()
+                    trySend(exist)
+                }
+            } else {
+                trySend(false)
+            }
+        }
+        awaitClose { SocketService.ioSocket?.socket?.off(Config.ON_REQUEST_CHECK_USERNAME) }
+    }
+
+    fun requestRegister(): Flow<Pair<Boolean, String>> = callbackFlow {
+
+        awaitClose { }
     }
 }

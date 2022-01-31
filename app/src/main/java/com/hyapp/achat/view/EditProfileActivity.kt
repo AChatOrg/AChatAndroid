@@ -1,8 +1,10 @@
 package com.hyapp.achat.view
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.Toast
@@ -15,6 +17,9 @@ import com.hyapp.achat.model.entity.*
 import com.hyapp.achat.view.fragment.ChangePassBottomSheet
 import com.hyapp.achat.view.utils.UiUtils
 import com.hyapp.achat.viewmodel.EditProfileViewModel
+import com.hyapp.achat.viewmodel.permissions.Permissions
+import gun0912.tedbottompicker.TedRxBottomPicker
+import io.reactivex.functions.Consumer
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -46,7 +51,49 @@ class EditProfileActivity : EventActivity() {
         setupGender()
         setupPassword()
         setupSaveButton()
+        setupAddPic()
         binding.backBtn.setOnClickListener { onBackPressed() }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        Permissions.onRequestPermissionsResult(this, requestCode, permissions, grantResults)
+    }
+
+    private fun setupAddPic() {
+        binding.addPicTextView.setOnClickListener {
+            Permissions.with(this)
+                .request(
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.CAMERA
+                )
+                .ifNecessary()
+                .withRationaleDialog(
+                    R.string.storage_camera_permission_message,
+                    R.drawable.permission_cam,
+                    R.drawable.permission_storage
+                )
+                .withPermanentDenialDialog(R.string.storage_camera_permission_need)
+                .onAnyDenied {
+                    Toast.makeText(
+                        this,
+                        R.string.storage_camera_permission_need,
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+                .onAllGranted {
+                    TedRxBottomPicker.with(this)
+                        .show()
+                        .subscribe({ uri ->
+                            Log.e("ssss", uri.toString())
+                        }, { t -> t.printStackTrace() })
+                }.execute()
+        }
     }
 
     private fun setupScrollView() {

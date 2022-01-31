@@ -4,6 +4,7 @@ import android.app.ProgressDialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.view.animation.AnimationUtils
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Lifecycle
@@ -17,6 +18,8 @@ import com.hyapp.achat.view.utils.UiUtils
 import com.hyapp.achat.viewmodel.LoginGuestViewModel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener
 
 class LoginGuestActivity : EventActivity() {
 
@@ -28,8 +31,21 @@ class LoginGuestActivity : EventActivity() {
         super.onCreate(savedInstanceState)
         init()
 //        setupHistory()
+        setupKeyboardEvent()
         setupProgressDialog()
         subscribeLogged()
+    }
+
+    private fun setupKeyboardEvent() {
+        KeyboardVisibilityEvent.setEventListener(this) { isOpen ->
+            if (isOpen) {
+                binding.alreadyMember.visibility = View.GONE
+                binding.login.visibility = View.GONE
+            } else {
+                binding.alreadyMember.visibility = View.VISIBLE
+                binding.login.visibility = View.VISIBLE
+            }
+        }
     }
 
     override fun onDestroy() {
@@ -60,7 +76,10 @@ class LoginGuestActivity : EventActivity() {
         progressDialog.setTitle(R.string.login_guest)
         progressDialog.setMessage(getString(R.string.loading))
         progressDialog.setCancelable(false)
-        progressDialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.cancel)) { dialog: DialogInterface, which: Int ->
+        progressDialog.setButton(
+            DialogInterface.BUTTON_NEGATIVE,
+            getString(R.string.cancel)
+        ) { dialog: DialogInterface, which: Int ->
             viewModel.cancelLogin()
             dialog.dismiss()
         }
@@ -79,7 +98,12 @@ class LoginGuestActivity : EventActivity() {
         when (message) {
             Event.MSG_EMPTY -> {
                 UiUtils.vibrate(this, 200)
-                binding.editTextUsername.startAnimation(AnimationUtils.loadAnimation(this, R.anim.shake))
+                binding.editTextUsername.startAnimation(
+                    AnimationUtils.loadAnimation(
+                        this,
+                        R.anim.shake
+                    )
+                )
             }
             Event.MSG_EXIST -> alert(R.string.login_guest, R.string.this_user_is_online)
             Event.MSG_NET -> alert(R.string.login_guest, R.string.no_network_connection)
@@ -90,7 +114,8 @@ class LoginGuestActivity : EventActivity() {
 
     private fun onLoading() {
         progressDialog.show()
-        progressDialog.getButton(DialogInterface.BUTTON_NEGATIVE).setTextColor(UiUtils.getStyleColor(this, R.attr.colorPrimary))
+        progressDialog.getButton(DialogInterface.BUTTON_NEGATIVE)
+            .setTextColor(UiUtils.getStyleColor(this, R.attr.colorPrimary))
     }
 
     private fun subscribeLogged() {

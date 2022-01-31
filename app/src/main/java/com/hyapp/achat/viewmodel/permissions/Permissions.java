@@ -2,6 +2,7 @@ package com.hyapp.achat.viewmodel.permissions;
 
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -25,6 +26,7 @@ import androidx.fragment.app.Fragment;
 import com.annimon.stream.Stream;
 import com.annimon.stream.function.Consumer;
 import com.hyapp.achat.R;
+import com.hyapp.achat.view.utils.UiUtils;
 
 import java.lang.ref.WeakReference;
 import java.security.SecureRandom;
@@ -173,11 +175,12 @@ public class Permissions {
 
         @SuppressWarnings("ConstantConditions")
         private void executePermissionsRequestWithRationale(PermissionsRequest request) {
-            RationaleDialog.createFor(permissionObject.getContext(), rationaleDialogMessage, rationalDialogHeader)
+            Dialog dlg = RationaleDialog.createFor(permissionObject.getContext(), rationaleDialogMessage, rationalDialogHeader)
                     .setCancelable(rationaleDialogCancelable)
                     .setPositiveButton(R.string.permissions_continue, (dialog, which) -> executePermissionsRequest(request))
                     .setNegativeButton(R.string.permissions_not_now, (dialog, which) -> executeNoPermissionsRequest(request))
                     .show();
+            UiUtils.setupDialogStyle(dlg, permissionObject.getContext());
         }
 
         private void executePermissionsRequest(PermissionsRequest request) {
@@ -374,13 +377,14 @@ public class Permissions {
             Context context = this.context.get();
 
             if (context != null) {
-                new AlertDialog.Builder(context)
+                Dialog dlg = new AlertDialog.Builder(context)
                         .setCancelable(cancelable)
                         .setTitle(R.string.permissions_permission_required)
                         .setMessage(message)
                         .setPositiveButton(R.string.permissions_continue, (dialog, which) -> context.startActivity(getApplicationSettingsIntent(context)))
                         .setNegativeButton(android.R.string.cancel, onNegativeButtonClicked)
                         .show();
+                UiUtils.setupDialogStyle(dlg, context);
             }
         }
     }

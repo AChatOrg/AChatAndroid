@@ -6,6 +6,9 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
         android:name=".App"
@@ -14,6 +17,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:process=":AChat"
+        android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AChat"
@@ -22,18 +26,21 @@
             android:name=".view.AvatarActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="true"
-            android:hardwareAccelerated="true"/>
+            android:hardwareAccelerated="true"
+            android:launchMode="singleTask" />
         <activity
             android:name=".view.EditProfileActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="true"
             android:hardwareAccelerated="true"
-            android:windowSoftInputMode="adjustResize|adjustNothing" />
+            android:launchMode="singleTask"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".view.ProfileActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="true"
-            android:hardwareAccelerated="true" />
+            android:hardwareAccelerated="true"
+            android:launchMode="singleTask" />
         <activity
             android:name=".view.ChatActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"

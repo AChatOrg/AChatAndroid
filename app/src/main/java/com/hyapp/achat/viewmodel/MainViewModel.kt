@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.*
 import org.apache.commons.collections4.queue.CircularFifoQueue
 import java.util.*
 import kotlin.collections.HashMap
+import kotlin.contracts.contract
 
 @ExperimentalCoroutinesApi
 class MainViewModel(application: Application) : AndroidViewModel(application) {
@@ -217,7 +218,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun activityStarted() {
         if (EventActivity.startedActivities > 0) {
-            ChatRepo.sendOnlineTime(true)
+            viewModelScope.launch(ioDispatcher) {
+                ChatRepo.sendOnlineTime(true)
+                UserLive.postValue(UserLive.value?.apply { onlineTime = UserConsts.TIME_ONLINE })
+                UserLive.value?.let {
+                    UserDao.put(it.apply { id = User.CURRENT_USER_ID })
+                }
+            }
         }
         refreshOnlineTimeJob?.cancel()
         refreshOnlineTimeJob = viewModelScope.launch {
@@ -230,12 +237,18 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun activityStopped() {
         if (EventActivity.startedActivities < 1) {
-            ChatRepo.sendOnlineTime(false)
+            viewModelScope.launch(ioDispatcher) {
+                ChatRepo.sendOnlineTime(false)
+                UserLive.postValue(UserLive.value?.apply { onlineTime = System.currentTimeMillis() })
+                UserLive.value?.let {
+                    UserDao.put(it.apply { id = User.CURRENT_USER_ID })
+                }
+            }
         }
         refreshOnlineTimeJob?.cancel()
     }
 
-    fun createRoom(name: String, gender: Byte): Flow<Event> = callbackFlow{
+    fun createRoom(name: String, gender: Byte): Flow<Event> = callbackFlow {
         val context = getApplication<Application>().applicationContext
         if (!NetUtils.isNetConnected(context)) {
             trySend(Event(Event.Status.ERROR, Event.MSG_NET))

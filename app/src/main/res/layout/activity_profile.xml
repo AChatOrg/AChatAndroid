@@ -41,8 +41,7 @@
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
-                    app:layout_scrollFlags="scroll">
+                    android:layout_marginBottom="8dp">
 
                     <com.facebook.drawee.view.SimpleDraweeView
                         android:id="@+id/avatar"
@@ -283,13 +282,32 @@
                         app:layout_constraintTop_toTopOf="@+id/videoCall"
                         app:tint="?colorPrimary" />
 
+                    <TextView
+                        android:id="@+id/mainButton"
+                        android:layout_width="0dp"
+                        android:layout_height="36dp"
+                        android:layout_marginLeft="16dp"
+                        android:layout_marginTop="24dp"
+                        android:layout_marginRight="16dp"
+                        android:background="@drawable/action_bg"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:fontFamily="@font/iran_sans_medium"
+                        android:gravity="center"
+                        android:textAllCaps="true"
+                        android:textSize="@dimen/text_16"
+                        app:layout_constraintEnd_toEndOf="@id/friends"
+                        app:layout_constraintStart_toStartOf="@id/views"
+                        app:layout_constraintTop_toBottomOf="@id/videoCall"
+                        tools:text="Register" />
+
                     <View
                         android:id="@+id/friendsDivider"
                         android:layout_width="match_parent"
                         android:layout_height="12dp"
-                        android:layout_marginTop="32dp"
+                        android:layout_marginTop="24dp"
                         android:background="@color/grey_02"
-                        app:layout_constraintTop_toBottomOf="@id/videoCall" />
+                        app:layout_constraintTop_toBottomOf="@id/mainButton" />
 
                     <TextView
                         android:id="@+id/friendsTitle"
@@ -419,7 +437,7 @@
                         android:id="@+id/currUserGroup"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
-                        app:constraint_referenced_ids="mediaDivider, notifsIcon, notifsSwitch"/>
+                        app:constraint_referenced_ids="mediaDivider, notifsIcon, notifsSwitch" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </ScrollView>

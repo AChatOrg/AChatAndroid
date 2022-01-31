@@ -10,7 +10,6 @@ import com.hyapp.achat.model.entity.Event
 import com.hyapp.achat.model.entity.Resource
 import com.hyapp.achat.model.entity.User
 import com.hyapp.achat.model.entity.UserInfo
-import com.hyapp.achat.model.event.ActionEvent
 import com.hyapp.achat.model.objectbox.ContactDao
 import com.hyapp.achat.model.objectbox.MessageDao
 import com.hyapp.achat.model.objectbox.UserDao
@@ -19,7 +18,6 @@ import com.hyapp.achat.viewmodel.utils.NetUtils
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
-import org.greenrobot.eventbus.EventBus
 
 @ExperimentalCoroutinesApi
 class ProfileViewModel(val user: User) : ViewModel() {
@@ -60,7 +58,7 @@ class ProfileViewModel(val user: User) : ViewModel() {
         }
     }
 
-    fun requestLikeUser() :Flow<Pair<LikeStatus, Long>> = callbackFlow{
+    fun requestLikeUser(): Flow<Pair<LikeStatus, Long>> = callbackFlow {
         if (!NetUtils.isNetConnected(App.context)) {
             trySend(Pair(LikeStatus.ERROR, 0))
         } else {
@@ -115,6 +113,29 @@ class ProfileViewModel(val user: User) : ViewModel() {
         }
         awaitClose()
     }
+
+    fun requestCheckUsername(username: CharSequence): Flow<Event> = callbackFlow {
+        if (username.matches(Regex("\\b[a-zA-Z][a-zA-Z0-9\\-._]{3,64}\\b"))) {
+            trySend(Event(Event.Status.LOADING))
+            LoginRepo.requestUsernameExist(username).collect { exist ->
+                trySend(
+                    if (exist) Event(
+                        Event.Status.ERROR,
+                        Event.MSG_EXIST
+                    ) else Event(Event.Status.SUCCESS)
+                )
+            }
+        } else {
+            trySend(Event(Event.Status.ERROR, Event.MSG_MATCH))
+        }
+        awaitClose()
+    }
+
+    fun requestRegister(username: String, password: String): Flow<Resource<Byte>> =
+        callbackFlow {
+
+            awaitClose()
+        }
 
     class Factory(private var user: User) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {

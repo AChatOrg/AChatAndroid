@@ -10,6 +10,7 @@
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/drawable-anydpi/avatar_profile.xml" value="0.2169230769230769" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/drawable-anydpi/ic_action_search.xml" value="0.2203125" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/drawable-anydpi/ic_action_settings.xml" value="0.21979166666666666" />
+        <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/drawable-v21/action_bg.xml" value="0.2169230769230769" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/drawable-v21/add_chat_fab.xml" value="0.2203125" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/drawable-v21/add_room_fab.xml" value="0.2169230769230769" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/drawable-v21/bg_button.xml" value="0.2203125" />
@@ -45,7 +46,7 @@
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/activity_guest_login.xml" value="0.25" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/activity_login.xml" value="0.2" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/activity_main.xml" value="0.25" />
-        <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/activity_profile.xml" value="0.33" />
+        <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/activity_profile.xml" value="0.22" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/bottom_sheet_change_pass.xml" value="0.1852355072463768" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/bottom_sheet_change_password.xml" value="0.25" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/bottom_sheet_new_room.xml" value="0.25" />

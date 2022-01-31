@@ -39,13 +39,7 @@ open class EventActivity : AppCompatActivity() {
             .setPositiveButton(R.string.ok, listener)
             .setCancelable(cancelable)
             .show()
-        val rect = Rect()
-        window.decorView.getWindowVisibleDisplayFrame(rect)
-        dialog.window?.setBackgroundDrawableResource(R.drawable.rect_round_white_8dp)
-        dialog.window?.setLayout(
-            (rect.width() * 0.8F).toInt(),
-            dialog.window?.attributes?.height ?: UiUtils.dp2px(this, 150F)
-        )
+        UiUtils.setupDialogStyle(dialog, this)
     }
 
     fun alert(
@@ -70,13 +64,7 @@ open class EventActivity : AppCompatActivity() {
             .setPositiveButton(R.string.yes, listener)
             .setCancelable(cancelable)
             .show()
-        val rect = Rect()
-        window.decorView.getWindowVisibleDisplayFrame(rect)
-        dialog.window?.setBackgroundDrawableResource(R.drawable.rect_round_white_8dp)
-        dialog.window?.setLayout(
-            (rect.width() * 0.8F).toInt(),
-            dialog.window?.attributes?.height ?: UiUtils.dp2px(this, 150F)
-        )
+        UiUtils.setupDialogStyle(dialog, this)
     }
 
     fun yesNoAlert(
