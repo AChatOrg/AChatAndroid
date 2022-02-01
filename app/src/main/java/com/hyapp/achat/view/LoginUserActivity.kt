@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.animation.AnimationUtils
+import android.widget.ArrayAdapter
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
@@ -13,6 +14,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.hyapp.achat.R
 import com.hyapp.achat.databinding.ActivityGuestLoginBinding
+import com.hyapp.achat.databinding.ActivityUserLoginBinding
 import com.hyapp.achat.model.entity.Event
 import com.hyapp.achat.view.utils.UiUtils
 import com.hyapp.achat.viewmodel.LoginViewModel
@@ -22,21 +24,21 @@ import kotlinx.coroutines.launch
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
 
 @ExperimentalCoroutinesApi
-class LoginGuestActivity : EventActivity() {
+class LoginUserActivity : EventActivity() {
 
     lateinit var viewModel: LoginViewModel
-    lateinit var binding: ActivityGuestLoginBinding
+    lateinit var binding: ActivityUserLoginBinding
     lateinit var progressDialog: ProgressDialog
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         init()
-//        setupHistory()
+        setupHistory()
         setupKeyboardEvent()
         setupProgressDialog()
         subscribeLogged()
-        binding.login.setOnClickListener {
-            startActivity(Intent(this, LoginUserActivity::class.java))
+        binding.loginGuest.setOnClickListener {
+            startActivity(Intent(this, LoginGuestActivity::class.java))
             finish()
         }
     }
@@ -44,11 +46,11 @@ class LoginGuestActivity : EventActivity() {
     private fun setupKeyboardEvent() {
         KeyboardVisibilityEvent.setEventListener(this) { isOpen ->
             if (isOpen) {
-                binding.alreadyMember.visibility = View.GONE
-                binding.login.visibility = View.GONE
+                binding.haveNotAccount.visibility = View.GONE
+                binding.loginGuest.visibility = View.GONE
             } else {
-                binding.alreadyMember.visibility = View.VISIBLE
-                binding.login.visibility = View.VISIBLE
+                binding.haveNotAccount.visibility = View.VISIBLE
+                binding.loginGuest.visibility = View.VISIBLE
             }
         }
     }
@@ -60,24 +62,20 @@ class LoginGuestActivity : EventActivity() {
 
     private fun init() {
         viewModel = ViewModelProvider(this)[LoginViewModel::class.java]
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_guest_login)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_user_login)
         binding.viewModel = viewModel
     }
 
-//    private fun setupHistory() {
-//        val nameHistory = viewModel.nameHistory
-//        val bioHistory = viewModel.bioHistory
-//        val nameAdapter = ArrayAdapter(this, R.layout.item_suggestion, nameHistory)
-//        val bioAdapter = ArrayAdapter(this, R.layout.item_suggestion, bioHistory)
-//        binding.editTextUsername.threshold = 1
-//        binding.editTextBio.threshold = 1
-//        binding.editTextUsername.setAdapter(nameAdapter)
-//        binding.editTextBio.setAdapter(bioAdapter)
-//    }
+    private fun setupHistory() {
+        val usernameHistory = viewModel.getUsernameHistory()
+        val usernameAdapter = ArrayAdapter(this, R.layout.item_suggestion, usernameHistory)
+        binding.editTextUsername.threshold = 1
+        binding.editTextUsername.setAdapter(usernameAdapter)
+    }
 
     private fun setupProgressDialog() {
         progressDialog = ProgressDialog(this, R.style.RoundedCornersDialog)
-        progressDialog.setTitle(R.string.login_guest)
+        progressDialog.setTitle(R.string.login_members)
         progressDialog.setMessage(getString(R.string.loading))
         progressDialog.setCancelable(false)
         progressDialog.setButton(
@@ -100,6 +98,16 @@ class LoginGuestActivity : EventActivity() {
     private fun onError(message: String) {
         progressDialog.dismiss()
         when (message) {
+            Event.MSG_MATCH -> {
+                UiUtils.vibrate(this, 200)
+                binding.editTextPassword.startAnimation(
+                    AnimationUtils.loadAnimation(
+                        this,
+                        R.anim.shake
+                    )
+                )
+                alert(R.string.login_members, R.string.incorrect_username_or_password)
+            }
             Event.MSG_EMPTY -> {
                 UiUtils.vibrate(this, 200)
                 binding.editTextUsername.startAnimation(

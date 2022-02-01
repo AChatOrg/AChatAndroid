@@ -68,4 +68,8 @@ class IOSocket(loginJson: String, token: String) : CoroutineScope {
     fun setToken(token: String) {
         SocketService.ioSocket?.options?.auth?.put("token", token)
     }
+
+    fun reconnect() {
+        socket.disconnect().connect()
+    }
 }

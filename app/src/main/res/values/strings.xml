@@ -128,4 +128,6 @@
     <string name="password_too_short">Password is too short</string>
     <string name="are_you_sure_logout_user">Are you sure to logout?</string>
     <string name="do_not_have_account">Do not have an account?</string>
+    <string name="login_members">Login members</string>
+    <string name="incorrect_username_or_password">Incorrect username or password</string>
 </resources>

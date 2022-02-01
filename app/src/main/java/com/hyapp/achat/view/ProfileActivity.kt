@@ -69,6 +69,19 @@ class ProfileActivity : EventActivity() {
         binding.avatar.setOnClickListener { AvatarActivity.start(this, user) }
     }
 
+
+    private fun init() {
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_profile)
+        user = intent.getParcelableExtra(EXTRA_USER) ?: User()
+        viewModel = ViewModelProvider(
+            this,
+            ProfileViewModel.Factory(user)
+        )[ProfileViewModel::class.java]
+        isCurrUser = UserLive.value?.uid == user.uid
+        binding.currUserGroup.visibility = if (isCurrUser) View.VISIBLE else View.GONE
+        isUserNotifEnabled = viewModel.isUserNotifEnabled()
+    }
+
     private fun setupMainButton(user: User) {
         if (isCurrUser) {
             if (user.isGuest) {
@@ -177,7 +190,10 @@ class ProfileActivity : EventActivity() {
                 when (res.status) {
                     Resource.Status.SUCCESS -> {
                         binding.progressBar.visibility = View.GONE
-                        val intent = Intent(this@ProfileActivity, LoginGuestActivity::class.java)
+                        val intent = Intent(
+                            this@ProfileActivity,
+                            if (res.data == true) LoginUserActivity::class.java else LoginGuestActivity::class.java
+                        )
                         intent.flags =
                             Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                         startActivity(intent)
@@ -214,18 +230,6 @@ class ProfileActivity : EventActivity() {
                 viewModel.setUserNotif(false)
             }
         }
-    }
-
-    private fun init() {
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_profile)
-        user = intent.getParcelableExtra(EXTRA_USER) ?: User()
-        viewModel = ViewModelProvider(
-            this,
-            ProfileViewModel.Factory(user)
-        )[ProfileViewModel::class.java]
-        isCurrUser = UserLive.value?.uid == user.uid
-        binding.currUserGroup.visibility = if (isCurrUser) View.VISIBLE else View.GONE
-        isUserNotifEnabled = viewModel.isUserNotifEnabled()
     }
 
     private fun setupToolbar() {

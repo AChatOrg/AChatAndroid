@@ -10,12 +10,14 @@ import com.hyapp.achat.model.UsersRoomsRepo
 import com.hyapp.achat.model.entity.*
 import com.hyapp.achat.model.objectbox.ContactDao
 import com.hyapp.achat.model.objectbox.MessageDao
+import com.hyapp.achat.model.objectbox.ObjectBox
 import com.hyapp.achat.model.objectbox.UserDao
 import com.hyapp.achat.viewmodel.service.SocketService
 import com.hyapp.achat.viewmodel.utils.NetUtils
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
+import okhttp3.internal.closeQuietly
 import org.json.JSONObject
 
 @ExperimentalCoroutinesApi
@@ -98,13 +100,14 @@ class ProfileViewModel(var user: User) : ViewModel() {
                             App.context.stopService(Intent(App.context, SocketService::class.java))
                             withContext(ioDispatcher) {
                                 MainViewModel.publicRoomsMessageMap.clear()
-                                Preferences.instance().putLogged(false)
+                                Preferences.instance().putLogged(false, false)
                                 Preferences.instance().deleteALl()
                                 ContactDao.removeALl()
                                 MessageDao.removeALl()
                                 UserDao.removeALl()
                             }
-                            trySend(Resource.success(true))
+                            ObjectBox.store.closeQuietly()
+                            trySend(Resource.success(false/*start login guest activity*/))
                         } else {
                             trySend(Resource.error(Event.MSG_ERROR, null))
                         }
@@ -113,8 +116,9 @@ class ProfileViewModel(var user: User) : ViewModel() {
             }
         } else {
             App.context.stopService(Intent(App.context, SocketService::class.java))
-            Preferences.instance().putLogged(false)
-            trySend(Resource.success(true))
+            Preferences.instance().putLogged(false, true)
+            ObjectBox.store.closeQuietly()
+            trySend(Resource.success(true/*start login user activity*/))
         }
         awaitClose()
     }

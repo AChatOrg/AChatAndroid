@@ -11,10 +11,12 @@ public interface Config {
     String OPERATION_RECONNECT_GUEST = "reconnectGuest";
     String OPERATION_LOGIN_USER = "loginUser";
     String OPERATION_RECONNECT_USER = "reconnectUser";
+    String OPERATION_RECONNECT_USER_BY_REFRESH_TOKEN = "reconnectUserByRefreshToken";
 
     /*On connection err*/
     String CONNECTION_ERR_INCORRECT_PASS = "incorrectPass";
     String CONNECTION_ERR_TOKEN_EXPIRED = "tokenExpired";
+    String CONNECTION_ERR_REFRESH_TOKEN_EXPIRED = "refreshTokenExpired";
 
     String ON_DISCONNECT = "disconnect";
     String ON_CONNECT = "connect";

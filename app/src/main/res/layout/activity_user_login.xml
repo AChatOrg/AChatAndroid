@@ -23,7 +23,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="@font/iran_sans_bold"
-            android:text="@string/login_guest"
+            android:text="@string/login_members"
             android:textSize="@dimen/text_22"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
@@ -44,6 +44,7 @@
             android:paddingStart="@dimen/padding_8"
             android:paddingEnd="@dimen/padding_8"
             android:singleLine="true"
+            android:text="@{viewModel.savedUsername}"
             android:textSize="@dimen/text_16"
             app:backgroundTint="@color/edit_text_tint_list"
             app:layout_constraintEnd_toEndOf="parent"
@@ -77,7 +78,7 @@
             android:elevation="4dp"
             android:focusable="true"
             android:onClick="@{v -> viewModel.loginUser(editTextUsername.getText().toString(), editTextPassword.getText().toString())}"
-            app:layout_constraintBottom_toTopOf="@+id/alreadyMember"
+            app:layout_constraintBottom_toTopOf="@+id/haveNotAccount"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent">
@@ -95,20 +96,20 @@
         </FrameLayout>
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/alreadyMember"
+            android:id="@+id/haveNotAccount"
             android:layout_width="wrap_content"
             android:layout_height="64dp"
             android:layout_marginBottom="-16dp"
             android:gravity="center"
             android:text="@string/do_not_have_account"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/login"
+            app:layout_constraintEnd_toStartOf="@+id/loginGuest"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintHorizontal_chainStyle="packed"
             app:layout_constraintStart_toStartOf="@id/btnLogin" />
 
         <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/login"
+            android:id="@+id/loginGuest"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_8"
@@ -118,10 +119,10 @@
             android:minHeight="36dp"
             android:text="@string/login_guest"
             android:textColor="?attr/linkColor"
-            app:layout_constraintBaseline_toBaselineOf="@+id/alreadyMember"
+            app:layout_constraintBaseline_toBaselineOf="@+id/haveNotAccount"
             app:layout_constraintEnd_toEndOf="@id/btnLogin"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/alreadyMember" />
+            app:layout_constraintStart_toEndOf="@+id/haveNotAccount" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

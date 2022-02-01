@@ -2,6 +2,7 @@ package com.hyapp.achat.model;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Pair;
 
 import com.hyapp.achat.Config;
 import com.hyapp.achat.model.entity.ConnLive;
@@ -24,6 +25,10 @@ public class Preferences {
     public static final String CURR_ACCOUNT = "currAccount";
 
     public static final String LOGGED = "logged";
+    public static final String HAS_REGISTERED = "hasRegistered";
+
+    public static final String USERNAME = "username";
+    public static final String USERNAME_SET = "usernameSet";
 
     public static final String NAME = "name";
     public static final String BIO = "bio";
@@ -74,14 +79,15 @@ public class Preferences {
         writer.apply();
     }
 
-    public void putLogged(boolean logged) {
+    public void putLogged(boolean logged, boolean hasRegistered) {
         SharedPreferences.Editor writer = preferences.edit();
         writer.putBoolean(LOGGED, logged);
+        writer.putBoolean(HAS_REGISTERED, hasRegistered);
         writer.apply();
     }
 
-    public boolean getLogged() {
-        return preferences.getBoolean(LOGGED, false);
+    public Pair<Boolean, Boolean> getLogged() {
+        return new Pair<>(preferences.getBoolean(LOGGED, false), preferences.getBoolean(HAS_REGISTERED, false));
     }
 
     public void putLoginGuest(String name, String bio, byte gender) {
@@ -100,6 +106,25 @@ public class Preferences {
             writer.putStringSet(BIO_SET, bioSet);
         }
         writer.apply();
+    }
+
+    public void putLoginUser(String username) {
+        SharedPreferences.Editor writer = preferences.edit();
+        writer.putString(USERNAME, username);
+        if (!username.isEmpty()) {
+            Set<String> nameSet = new HashSet<>(preferences.getStringSet(USERNAME_SET, new HashSet<>()));
+            nameSet.add(username);
+            writer.putStringSet(USERNAME_SET, nameSet);
+        }
+        writer.apply();
+    }
+
+    public String getLoginUsername() {
+        return preferences.getString(USERNAME, "");
+    }
+
+    public Set<String> getLoginUserameSet() {
+        return new HashSet<>(preferences.getStringSet(USERNAME_SET, new HashSet<>()));
     }
 
     public String getLoginName() {

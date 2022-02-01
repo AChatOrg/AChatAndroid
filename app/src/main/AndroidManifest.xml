@@ -23,6 +23,12 @@
         android:theme="@style/Theme.AChat"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".view.LoginUserActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
             android:name=".view.AvatarActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="true"
