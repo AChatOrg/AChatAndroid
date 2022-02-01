@@ -1,6 +1,8 @@
 package com.hyapp.achat.model.objectbox
 
 import com.hyapp.achat.model.entity.User
+import com.hyapp.achat.model.entity.User_
+import io.objectbox.query.QueryBuilder
 
 object UserDao {
 
@@ -14,7 +16,11 @@ object UserDao {
         return ObjectBox.store.boxFor(User::class.java).put(user)
     }
 
-    fun removeALl() {
-        ObjectBox.store.boxFor(User::class.java).removeAll()
+    fun removeALl(account: String) {
+        ObjectBox.store.boxFor(User::class.java)
+            .query()
+            .equal(User_.uid, account, QueryBuilder.StringOrder.CASE_SENSITIVE)
+            .build()
+            .remove()
     }
 }

@@ -40,8 +40,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private var stopTypingJob: Job? = null
     private var refreshOnlineTimeJob: Job? = null
 
-    private var account = ""
-
     companion object {
         private const val PUBLIC_ROOM_MESSAGES_CAPACITY = 200
 
@@ -58,13 +56,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     init {
-        val currUser = UserLive.value
-        if (currUser != null) {
-            account = currUser.uid
-        } else {
+        if (UserLive.value == null) {
             UserDao.get(User.CURRENT_USER_ID)?.let {
                 UserLive.value = it
-                account = it.uid
             }
         }
         val context = getApplication<Application>().applicationContext
@@ -75,7 +69,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun loadContacts() {
-        _contactsLive.value = ContactList(ContactDao.all(account))
+        _contactsLive.value = ContactList(ContactDao.all(UserLive.value?.uid ?: ""))
     }
 
     fun reloadUsers() {
@@ -210,7 +204,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             stopTypingJob?.cancel()
             stopTypingJob = viewModelScope.launch(ioDispatcher) {
                 delay(3000)
-                ContactDao.get(account, contact.uid)?.let {
+                ContactDao.get(UserLive.value?.uid ?: "", contact.uid)?.let {
                     updated = list.update(it.apply { typingName = null })
                     if (updated) {
                         _contactsLive.postValue(list)

@@ -22,7 +22,7 @@ import io.socket.emitter.Emitter;
 public class Preferences {
 
     public static final String DEFAULT_NAME = "default";
-    public static final String CURR_ACCOUNT = "currAccount";
+    public static final String ACCOUNT = "account";
 
     public static final String LOGGED = "logged";
     public static final String HAS_REGISTERED = "hasRegistered";
@@ -49,34 +49,16 @@ public class Preferences {
 
     private final SharedPreferences preferences;
 
-    public Preferences(Context context, String account) {
-        preferences = context.getSharedPreferences(account, Context.MODE_PRIVATE);
+    public Preferences(Context context) {
+        preferences = context.getSharedPreferences(DEFAULT_NAME, Context.MODE_PRIVATE);
     }
 
-    public static void init(Context context, String account) {
-        instance = new Preferences(context, account);
+    public static void init(Context context) {
+        instance = new Preferences(context);
     }
 
     public static Preferences instance() {
         return instance;
-    }
-
-    public static void putCurrAccount(Context context, String account) {
-        SharedPreferences prefs = context.getSharedPreferences(DEFAULT_NAME, Context.MODE_PRIVATE);
-        SharedPreferences.Editor writer = prefs.edit();
-        writer.putString(CURR_ACCOUNT, account);
-        writer.apply();
-    }
-
-    public static String getCurrAccount(Context context) {
-        SharedPreferences prefs = context.getSharedPreferences(DEFAULT_NAME, Context.MODE_PRIVATE);
-        return prefs.getString(CURR_ACCOUNT, "");
-    }
-
-    public void deleteALl() {
-        SharedPreferences.Editor writer = preferences.edit();
-        writer.clear();
-        writer.apply();
     }
 
     public void putLogged(boolean logged, boolean hasRegistered) {
@@ -164,35 +146,35 @@ public class Preferences {
         return preferences.getString(LOGIN_INFO, json.toString());
     }
 
-    public void incrementContactMessagesCount(String contactUid) {
-        long count = preferences.getLong(CONTACT_MESSAGES_COUNT + contactUid, 0);
+    public void incrementContactMessagesCount(String account, String contactUid) {
+        long count = preferences.getLong(CONTACT_MESSAGES_COUNT + account + contactUid, 0);
         SharedPreferences.Editor writer = preferences.edit();
-        writer.putLong(CONTACT_MESSAGES_COUNT + contactUid, count + 1);
+        writer.putLong(CONTACT_MESSAGES_COUNT + account + contactUid, count + 1);
         writer.apply();
     }
 
-    public long getContactMessagesCount(String contactUid) {
-        return preferences.getLong(CONTACT_MESSAGES_COUNT + contactUid, 0);
+    public long getContactMessagesCount(String account, String contactUid) {
+        return preferences.getLong(CONTACT_MESSAGES_COUNT + account + contactUid, 0);
     }
 
-    public void setUserNotif(String userUid, boolean enabled) {
+    public void setUserNotif(String account, String userUid, boolean enabled) {
         SharedPreferences.Editor writer = preferences.edit();
-        writer.putBoolean(OTHER_USER_NOTIFICATIONS + userUid, enabled);
+        writer.putBoolean(OTHER_USER_NOTIFICATIONS + account + userUid, enabled);
         writer.apply();
     }
 
-    public boolean isUserNotifEnabled(String userUid) {
-        return preferences.getBoolean(OTHER_USER_NOTIFICATIONS + userUid, true);
+    public boolean isUserNotifEnabled(String account, String userUid) {
+        return preferences.getBoolean(OTHER_USER_NOTIFICATIONS + account + userUid, true);
     }
 
-    public void setCurrUserNotif(boolean enabled) {
+    public void setCurrUserNotif(String account, boolean enabled) {
         SharedPreferences.Editor writer = preferences.edit();
-        writer.putBoolean(CURR_USER_NOTIFICATIONS, enabled);
+        writer.putBoolean(CURR_USER_NOTIFICATIONS + account, enabled);
         writer.apply();
     }
 
-    public boolean isCurrUserNotifEnabled() {
-        return preferences.getBoolean(CURR_USER_NOTIFICATIONS, true);
+    public boolean isCurrUserNotifEnabled(String account) {
+        return preferences.getBoolean(CURR_USER_NOTIFICATIONS + account, true);
     }
 
     public void putToken(String token) {

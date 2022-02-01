@@ -21,6 +21,7 @@ import com.hyapp.achat.R;
 import com.hyapp.achat.model.Preferences;
 import com.hyapp.achat.model.entity.Contact;
 import com.hyapp.achat.model.entity.Message;
+import com.hyapp.achat.model.entity.UserLive;
 import com.hyapp.achat.view.ChatActivity;
 import com.hyapp.achat.view.MainActivity;
 import com.hyapp.achat.viewmodel.receiver.NotifReceiver;
@@ -90,8 +91,8 @@ public class Notifs {
 
     @SuppressLint("UnspecifiedImmutableFlag")
     public static void notifyMessage(Context context, Message message, Contact contact) {
-        if (Preferences.instance().isCurrUserNotifEnabled()) {
-            if (Preferences.instance().isUserNotifEnabled(contact.getUid())) {
+        if (Preferences.instance().isCurrUserNotifEnabled(UserLive.INSTANCE.getValue() != null ? UserLive.INSTANCE.getValue().getUid() : "")) {
+            if (Preferences.instance().isUserNotifEnabled(UserLive.INSTANCE.getValue() != null ? UserLive.INSTANCE.getValue().getUid() : "", contact.getUid())) {
                 Intent receiverIntent = new Intent(context, ChatActivity.class);
                 receiverIntent.putExtra(ChatActivity.EXTRA_CONTACT, contact);
                 receiverIntent.setData((Uri.parse("custom://" + System.currentTimeMillis())));

@@ -29,6 +29,11 @@ class ProfileViewModel(var user: User) : ViewModel() {
     enum class LikeStatus { ERROR, LIKED, DISLIKED }
 
     init {
+        if (UserLive.value == null) {
+            UserDao.get(User.CURRENT_USER_ID)?.let {
+                UserLive.value = it
+            }
+        }
         requestUserInfo()
     }
 
@@ -71,19 +76,19 @@ class ProfileViewModel(var user: User) : ViewModel() {
     }
 
     fun isCurrUserNotifEnabled(): Boolean {
-        return Preferences.instance().isCurrUserNotifEnabled
+        return Preferences.instance().isCurrUserNotifEnabled(UserLive.value?.uid ?: "")
     }
 
     fun setCurrUserNotif(enabled: Boolean) {
-        Preferences.instance().setCurrUserNotif(enabled)
+        Preferences.instance().setCurrUserNotif(UserLive.value?.uid ?: "", enabled)
     }
 
     fun setUserNotif(enabled: Boolean) {
-        Preferences.instance().setUserNotif(user.uid, enabled)
+        Preferences.instance().setUserNotif(UserLive.value?.uid ?: "", user.uid, enabled)
     }
 
     fun isUserNotifEnabled(): Boolean {
-        return Preferences.instance().isUserNotifEnabled(user.uid)
+        return Preferences.instance().isUserNotifEnabled(UserLive.value?.uid ?: "", user.uid)
     }
 
     fun requestLogout(): Flow<Resource<Boolean>> = callbackFlow {
@@ -99,10 +104,9 @@ class ProfileViewModel(var user: User) : ViewModel() {
                             withContext(ioDispatcher) {
                                 MainViewModel.publicRoomsMessageMap.clear()
                                 Preferences.instance().putLogged(false, false)
-                                Preferences.instance().deleteALl()
                                 ContactDao.removeALl(user.uid)
                                 MessageDao.removeALl(user.uid)
-                                UserDao.removeALl()
+                                UserDao.removeALl(user.uid)
                             }
                             trySend(Resource.success(false/*start login guest activity*/))
                         } else {

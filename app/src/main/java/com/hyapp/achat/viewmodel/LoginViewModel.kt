@@ -73,9 +73,6 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
             json.put("gender", genderByte)
             val jsonStr = json.toString()
 
-            Preferences.putCurrAccount(context, uid)
-            Preferences.init(context, uid)
-
             Preferences.instance().putLoginInfo(jsonStr)
             SocketService.start(context, jsonStr)
         }
@@ -106,9 +103,6 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
             json.put("password", password)
             json.put("token", "")
             val jsonStr = json.toString()
-
-            Preferences.putCurrAccount(context, usernameTrim)
-            Preferences.init(context, usernameTrim)
 
             Preferences.instance().putLoginUser(usernameTrim)
             Preferences.instance().putLoginInfo(jsonStr)

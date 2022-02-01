@@ -28,10 +28,7 @@ class App : MultiDexApplication() {
     override fun onCreate() {
         super.onCreate()
         context = applicationContext
-        val account = Preferences.getCurrAccount(context)
-        if (account.isNotEmpty()) {
-            Preferences.init(context, account)
-        }
+        Preferences.init(context)
         Fresco.initialize(context)
         ObjectBox.init(context)
         AXrLottie.init(context)
