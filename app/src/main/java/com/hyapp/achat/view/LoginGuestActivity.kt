@@ -15,15 +15,14 @@ import com.hyapp.achat.R
 import com.hyapp.achat.databinding.ActivityGuestLoginBinding
 import com.hyapp.achat.model.entity.Event
 import com.hyapp.achat.view.utils.UiUtils
-import com.hyapp.achat.viewmodel.LoginGuestViewModel
+import com.hyapp.achat.viewmodel.LoginViewModel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent
-import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener
 
 class LoginGuestActivity : EventActivity() {
 
-    lateinit var viewModel: LoginGuestViewModel
+    lateinit var viewModel: LoginViewModel
     lateinit var binding: ActivityGuestLoginBinding
     lateinit var progressDialog: ProgressDialog
 
@@ -54,7 +53,7 @@ class LoginGuestActivity : EventActivity() {
     }
 
     private fun init() {
-        viewModel = ViewModelProvider(this)[LoginGuestViewModel::class.java]
+        viewModel = ViewModelProvider(this)[LoginViewModel::class.java]
         binding = DataBindingUtil.setContentView(this, R.layout.activity_guest_login)
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
@@ -80,7 +79,7 @@ class LoginGuestActivity : EventActivity() {
             DialogInterface.BUTTON_NEGATIVE,
             getString(R.string.cancel)
         ) { dialog: DialogInterface, which: Int ->
-            viewModel.cancelLogin()
+            viewModel.cancelLoginGuest()
             dialog.dismiss()
         }
     }

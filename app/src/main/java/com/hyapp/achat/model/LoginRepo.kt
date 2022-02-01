@@ -13,7 +13,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.callbackFlow
+import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
+import java.io.IOException
 
 @ExperimentalCoroutinesApi
 object LoginRepo {
@@ -33,11 +37,29 @@ object LoginRepo {
         _loggedState.tryEmit(user)
         Preferences.instance().putLogged(true)
 
-        JSONObject(Preferences.instance().loginInfo).let {
-            it.put("operation", Config.OPERATION_RECONNECT_GUEST)
-            val newJson = it.toString()
-            Preferences.instance().putLoginInfo(newJson)
-            SocketService.ioSocket?.setQuery(newJson)
+        if (user.isGuest) {
+            JSONObject(Preferences.instance().loginInfo).let {
+                it.put("operation", Config.OPERATION_RECONNECT_GUEST)
+                val newJson = it.toString()
+                Preferences.instance().putLoginInfo(newJson)
+                SocketService.ioSocket?.setQuery(newJson)
+            }
+        } else {
+            if (args.size > 1) {
+                val token = args[1].toString()
+                val refreshToken = args[2].toString()
+                Preferences.instance().putTokens(token, refreshToken)
+
+                JSONObject(Preferences.instance().loginInfo).let {
+                    it.put("operation", Config.OPERATION_RECONNECT_USER)
+                    it.put("username", user.username)
+                    it.put("password", "")
+                    val newJson = it.toString()
+                    Preferences.instance().putLoginInfo(newJson)
+                    SocketService.ioSocket?.setQuery(newJson)
+                    SocketService.ioSocket?.setToken(token)
+                }
+            }
         }
     }
 
@@ -73,8 +95,72 @@ object LoginRepo {
         awaitClose { SocketService.ioSocket?.socket?.off(Config.ON_REQUEST_CHECK_USERNAME) }
     }
 
-    fun requestRegister(): Flow<Pair<Boolean, String>> = callbackFlow {
+    fun requestRegister(username: String, password: String): Flow<Triple<User, String, String>> =
+        callbackFlow {
+            SocketService.ioSocket?.socket?.let {
+                if (it.connected()) {
+                    it.emit(Config.ON_REQUEST_REGISTER, username, password)
+                    it.on(Config.ON_REQUEST_REGISTER) { args ->
+                        it.off(Config.ON_REQUEST_REGISTER)
+                        val user = GsonBuilder()
+                            .registerTypeAdapter(User::class.java, UserDeserializer())
+                            .create()
+                            .fromJson(args[0].toString(), User::class.java)
+                        val token = args[1].toString()
+                        val refreshToken = args[2].toString()
+                        if (token.isNotEmpty() && refreshToken.isNotEmpty()) {
+                            trySend(Triple(user, token, refreshToken))
+                        } else {
+                            trySend((Triple(User(), "", "")))
+                        }
+                    }
+                } else {
+                    trySend((Triple(User(), "", "")))
+                }
+            }
+            awaitClose { }
+        }
 
-        awaitClose { }
-    }
+//    fun requestLoginUser(username: String, password: String): Flow<Triple<User, String, String>> =
+//        callbackFlow {
+//
+//            val json = JSONObject()
+//            json.put("username", username)
+//            json.put("password", password)
+//
+//            val mediaType = "application/json; charset=utf-8".toMediaType()
+//            val client = OkHttpClient()
+//            val body = json.toString().toRequestBody(mediaType)
+//            val request = Request.Builder()
+//                .url(Config.SERVER_URL)
+//                .post(body)
+//                .build()
+//            val response = client.newCall(request)
+//
+//            response.enqueue(object : Callback {
+//                override fun onFailure(call: Call, e: IOException) {
+//                    trySend((Triple(User(), "", "")))
+//                }
+//
+//                override fun onResponse(call: Call, response: Response) {
+//                    if (response.isSuccessful) {
+//                        val jsonObj = JSONObject(response.body.toString())
+//                        val user = GsonBuilder()
+//                            .registerTypeAdapter(User::class.java, UserDeserializer())
+//                            .create()
+//                            .fromJson(jsonObj.get("user").toString(), User::class.java)
+//                        val token = jsonObj.get("token").toString()
+//                        val refreshToken = jsonObj.get("refreshToken").toString()
+//                        if (token.isNotEmpty() && refreshToken.isNotEmpty()) {
+//                            trySend(Triple(user, token, refreshToken))
+//                        } else {
+//                            trySend((Triple(User(), "", "")))
+//                        }
+//                    } else {
+//                        trySend((Triple(User(), "", "")))
+//                    }
+//                }
+//            })
+//            awaitClose { response.cancel() }
+//        }
 }

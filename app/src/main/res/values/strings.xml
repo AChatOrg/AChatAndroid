@@ -125,4 +125,7 @@
     <string name="invalid_username">Invalid username</string>
     <string name="username_exist">Username already exist</string>
     <string name="username_available">Username available</string>
+    <string name="password_too_short">Password is too short</string>
+    <string name="are_you_sure_logout_user">Are you sure to logout?</string>
+    <string name="do_not_have_account">Do not have an account?</string>
 </resources>

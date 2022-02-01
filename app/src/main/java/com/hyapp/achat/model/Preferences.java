@@ -5,12 +5,14 @@ import android.content.SharedPreferences;
 
 import com.hyapp.achat.Config;
 import com.hyapp.achat.model.entity.ConnLive;
+import com.hyapp.achat.model.entity.Contact;
 import com.hyapp.achat.viewmodel.utils.SecureUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -18,7 +20,8 @@ import io.socket.emitter.Emitter;
 
 public class Preferences {
 
-    private static final String DEFAULT_NAME = "login";
+    public static final String DEFAULT_NAME = "default";
+    public static final String CURR_ACCOUNT = "currAccount";
 
     public static final String LOGGED = "logged";
 
@@ -34,22 +37,35 @@ public class Preferences {
     public static final String OTHER_USER_NOTIFICATIONS = "OUN";
     public static final String CURR_USER_NOTIFICATIONS = "CUN";
 
+    public static final String TOKEN = "token";
+    public static final String REFRESH_TOKEN = "refreshToken";
+
     private static Preferences instance;
 
     private final SharedPreferences preferences;
 
-    public Preferences(Context context) {
-        preferences = context.getSharedPreferences(DEFAULT_NAME, Context.MODE_PRIVATE);
+    public Preferences(Context context, String account) {
+        preferences = context.getSharedPreferences(account, Context.MODE_PRIVATE);
     }
 
-    public static void init(Context context) {
-        if (instance == null) {
-            instance = new Preferences(context);
-        }
+    public static void init(Context context, String account) {
+        instance = new Preferences(context, account);
     }
 
     public static Preferences instance() {
         return instance;
+    }
+
+    public static void putCurrAccount(Context context, String account) {
+        SharedPreferences prefs = context.getSharedPreferences(DEFAULT_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor writer = prefs.edit();
+        writer.putString(CURR_ACCOUNT, account);
+        writer.apply();
+    }
+
+    public static String getCurrAccount(Context context) {
+        SharedPreferences prefs = context.getSharedPreferences(DEFAULT_NAME, Context.MODE_PRIVATE);
+        return prefs.getString(CURR_ACCOUNT, "");
     }
 
     public void deleteALl() {
@@ -152,5 +168,26 @@ public class Preferences {
 
     public boolean isCurrUserNotifEnabled() {
         return preferences.getBoolean(CURR_USER_NOTIFICATIONS, true);
+    }
+
+    public void putToken(String token) {
+        SharedPreferences.Editor writer = preferences.edit();
+        writer.putString(TOKEN, token);
+        writer.apply();
+    }
+
+    public void putTokens(String token, String refreshToken) {
+        SharedPreferences.Editor writer = preferences.edit();
+        writer.putString(TOKEN, token);
+        writer.putString(REFRESH_TOKEN, refreshToken);
+        writer.apply();
+    }
+
+    public String getToken() {
+        return preferences.getString(TOKEN, "");
+    }
+
+    public String getRefreshToken() {
+        return preferences.getString(REFRESH_TOKEN, "");
     }
 }

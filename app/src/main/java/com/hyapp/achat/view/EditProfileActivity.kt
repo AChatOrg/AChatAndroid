@@ -19,7 +19,6 @@ import com.hyapp.achat.view.utils.UiUtils
 import com.hyapp.achat.viewmodel.EditProfileViewModel
 import com.hyapp.achat.viewmodel.permissions.Permissions
 import gun0912.tedbottompicker.TedRxBottomPicker
-import io.reactivex.functions.Consumer
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -122,7 +121,7 @@ class EditProfileActivity : EventActivity() {
         binding.nameEditText.setText(user.name)
         binding.bioEditText.setText(user.bio)
         binding.genderEditText.setText(if (user.isMale) R.string.male else R.string.female)
-        binding.usernameEditText.setText(user.username)
+        binding.usernameEditText.setText(user.username.replace("-",""))
         binding.passwordEditText.setText(if (user.isGuest) "" else "0000000000000000")
     }
 

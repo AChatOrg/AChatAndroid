@@ -133,26 +133,37 @@ class RegisterBottomSheet : BottomSheetDialogFragment() {
                         R.anim.shake
                     )
                 )
-            }
-            lifecycleScope.launch {
-                viewModel.requestRegister(
-                    binding.inputOne.text.toString(),
-                    binding.inputTwo.text.toString(),
-                ).collect { res ->
-                    when (res.status) {
-                        Resource.Status.SUCCESS -> {
-                            binding.progressBar.visibility = View.GONE
-                            dismiss()
-                            Toast.makeText(
-                                requireContext(),
-                                R.string.successfully_registered,
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }
-                        Resource.Status.ERROR -> onError(res)
-                        Resource.Status.LOADING -> {
-                            binding.progressBar.visibility = View.VISIBLE
-                            binding.btn.isEnabled = false
+            } else if (binding.inputTwo.text?.length ?: 0 < 4) {
+                Toast.makeText(requireContext(), R.string.password_too_short, Toast.LENGTH_LONG)
+                    .show()
+                UiUtils.vibrate(requireContext(), 200)
+                binding.inputTwo.startAnimation(
+                    AnimationUtils.loadAnimation(
+                        requireContext(),
+                        R.anim.shake
+                    )
+                )
+            } else {
+                lifecycleScope.launch {
+                    viewModel.requestRegister(
+                        binding.inputOne.text.toString(),
+                        binding.inputTwo.text.toString(),
+                    ).collect { res ->
+                        when (res.status) {
+                            Resource.Status.SUCCESS -> {
+                                binding.progressBar.visibility = View.GONE
+                                dismiss()
+                                Toast.makeText(
+                                    requireContext(),
+                                    R.string.successfully_registered,
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                            Resource.Status.ERROR -> onError(res.message)
+                            Resource.Status.LOADING -> {
+                                binding.progressBar.visibility = View.VISIBLE
+                                binding.btn.isEnabled = false
+                            }
                         }
                     }
                 }
@@ -160,10 +171,10 @@ class RegisterBottomSheet : BottomSheetDialogFragment() {
         }
     }
 
-    private fun onError(res: Resource<Byte>) {
+    private fun onError(msg: String) {
         binding.progressBar.visibility = View.GONE
         binding.btn.isEnabled = true
-        when (res.message) {
+        when (msg) {
             Event.MSG_NET -> Toast.makeText(
                 requireContext(),
                 R.string.no_network_connection,

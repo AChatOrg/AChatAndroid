@@ -65,12 +65,11 @@ class ProfileActivity : EventActivity() {
         observeUser()
         observeUserInfo()
         setupCurrUserNotif()
-        setupMainButton()
         binding.swipeRefreshLayout.setOnRefreshListener { viewModel.requestUserInfo() }
         binding.avatar.setOnClickListener { AvatarActivity.start(this, user) }
     }
 
-    private fun setupMainButton() {
+    private fun setupMainButton(user: User) {
         if (isCurrUser) {
             if (user.isGuest) {
                 binding.mainButton.setText(R.string.register)
@@ -158,10 +157,10 @@ class ProfileActivity : EventActivity() {
             isUserNotifEnabled = !isUserNotifEnabled
             setNotif(isUserNotifEnabled)
         } else if (item.itemId == R.id.logout) {
-            if (user.isGuest && isCurrUser) {
+            if (isCurrUser) {
                 yesNoAlert(
                     R.string.logout,
-                    R.string.are_you_sure_logout_guest
+                    if (user.isGuest) R.string.are_you_sure_logout_guest else R.string.are_you_sure_logout_user
                 ) { p, p1 -> logout() }
             }
         } else if (item.itemId == R.id.edit) {
@@ -292,7 +291,7 @@ class ProfileActivity : EventActivity() {
 
     private fun setupUser(user: User) {
         binding.run {
-            toolbar.title = user.username
+            toolbar.title = user.username.replace("-", "")
             val avatars: List<String> = user.avatars
             avatar.setImageURI(if (avatars.isNotEmpty()) avatars[0] else null)
             name.text = user.name
@@ -324,10 +323,13 @@ class ProfileActivity : EventActivity() {
     private fun observeUser() {
         if (isCurrUser) {
             UserLive.observe(this) {
-                setupUser(it)
+                user = it
+                setupUser(user)
+                setupMainButton(user)
             }
         } else {
             setupUser(user)
+            setupMainButton(user)
         }
     }
 

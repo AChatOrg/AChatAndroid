@@ -2,10 +2,8 @@ package com.hyapp.achat.viewmodel
 
 import android.app.Application
 import android.content.Intent
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.hyapp.achat.App
 import com.hyapp.achat.Config
 import com.hyapp.achat.model.LoginRepo
 import com.hyapp.achat.model.entity.*
@@ -15,14 +13,14 @@ import com.hyapp.achat.model.objectbox.UserDao
 import com.hyapp.achat.viewmodel.service.SocketService
 import com.hyapp.achat.viewmodel.utils.NetUtils
 import com.hyapp.achat.viewmodel.utils.SecureUtils
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.util.*
 
-class LoginGuestViewModel(application: Application) : AndroidViewModel(application) {
+@ExperimentalCoroutinesApi
+class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _loggedFlow = MutableSharedFlow<Event>(extraBufferCapacity = 1)
     val loggedFlow = _loggedFlow.asSharedFlow()
@@ -55,24 +53,61 @@ class LoginGuestViewModel(application: Application) : AndroidViewModel(applicati
 
             _loggedFlow.tryEmit(Event(Event.Status.LOADING))
 
+            val uid = UUID.randomUUID().toString()
+
             val json = JSONObject()
             json.put("operation", Config.OPERATION_LOGIN_GUEST)
             json.put("androidId", SecureUtils.androidId(context))
-            json.put("uid", UUID.randomUUID().toString())
+            json.put("uid", uid)
             json.put("name", nameTrim)
             json.put("bio", bioTrim)
             json.put("gender", genderByte)
             val jsonStr = json.toString()
+
+            Preferences.putCurrAccount(context, uid)
+            Preferences.init(context, uid)
+            ObjectBox.init(context, uid)
 
             Preferences.instance().putLoginInfo(jsonStr)
             SocketService.start(context, jsonStr)
         }
     }
 
-    fun cancelLogin() {
+    fun cancelLoginGuest() {
         val context = getApplication<Application>().applicationContext
         context.stopService(Intent(context, SocketService::class.java))
     }
+
+    fun loginUser(username: String, password: String) {
+        val context = getApplication<Application>().applicationContext
+
+        if (username.isEmpty()) {
+            _loggedFlow.tryEmit(Event(Event.Status.ERROR, Event.MSG_EMPTY))
+
+        } else if (!NetUtils.isNetConnected(context)) {
+            _loggedFlow.tryEmit(Event(Event.Status.ERROR, Event.MSG_NET))
+
+        } else {
+            val usernameTrim = username.trim()
+
+            _loggedFlow.tryEmit(Event(Event.Status.LOADING))
+
+            val json = JSONObject()
+            json.put("operation", Config.OPERATION_LOGIN_USER)
+            json.put("username", usernameTrim)
+            json.put("password", password)
+            json.put("token", "")
+            val jsonStr = json.toString()
+
+            Preferences.putCurrAccount(context, usernameTrim)
+            Preferences.init(context, usernameTrim)
+            ObjectBox.init(context, usernameTrim)
+
+            Preferences.instance().putLoginInfo(jsonStr)
+            SocketService.start(context, jsonStr)
+        }
+    }
+
 
 //    val savedName: String
 //        get() = Preferences.instance().loginName

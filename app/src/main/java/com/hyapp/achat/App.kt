@@ -8,7 +8,9 @@ import com.aghajari.rlottie.AXrLottie
 import com.aghajari.rlottie.AXrLottieImageView
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.hyapp.achat.model.Preferences
+import com.hyapp.achat.model.entity.User
 import com.hyapp.achat.model.objectbox.ObjectBox
+import com.hyapp.achat.model.objectbox.UserDao
 import com.hyapp.achat.view.component.emojiview.AXEmojiManager
 import com.hyapp.achat.view.component.emojiview.iosprovider.AXIOSEmojiProvider
 import com.hyapp.achat.view.component.emojiview.listener.StickerViewCreatorListener
@@ -26,9 +28,12 @@ class App : MultiDexApplication() {
     override fun onCreate() {
         super.onCreate()
         context = applicationContext
-        Preferences.init(context)
         Fresco.initialize(context)
-        ObjectBox.init(context)
+        val account = Preferences.getCurrAccount(context)
+        if (account.isNotEmpty()) {
+            ObjectBox.init(context, account)
+            Preferences.init(context, account)
+        }
         AXrLottie.init(context)
         AXEmojiManager.install(context, AXIOSEmojiProvider(context))
         AXEmojiManager.setStickerViewCreatorListener(object : StickerViewCreatorListener {

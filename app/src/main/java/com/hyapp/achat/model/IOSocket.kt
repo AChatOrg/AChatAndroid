@@ -10,14 +10,16 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
+import org.apache.commons.collections4.map.SingletonMap
 import java.net.URISyntaxException
 import kotlin.coroutines.CoroutineContext
 
 @ExperimentalCoroutinesApi
-class IOSocket(loginJson: String) : CoroutineScope {
+class IOSocket(loginJson: String, token: String) : CoroutineScope {
 
-    var options: IO.Options = IO.Options.builder()
+    private var options: IO.Options = IO.Options.builder()
         .setQuery(Config.SOCKET_QUERY_DATA + "=" + loginJson)
+        .setAuth(SingletonMap("token", token))
         .build()
 
     lateinit var socket: Socket
@@ -61,5 +63,9 @@ class IOSocket(loginJson: String) : CoroutineScope {
 
     fun setQuery(json: String) {
         SocketService.ioSocket?.options?.query = Config.SOCKET_QUERY_DATA + "=" + json
+    }
+
+    fun setToken(token: String) {
+        SocketService.ioSocket?.options?.auth?.put("token", token)
     }
 }

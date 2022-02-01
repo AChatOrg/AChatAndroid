@@ -21,7 +21,7 @@ public class LauncherActivity extends AppCompatActivity {
             return;
         }
 
-        if (Preferences.instance().getLogged()) {
+        if (Preferences.instance() != null && Preferences.instance().getLogged()) {
             startActivity(new Intent(this, MainActivity.class));
         } else {
             startActivity(new Intent(this, LoginGuestActivity.class));

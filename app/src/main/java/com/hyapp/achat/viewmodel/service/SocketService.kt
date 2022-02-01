@@ -49,9 +49,13 @@ class SocketService : Service() {
         val loginJson = intent.getStringExtra(EXTRA_LOGIN_EVENT)
 
         if (ioSocket == null) {
-            ioSocket = IOSocket(loginJson ?: Preferences.instance().loginInfo)
+            ioSocket = IOSocket(
+                loginJson ?: Preferences.instance().loginInfo,
+                Preferences.instance().token
+            )
         } else {
             ioSocket?.setQuery(Preferences.instance().loginInfo)
+            ioSocket?.setToken(Preferences.instance().token)
         }
         startForeground(Notifs.ID_SOCKET, Notifs.getSocketNotif(this))
         return START_STICKY

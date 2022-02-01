@@ -3,13 +3,11 @@ package com.hyapp.achat.viewmodel
 import android.content.Intent
 import androidx.lifecycle.*
 import com.hyapp.achat.App
+import com.hyapp.achat.Config
 import com.hyapp.achat.model.LoginRepo
 import com.hyapp.achat.model.Preferences
 import com.hyapp.achat.model.UsersRoomsRepo
-import com.hyapp.achat.model.entity.Event
-import com.hyapp.achat.model.entity.Resource
-import com.hyapp.achat.model.entity.User
-import com.hyapp.achat.model.entity.UserInfo
+import com.hyapp.achat.model.entity.*
 import com.hyapp.achat.model.objectbox.ContactDao
 import com.hyapp.achat.model.objectbox.MessageDao
 import com.hyapp.achat.model.objectbox.UserDao
@@ -18,9 +16,10 @@ import com.hyapp.achat.viewmodel.utils.NetUtils
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
+import org.json.JSONObject
 
 @ExperimentalCoroutinesApi
-class ProfileViewModel(val user: User) : ViewModel() {
+class ProfileViewModel(var user: User) : ViewModel() {
 
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 
@@ -88,34 +87,40 @@ class ProfileViewModel(val user: User) : ViewModel() {
     }
 
     fun requestLogout(): Flow<Resource<Boolean>> = callbackFlow {
-        trySend(Resource.loading(null))
-        if (!NetUtils.isNetConnected(App.context)) {
-            trySend(Resource.error(Event.MSG_NET, null))
-        } else {
-            viewModelScope.launch {
-                LoginRepo.requestLogout().collect { loggedOut ->
-                    if (loggedOut) {
-                        App.context.stopService(Intent(App.context, SocketService::class.java))
-                        withContext(ioDispatcher) {
-                            MainViewModel.publicRoomsMessageMap.clear()
-                            Preferences.instance().putLogged(false)
-                            Preferences.instance().deleteALl()
-                            ContactDao.removeALl()
-                            MessageDao.removeALl()
-                            UserDao.removeALl()
+        if (user.isGuest) {
+            trySend(Resource.loading(null))
+            if (!NetUtils.isNetConnected(App.context)) {
+                trySend(Resource.error(Event.MSG_NET, null))
+            } else {
+                viewModelScope.launch {
+                    LoginRepo.requestLogout().collect { loggedOut ->
+                        if (loggedOut) {
+                            App.context.stopService(Intent(App.context, SocketService::class.java))
+                            withContext(ioDispatcher) {
+                                MainViewModel.publicRoomsMessageMap.clear()
+                                Preferences.instance().putLogged(false)
+                                Preferences.instance().deleteALl()
+                                ContactDao.removeALl()
+                                MessageDao.removeALl()
+                                UserDao.removeALl()
+                            }
+                            trySend(Resource.success(true))
+                        } else {
+                            trySend(Resource.error(Event.MSG_ERROR, null))
                         }
-                        trySend(Resource.success(true))
-                    } else {
-                        trySend(Resource.error(Event.MSG_ERROR, null))
                     }
                 }
             }
+        } else {
+            App.context.stopService(Intent(App.context, SocketService::class.java))
+            Preferences.instance().putLogged(false)
+            trySend(Resource.success(true))
         }
         awaitClose()
     }
 
     fun requestCheckUsername(username: CharSequence): Flow<Event> = callbackFlow {
-        if (username.matches(Regex("\\b[a-zA-Z][a-zA-Z0-9\\-._]{3,64}\\b"))) {
+        if (username.matches(Regex("^[a-zA-Z_][\\w](?!.*?\\.{2})[\\w.]{1,28}[\\w]\$"))) {
             trySend(Event(Event.Status.LOADING))
             LoginRepo.requestUsernameExist(username).collect { exist ->
                 trySend(
@@ -131,11 +136,37 @@ class ProfileViewModel(val user: User) : ViewModel() {
         awaitClose()
     }
 
-    fun requestRegister(username: String, password: String): Flow<Resource<Byte>> =
-        callbackFlow {
-
-            awaitClose()
+    fun requestRegister(username: String, password: String): Flow<Resource<User>> = callbackFlow {
+        trySend(Resource.loading(null))
+        if (!NetUtils.isNetConnected(App.context)) {
+            trySend(Resource.error(Event.MSG_NET, null))
+        } else {
+            LoginRepo.requestRegister(username, password).collect { triple ->
+                val user = triple.first
+                val token = triple.second
+                val refreshToken = triple.third
+                if (token.isNotEmpty() && refreshToken.isNotEmpty()) {
+                    Preferences.instance().putTokens(token, refreshToken)
+                    UserDao.put(user.apply { id = User.CURRENT_USER_ID })
+                    UserLive.value = user
+                    this@ProfileViewModel.user = user
+                    JSONObject(Preferences.instance().loginInfo).let {
+                        it.put("operation", Config.OPERATION_RECONNECT_USER)
+                        it.put("username", user.username)
+                        it.put("password", "")
+                        SocketService.ioSocket?.setToken(token)
+                        val newJson = it.toString()
+                        Preferences.instance().putLoginInfo(newJson)
+                        SocketService.ioSocket?.setQuery(newJson)
+                    }
+                    trySend(Resource.success(user))
+                } else {
+                    trySend(Resource.error(Event.MSG_ERROR, null))
+                }
+            }
         }
+        awaitClose()
+    }
 
     class Factory(private var user: User) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {

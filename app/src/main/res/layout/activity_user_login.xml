@@ -35,10 +35,10 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/margin_16"
-            android:autofillHints="@string/name_required"
+            android:autofillHints="@string/username"
             android:fontFamily="@font/iran_sans_regular"
             android:gravity="start|center_vertical"
-            android:hint="@string/name_required"
+            android:hint="@string/username"
             android:imeOptions="flagNoExtractUi"
             android:inputType="text"
             android:paddingStart="@dimen/padding_8"
@@ -51,15 +51,15 @@
             app:layout_constraintTop_toBottomOf="@+id/title" />
 
         <com.google.android.material.textfield.MaterialAutoCompleteTextView
-            android:id="@+id/editTextBio"
+            android:id="@+id/editTextPassword"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:autofillHints="@string/biography_optional"
+            android:autofillHints="@string/password"
             android:fontFamily="@font/iran_sans_regular"
             android:gravity="start|center_vertical"
-            android:hint="@string/biography_optional"
+            android:hint="@string/password"
             android:imeOptions="flagNoExtractUi"
-            android:inputType="text"
+            android:inputType="textPassword"
             android:singleLine="true"
             android:textSize="@dimen/text_16"
             app:backgroundTint="@color/edit_text_tint_list"
@@ -67,37 +67,6 @@
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/editTextUsername"
             app:layout_constraintTop_toBottomOf="@+id/editTextUsername" />
-
-        <RadioGroup
-            android:id="@+id/radioGroup"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:checkedButton="@+id/radioBtnMale"
-            android:gravity="start"
-            android:orientation="horizontal"
-            app:layout_constraintEnd_toEndOf="@+id/editTextBio"
-            app:layout_constraintStart_toStartOf="@+id/editTextBio"
-            app:layout_constraintTop_toBottomOf="@+id/editTextBio">
-
-            <com.google.android.material.radiobutton.MaterialRadioButton
-                android:id="@+id/radioBtnMale"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="@font/iran_sans_regular"
-                android:text="@string/male"
-                app:buttonTint="@color/radio_button_tint_list" />
-
-            <com.google.android.material.radiobutton.MaterialRadioButton
-                android:id="@+id/radioBtnFemale"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_16"
-                android:layout_marginLeft="@dimen/margin_16"
-                android:fontFamily="@font/iran_sans_regular"
-                android:text="@string/female"
-                app:buttonTint="@color/radio_button_tint_list" />
-        </RadioGroup>
 
         <FrameLayout
             android:id="@+id/btnLogin"
@@ -107,7 +76,7 @@
             android:clickable="true"
             android:elevation="4dp"
             android:focusable="true"
-            android:onClick="@{v -> viewModel.loginGuest(editTextUsername.getText().toString(), editTextBio.getText().toString(), radioBtnMale.isChecked())}"
+            android:onClick="@{v -> viewModel.loginUser(editTextUsername.getText().toString(), editTextPassword.getText().toString())}"
             app:layout_constraintBottom_toTopOf="@+id/alreadyMember"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
@@ -119,7 +88,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:fontFamily="@font/iran_sans_regular"
-                android:text="@string/login_guest"
+                android:text="@string/login"
                 android:textAllCaps="true"
                 android:textColor="@color/white"
                 android:textSize="@dimen/text_14" />
@@ -131,7 +100,7 @@
             android:layout_height="64dp"
             android:layout_marginBottom="-16dp"
             android:gravity="center"
-            android:text="@string/already_a_member"
+            android:text="@string/do_not_have_account"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/login"
             app:layout_constraintHorizontal_bias="0.5"
@@ -147,7 +116,7 @@
             android:gravity="start|center_vertical"
             android:minWidth="36dp"
             android:minHeight="36dp"
-            android:text="@string/login"
+            android:text="@string/login_guest"
             android:textColor="?attr/linkColor"
             app:layout_constraintBaseline_toBaselineOf="@+id/alreadyMember"
             app:layout_constraintEnd_toEndOf="@id/btnLogin"

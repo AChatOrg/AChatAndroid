@@ -1,5 +1,7 @@
 package com.hyapp.achat;
 
+import org.jetbrains.annotations.NotNull;
+
 public interface Config {
     String SERVER_URL = "http://192.168.1.103:24240";
 
@@ -7,6 +9,12 @@ public interface Config {
 
     String OPERATION_LOGIN_GUEST = "loginGuest";
     String OPERATION_RECONNECT_GUEST = "reconnectGuest";
+    String OPERATION_LOGIN_USER = "loginUser";
+    String OPERATION_RECONNECT_USER = "reconnectUser";
+
+    /*On connection err*/
+    String CONNECTION_ERR_INCORRECT_PASS = "incorrectPass";
+    String CONNECTION_ERR_TOKEN_EXPIRED = "tokenExpired";
 
     String ON_DISCONNECT = "disconnect";
     String ON_CONNECT = "connect";
@@ -32,6 +40,7 @@ public interface Config {
     String ON_REQUEST_EDIT_PROFILE = "requestEditProfile";
     String ON_USER_EDIT = "userEdit";
     String ON_REQUEST_CHECK_USERNAME = "requestCheckUsername";
+    String ON_REQUEST_REGISTER = "requestRegister";
 
     /*On Pv Chat*/
     String ON_MESSAGE = "msg";
