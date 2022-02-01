@@ -28,12 +28,12 @@ class App : MultiDexApplication() {
     override fun onCreate() {
         super.onCreate()
         context = applicationContext
-        Fresco.initialize(context)
         val account = Preferences.getCurrAccount(context)
         if (account.isNotEmpty()) {
-            ObjectBox.init(context, account)
             Preferences.init(context, account)
         }
+        Fresco.initialize(context)
+        ObjectBox.init(context)
         AXrLottie.init(context)
         AXEmojiManager.install(context, AXIOSEmojiProvider(context))
         AXEmojiManager.setStickerViewCreatorListener(object : StickerViewCreatorListener {

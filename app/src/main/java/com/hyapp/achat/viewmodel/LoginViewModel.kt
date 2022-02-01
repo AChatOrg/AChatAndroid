@@ -6,8 +6,8 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.hyapp.achat.Config
 import com.hyapp.achat.model.LoginRepo
-import com.hyapp.achat.model.entity.*
 import com.hyapp.achat.model.Preferences
+import com.hyapp.achat.model.entity.*
 import com.hyapp.achat.model.objectbox.ObjectBox
 import com.hyapp.achat.model.objectbox.UserDao
 import com.hyapp.achat.viewmodel.service.SocketService
@@ -15,9 +15,10 @@ import com.hyapp.achat.viewmodel.utils.NetUtils
 import com.hyapp.achat.viewmodel.utils.SecureUtils
 import io.objectbox.BoxStore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import okhttp3.internal.closeQuietly
 import org.json.JSONObject
 import java.util.*
 
@@ -74,18 +75,15 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
             Preferences.putCurrAccount(context, uid)
             Preferences.init(context, uid)
-            if (!BoxStore.isDatabaseOpen(context, uid))
-                ObjectBox.init(context, uid)
 
             Preferences.instance().putLoginInfo(jsonStr)
             SocketService.start(context, jsonStr)
         }
     }
 
-    fun cancelLoginGuest() {
+    fun cancelLogin() {
         val context = getApplication<Application>().applicationContext
         context.stopService(Intent(context, SocketService::class.java))
-        ObjectBox.store.closeQuietly()
     }
 
     fun loginUser(username: String, password: String) {
@@ -111,10 +109,10 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
             Preferences.putCurrAccount(context, usernameTrim)
             Preferences.init(context, usernameTrim)
-            if (!BoxStore.isDatabaseOpen(context, usernameTrim))
-                ObjectBox.init(context, usernameTrim)
 
+            Preferences.instance().putLoginUser(usernameTrim)
             Preferences.instance().putLoginInfo(jsonStr)
+
             SocketService.start(context, jsonStr)
         }
     }
@@ -127,7 +125,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
     fun getUsernameHistory(): Array<String> {
         return if (Preferences.instance() != null) {
-            val set = Preferences.instance().loginUserameSet
+            val set = Preferences.instance().loginUsernameSet
             set.toTypedArray()
         } else emptyArray()
     }

@@ -43,9 +43,11 @@ data class Message(
     var bubble: Byte = BUBBLE_SINGLE,
 
     @Id
-    var id: Long = 0
+    var id: Long = 0,
 
-) : Parcelable {
+    var account: String = "",
+
+    ) : Parcelable {
     constructor(
         uid: String = "",
         type: Byte = TYPE_TEXT,

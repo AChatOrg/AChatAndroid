@@ -38,7 +38,9 @@ data class Contact(
     @Id
     var id: Long = 0,
 
-    @Transient var typingName: String? = null
+    @Transient var typingName: String? = null,
+
+    var account: String = ""
 
 ) : UserConsts(), Parcelable {
 

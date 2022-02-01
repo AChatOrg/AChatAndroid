@@ -84,7 +84,7 @@ class LoginGuestActivity : EventActivity() {
             DialogInterface.BUTTON_NEGATIVE,
             getString(R.string.cancel)
         ) { dialog: DialogInterface, which: Int ->
-            viewModel.cancelLoginGuest()
+            viewModel.cancelLogin()
             dialog.dismiss()
         }
     }

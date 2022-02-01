@@ -52,6 +52,20 @@ object ChatRepo {
         MutableSharedFlow<Pair<Byte, Message>>(extraBufferCapacity = Int.MAX_VALUE)
     val messageFlow = _messageFlow.asSharedFlow()
 
+    private var account: String = ""
+
+    init {
+        val currUser = UserLive.value
+        if (currUser != null) {
+            account = currUser.uid
+        } else {
+            UserDao.get(User.CURRENT_USER_ID)?.let {
+                UserLive.value = it
+                account = it.uid
+            }
+        }
+    }
+
     fun listen(socket: Socket) {
         socket.on(Config.ON_MESSAGE, onPvMessage)
         socket.on(Config.ON_MESSAGE_SENT, onMessageSent)
@@ -67,7 +81,7 @@ object ChatRepo {
             ensureActive()
             mutex.withLock {
 
-                val contact = ContactDao.get(cont.uid) ?: cont
+                val contact = ContactDao.get(account, cont.uid) ?: cont
 
                 if (cont.isUser || cont.isPvRoom)
                     contact.messageDelivery = Message.DELIVERY_WAITING
@@ -77,7 +91,10 @@ object ChatRepo {
                 setupAndPutContact(contact, message)
 
                 if (!message.isRoom) {
-                    message.id = MessageDao.put(message.apply { id = 0 })
+                    message.id = MessageDao.put(message.apply {
+                        account = ChatRepo.account
+                        id = 0
+                    })
                     Preferences.instance().incrementContactMessagesCount(contact.uid)
                 } else {
                     MainViewModel.addPublicRoomUnreadMessage(contact.uid, message)
@@ -97,7 +114,7 @@ object ChatRepo {
             ensureActive()
             mutex.withLock {
                 (UserLive.value ?: UserDao.get(User.CURRENT_USER_ID))?.let {
-                    var messages = MessageDao.waitings(it.uid)
+                    var messages = MessageDao.waitings(account, it.uid)
                     for (message in messages) {
                         SocketService.ioSocket?.socket?.let { socket ->
                             if (socket.connected()) {
@@ -105,7 +122,7 @@ object ChatRepo {
                             }
                         }
                     }
-                    messages = MessageDao.allSentUnReads(it.uid)
+                    messages = MessageDao.allSentUnReads(account, it.uid)
                     for (message in messages) {
                         SocketService.ioSocket?.socket?.let { socket ->
                             if (socket.connected()) {
@@ -126,7 +143,7 @@ object ChatRepo {
         withContext(ioDispatcher) {
             ensureActive()
             mutex.withLock {
-                val contacts = ContactDao.all()
+                val contacts = ContactDao.all(account)
                 val list = ArrayList<String>()
                 for (contact in contacts) {
                     list.add(contact.uid)
@@ -144,11 +161,11 @@ object ChatRepo {
             withContext(ioDispatcher) {
                 ensureActive()
                 mutex.withLock {
-                    ContactDao.get(contact.uid)?.let {
+                    ContactDao.get(account, contact.uid)?.let {
                         var count = it.notifCount.toInt()
                         count = max(count - changedMessages.size, 0)
                         it.notifCount = count.toString()
-                        ContactDao.put(it)
+                        ContactDao.put(it.apply { account = ChatRepo.account })
                         _contactFlow.tryEmit(Pair(CONTACT_UPDATE, it))
                     }
                     MessageDao.put(changedMessages)
@@ -174,9 +191,9 @@ object ChatRepo {
 
     suspend fun clearContactNotifs(contactUid: String) {
         withContext(ioDispatcher) {
-            ContactDao.get(contactUid)?.let {
+            ContactDao.get(account, contactUid)?.let {
                 it.notifCount = "0"
-                ContactDao.put(it)
+                ContactDao.put(it.apply { account = ChatRepo.account })
                 _contactFlow.tryEmit(Pair(CONTACT_UPDATE, it))
             }
         }
@@ -206,9 +223,9 @@ object ChatRepo {
                     receiverUid = roomUid
                 ).also { message ->
                     MainViewModel.addPublicRoomUnreadMessage(roomUid, message)
-                    ContactDao.get(roomUid)?.let {
+                    ContactDao.get(account, roomUid)?.let {
                         it.message = message.text
-                        ContactDao.put(it)
+                        ContactDao.put(it.apply { account = ChatRepo.account })
                         _contactFlow.tryEmit(Pair(CONTACT_UPDATE, it))
                     }
                 }
@@ -228,9 +245,9 @@ object ChatRepo {
                     receiverUid = roomUid
                 ).also { message ->
                     MainViewModel.addPublicRoomUnreadMessage(roomUid, message)
-                    ContactDao.get(roomUid)?.let {
+                    ContactDao.get(account, roomUid)?.let {
                         it.message = message.text
-                        ContactDao.put(it)
+                        ContactDao.put(it.apply { account = ChatRepo.account })
                         _contactFlow.tryEmit(Pair(CONTACT_UPDATE, it))
                     }
                 }
@@ -247,7 +264,7 @@ object ChatRepo {
         if (message.type == Message.TYPE_TEXT) {
             contact.message = message.text
         }
-        val contactId = ContactDao.put(contact)
+        val contactId = ContactDao.put(contact.apply { account = ChatRepo.account })
         contact.id = contactId
         _contactFlow.tryEmit(Pair(CONTACT_PUT, contact))
     }
@@ -260,9 +277,9 @@ object ChatRepo {
         try {
 
             val contact = if (message.isPv)
-                ContactDao.get(message.senderUid) ?: message.getContact()
+                ContactDao.get(account, message.senderUid) ?: message.getContact()
             else
-                ContactDao.get(message.receiverUid)
+                ContactDao.get(account, message.receiverUid)
 
             _messageFlow.tryEmit(Pair(MESSAGE_RECEIVE, message))
 
@@ -275,7 +292,10 @@ object ChatRepo {
                 }
                 setupAndPutContact(contact, message)
                 if (!message.isRoom) {
-                    message.id = MessageDao.put(message.apply { id = 0 })
+                    message.id = MessageDao.put(message.apply {
+                        account = ChatRepo.account
+                        id = 0
+                    })
                     Preferences.instance().incrementContactMessagesCount(contact.uid)
                     /*send notif*/
                     if (ChatViewModel.isActivityStoppedForContact(contact.uid)) {
@@ -300,36 +320,36 @@ object ChatRepo {
     }
 
     private val onMessageSent = Emitter.Listener { args ->
-        MessageDao.get(args[0].toString())?.let { message ->
+        MessageDao.get(account, args[0].toString())?.let { message ->
             message.delivery = Message.DELIVERY_SENT
-            ContactDao.get(message.receiverUid)?.let { contact ->
+            ContactDao.get(account, message.receiverUid)?.let { contact ->
                 contact.messageTime = message.time
                 contact.messageDelivery = message.delivery
-                ContactDao.put(contact)
+                ContactDao.put(contact.apply { account = ChatRepo.account })
                 _contactFlow.tryEmit(Pair(CONTACT_UPDATE, contact))
             }
 
             _messageFlow.tryEmit(Pair(MESSAGE_SENT, message))
 
             if (message.isPv || message.isPvRoom) {
-                MessageDao.put(message)
+                MessageDao.put(message.apply { account = ChatRepo.account })
             }
         }
     }
 
     private val onMessageRead = Emitter.Listener { args ->
-        MessageDao.get(args[0].toString())?.let { message ->
+        MessageDao.get(account, args[0].toString())?.let { message ->
             message.delivery = Message.DELIVERY_READ
-            ContactDao.get(message.receiverUid)?.let { contact ->
+            ContactDao.get(account, message.receiverUid)?.let { contact ->
                 contact.messageDelivery = message.delivery
-                ContactDao.put(contact)
+                ContactDao.put(contact.apply { account = ChatRepo.account })
                 _contactFlow.tryEmit(Pair(CONTACT_UPDATE, contact))
             }
 
             _messageFlow.tryEmit(Pair(MESSAGE_READ, message))
 
             if (!message.isRoom) {
-                MessageDao.markAllSentAsReadUntil(message)
+                MessageDao.markAllSentAsReadUntil(account, message)
                 SocketService.ioSocket?.socket?.emit(
                     Config.ON_MSG_READ_RECEIVED,
                     message.uid,
@@ -341,16 +361,16 @@ object ChatRepo {
     }
 
     private val onMessageReadReceived = Emitter.Listener { args ->
-        MessageDao.get(args[0].toString())?.let { message ->
+        MessageDao.get(account, args[0].toString())?.let { message ->
             if (message.isPv || message.isPvRoom) {
-                MessageDao.markAllReceivedAsReadUntil(message)
+                MessageDao.markAllReceivedAsReadUntil(account, message)
             }
         }
     }
 
     private val onTyping = Emitter.Listener { args ->
         if (args.size < 2) {//if isPv
-            ContactDao.get(args[0].toString())?.let {
+            ContactDao.get(account, args[0].toString())?.let {
                 _contactFlow.tryEmit(Pair(CONTACT_TYPING, it.apply { typingName = "" }))
                 _messageFlow.tryEmit(
                     Pair(
@@ -364,7 +384,7 @@ object ChatRepo {
                 )
             }
         } else {
-            ContactDao.get(args[0].toString())?.let {
+            ContactDao.get(account, args[0].toString())?.let {
                 val user = GsonBuilder()
                     .registerTypeAdapter(User::class.java, UserDeserializer())
                     .create()
@@ -386,9 +406,9 @@ object ChatRepo {
     }
 
     private val onOnlineTime = Emitter.Listener { args ->
-        ContactDao.get(args[0].toString())?.let {
+        ContactDao.get(account, args[0].toString())?.let {
             it.onlineTime = args[1].toString().toLong()
-            ContactDao.put(it)
+            ContactDao.put(it.apply { account = ChatRepo.account })
             _contactFlow.tryEmit(Pair(CONTACT_UPDATE, it))
             _messageFlow.tryEmit(
                 Pair(
@@ -403,9 +423,9 @@ object ChatRepo {
         val jsonArray = JSONArray(args[0].toString())
         for (i in 0 until jsonArray.length()) {
             val json = JSONObject(jsonArray[i].toString())
-            ContactDao.get(json.getString("uid"))?.let { contact ->
+            ContactDao.get(account, json.getString("uid"))?.let { contact ->
                 contact.onlineTime = json.getLong("onlineTime")
-                ContactDao.put(contact)
+                ContactDao.put(contact.apply { account = ChatRepo.account })
                 _contactFlow.tryEmit(Pair(CONTACT_UPDATE, contact))
             }
         }

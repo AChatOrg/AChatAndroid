@@ -11,10 +11,9 @@ object ObjectBox {
         private set
 
     @JvmStatic
-    fun init(context: Context, account: String) {
+    fun init(context: Context) {
         store = MyObjectBox.builder()
             .androidContext(context.applicationContext)
-            .name(account)
             .build()
     }
 }

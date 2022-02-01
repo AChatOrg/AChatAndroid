@@ -327,9 +327,11 @@ class ProfileActivity : EventActivity() {
     private fun observeUser() {
         if (isCurrUser) {
             UserLive.observe(this) {
-                user = it
-                setupUser(user)
-                setupMainButton(user)
+                it?.let {
+                    user = it
+                    setupUser(user)
+                    setupMainButton(user)
+                }
             }
         } else {
             setupUser(user)

@@ -1,6 +1,7 @@
 package com.hyapp.achat.viewmodel
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -39,6 +40,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private var stopTypingJob: Job? = null
     private var refreshOnlineTimeJob: Job? = null
 
+    private var account = ""
+
     companion object {
         private const val PUBLIC_ROOM_MESSAGES_CAPACITY = 200
 
@@ -55,7 +58,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     init {
-        UserLive.value = UserDao.get(User.CURRENT_USER_ID)
+        val currUser = UserLive.value
+        if (currUser != null) {
+            account = currUser.uid
+        } else {
+            UserDao.get(User.CURRENT_USER_ID)?.let {
+                UserLive.value = it
+                account = it.uid
+            }
+        }
         val context = getApplication<Application>().applicationContext
         SocketService.start(context, Preferences.instance().loginInfo)
         loadContacts()
@@ -64,7 +75,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun loadContacts() {
-        _contactsLive.value = ContactList(ContactDao.all())
+        _contactsLive.value = ContactList(ContactDao.all(account))
     }
 
     fun reloadUsers() {
@@ -199,7 +210,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             stopTypingJob?.cancel()
             stopTypingJob = viewModelScope.launch(ioDispatcher) {
                 delay(3000)
-                ContactDao.get(contact.uid)?.let {
+                ContactDao.get(account, contact.uid)?.let {
                     updated = list.update(it.apply { typingName = null })
                     if (updated) {
                         _contactsLive.postValue(list)
@@ -239,7 +250,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         if (EventActivity.startedActivities < 1) {
             viewModelScope.launch(ioDispatcher) {
                 ChatRepo.sendOnlineTime(false)
-                UserLive.postValue(UserLive.value?.apply { onlineTime = System.currentTimeMillis() })
+                UserLive.postValue(UserLive.value?.apply {
+                    onlineTime = System.currentTimeMillis()
+                })
                 UserLive.value?.let {
                     UserDao.put(it.apply { id = User.CURRENT_USER_ID })
                 }

@@ -4,13 +4,11 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import com.hyapp.achat.Config
-import com.hyapp.achat.model.entity.Room
-import com.hyapp.achat.model.entity.SortedList
-import com.hyapp.achat.model.entity.User
-import com.hyapp.achat.model.entity.UserInfo
+import com.hyapp.achat.model.entity.*
 import com.hyapp.achat.model.gson.RoomDeserializer
 import com.hyapp.achat.model.gson.UserDeserializer
 import com.hyapp.achat.model.objectbox.ContactDao
+import com.hyapp.achat.model.objectbox.UserDao
 import com.hyapp.achat.viewmodel.ProfileViewModel
 import com.hyapp.achat.viewmodel.service.SocketService
 import io.socket.client.Socket
@@ -37,6 +35,20 @@ object UsersRoomsRepo {
 
     private val _flow = MutableSharedFlow<Pair<Byte, Any>>(extraBufferCapacity = 1)
     val flow = _flow.asSharedFlow()
+
+    private var account: String = ""
+
+    init {
+        val currUser = UserLive.value
+        if (currUser != null) {
+            account = currUser.uid
+        } else {
+            UserDao.get(User.CURRENT_USER_ID)?.let {
+                UserLive.value = it
+                account = it.uid
+            }
+        }
+    }
 
     fun listen(socket: Socket) {
         socket.on(Config.ON_USER_CAME, onUserCame)
@@ -228,9 +240,9 @@ object UsersRoomsRepo {
             .registerTypeAdapter(User::class.java, UserDeserializer())
             .create()
             .fromJson(args[0].toString(), User::class.java)
-        ContactDao.get(user.uid)?.let {
+        ContactDao.get(account, user.uid)?.let {
             it.setUser(user)
-            ContactDao.put(it)
+            ContactDao.put(it.apply { account = UsersRoomsRepo.account })
             ChatRepo.emitContactToViewModel(it)
         }
         _flow.tryEmit(Pair(USER_UPDATE, user))

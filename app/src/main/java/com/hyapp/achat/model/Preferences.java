@@ -123,7 +123,7 @@ public class Preferences {
         return preferences.getString(USERNAME, "");
     }
 
-    public Set<String> getLoginUserameSet() {
+    public Set<String> getLoginUsernameSet() {
         return new HashSet<>(preferences.getStringSet(USERNAME_SET, new HashSet<>()));
     }
 

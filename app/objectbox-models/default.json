@@ -5,7 +5,7 @@
   "entities": [
     {
       "id": "1:7499101650816396696",
-      "lastPropertyId": "20:442245945422666794",
+      "lastPropertyId": "21:4518317593227452277",
       "name": "Contact",
       "properties": [
         {
@@ -95,13 +95,18 @@
           "id": "20:442245945422666794",
           "name": "username",
           "type": 9
+        },
+        {
+          "id": "21:4518317593227452277",
+          "name": "account",
+          "type": 9
         }
       ],
       "relations": []
     },
     {
       "id": "2:7262915003648557870",
-      "lastPropertyId": "24:219478855963061024",
+      "lastPropertyId": "25:3911611798376965300",
       "name": "Message",
       "properties": [
         {
@@ -219,6 +224,11 @@
         {
           "id": "24:219478855963061024",
           "name": "senderUsername",
+          "type": 9
+        },
+        {
+          "id": "25:3911611798376965300",
+          "name": "account",
           "type": 9
         }
       ],

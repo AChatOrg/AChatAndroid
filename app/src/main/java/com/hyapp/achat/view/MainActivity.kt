@@ -93,8 +93,10 @@ class MainActivity : EventActivity() {
 
     private fun observeUser() {
         UserLive.observe(this) {
-            val avatars: List<String> = it.avatars
-            binding.userAvatar.setImageURI(if (avatars.isNotEmpty()) avatars[0] else null)
+            it?.let {
+                val avatars: List<String> = it.avatars
+                binding.userAvatar.setImageURI(if (avatars.isNotEmpty()) avatars[0] else null)
+            }
         }
     }
 

@@ -42,6 +42,7 @@ class ChatViewModel(var contact: Contact) : ViewModel() {
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 
     private val currentUser = UserDao.get(User.CURRENT_USER_ID)
+    private val account = currentUser?.uid ?: ""
 
     private val _contactLive = MutableLiveData<Contact>()
     val contactLive = _contactLive as LiveData<Contact>
@@ -133,9 +134,9 @@ class ChatViewModel(var contact: Contact) : ViewModel() {
             val limit = min(remaining + PAGING_LIMIT, PAGING_LIMIT)
 
             val messages = if (contact.isPvRoom)
-                MessageDao.allRoom(contact.uid, offset, limit)
+                MessageDao.allRoom(account, contact.uid, offset, limit)
             else
-                MessageDao.all((currentUser ?: User()).uid, contact.uid, offset, limit)
+                MessageDao.all(account, (currentUser ?: User()).uid, contact.uid, offset, limit)
 
             val firstMessage = messages[messages.size - 1]
             if (firstMessage.transfer == Message.TRANSFER_SEND
@@ -195,9 +196,9 @@ class ChatViewModel(var contact: Contact) : ViewModel() {
                 ensureActive()
                 _messagesLive.value?.data?.let { list ->
                     val messages = if (contact.isPvRoom)
-                        MessageDao.allReceivedUnReadsRoom((currentUser ?: User()).uid, contact.uid)
+                        MessageDao.allReceivedUnReadsRoom(account, (currentUser ?: User()).uid, contact.uid)
                     else
-                        MessageDao.allReceivedUnReads(contact.uid)
+                        MessageDao.allReceivedUnReads(account, contact.uid)
 
                     for (message in messages) {
                         list.addMessageLast(message)
@@ -443,7 +444,9 @@ class ChatViewModel(var contact: Contact) : ViewModel() {
         if (EventActivity.startedActivities < 1) {
             viewModelScope.launch(ioDispatcher) {
                 ChatRepo.sendOnlineTime(false)
-                UserLive.postValue(UserLive.value?.apply { onlineTime = System.currentTimeMillis() })
+                UserLive.postValue(UserLive.value?.apply {
+                    onlineTime = System.currentTimeMillis()
+                })
                 UserLive.value?.let {
                     UserDao.put(it.apply { id = User.CURRENT_USER_ID })
                 }
@@ -456,7 +459,7 @@ class ChatViewModel(var contact: Contact) : ViewModel() {
     fun onActivityCreate() {
         if (!contact.isUser) {
             viewModelScope.launch(ioDispatcher) {
-                if (ContactDao.get(contactUid) == null) {
+                if (ContactDao.get(account, contactUid) == null) {
                     ChatRepo.sendJoinLeaveRoom(contactUid, true)
                 }
             }
@@ -466,7 +469,7 @@ class ChatViewModel(var contact: Contact) : ViewModel() {
     fun onActivityDestroy() {
         if (!contact.isUser) {
             viewModelScope.launch(ioDispatcher) {
-                if (ContactDao.get(contactUid) == null) {
+                if (ContactDao.get(account, contactUid) == null) {
                     ChatRepo.sendJoinLeaveRoom(contactUid, false)
                 }
             }

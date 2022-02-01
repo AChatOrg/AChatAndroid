@@ -119,7 +119,10 @@ class RoomAdapter(private val context: Context) :
             val room = getItem(adapterPosition)
             UserLive.value?.let { user ->
                 if (room.gender == UserConsts.GENDER_MIXED || room.gender == user.gender)
-                    start(context, Contact(room!!, membersStr, onlineStr))
+                    start(
+                        context,
+                        Contact(room!!, membersStr, onlineStr)
+                    )
                 else if (context is EventActivity) {
                     val genderStr = when (room.gender) {
                         UserConsts.GENDER_MALE -> context.getString(R.string.male)

@@ -9,14 +9,19 @@ object ContactDao {
 
     private val getQuery: Query<Contact> by lazy {
         ObjectBox.store.boxFor(Contact::class.java)
-            .query()
-            .equal(Contact_.uid, "", QueryBuilder.StringOrder.CASE_SENSITIVE)
+            .query(
+                Contact_.account.equal("", QueryBuilder.StringOrder.CASE_SENSITIVE)
+                    .and(Contact_.uid.equal("", QueryBuilder.StringOrder.CASE_SENSITIVE))
+            )
             .build()
     }
 
     @JvmStatic
-    fun get(uid: String): Contact? {
-        return getQuery.setParameter(Contact_.uid, uid).findUnique()
+    fun get(account: String, uid: String): Contact? {
+        return getQuery
+            .setParameter(Contact_.account, account)
+            .setParameter(Contact_.uid, uid)
+            .findUnique()
     }
 
     @JvmStatic
@@ -25,8 +30,9 @@ object ContactDao {
     }
 
     @JvmStatic
-    fun all(): List<Contact> {
+    fun all(account: String): List<Contact> {
         return ObjectBox.store.boxFor(Contact::class.java).query()
+            .equal(Contact_.account, account, QueryBuilder.StringOrder.CASE_SENSITIVE)
             .order(Contact_.messageTime, QueryBuilder.DESCENDING)
             .build().find()
     }
@@ -36,7 +42,11 @@ object ContactDao {
         return ObjectBox.store.boxFor(Contact::class.java).remove(contact.id)
     }
 
-    fun removeALl() {
-        ObjectBox.store.boxFor(Contact::class.java).removeAll()
+
+    fun removeALl(account: String) {
+        ObjectBox.store.boxFor(Contact::class.java).query()
+            .equal(Contact_.account, account, QueryBuilder.StringOrder.CASE_SENSITIVE)
+            .build()
+            .remove()
     }
 }

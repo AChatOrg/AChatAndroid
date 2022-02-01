@@ -13,7 +13,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.hyapp.achat.R
-import com.hyapp.achat.databinding.ActivityGuestLoginBinding
 import com.hyapp.achat.databinding.ActivityUserLoginBinding
 import com.hyapp.achat.model.entity.Event
 import com.hyapp.achat.view.utils.UiUtils
@@ -82,7 +81,7 @@ class LoginUserActivity : EventActivity() {
             DialogInterface.BUTTON_NEGATIVE,
             getString(R.string.cancel)
         ) { dialog: DialogInterface, which: Int ->
-            viewModel.cancelLoginGuest()
+            viewModel.cancelLogin()
             dialog.dismiss()
         }
     }
@@ -106,7 +105,9 @@ class LoginUserActivity : EventActivity() {
                         R.anim.shake
                     )
                 )
-                alert(R.string.login_members, R.string.incorrect_username_or_password)
+                alert(R.string.login_members, R.string.incorrect_username_or_password) { _, _ ->
+                    viewModel.cancelLogin()
+                }
             }
             Event.MSG_EMPTY -> {
                 UiUtils.vibrate(this, 200)

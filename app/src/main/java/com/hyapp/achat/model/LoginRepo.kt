@@ -42,7 +42,6 @@ object LoginRepo {
             .registerTypeAdapter(User::class.java, UserDeserializer())
             .create()
             .fromJson(args[0].toString(), User::class.java)
-        _loggedState.tryEmit(Resource.success(user))
 
         if (user.isGuest) {
             Preferences.instance().putLogged(true, false)
@@ -70,6 +69,8 @@ object LoginRepo {
                 }
             }
         }
+
+        _loggedState.tryEmit(Resource.success(user))
     }
 
     private val onConnectionError = Emitter.Listener { err ->
