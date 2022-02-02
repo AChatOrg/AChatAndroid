@@ -3,14 +3,18 @@ package com.hyapp.achat.view
 import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.internal.TextWatcherAdapter
 import com.hyapp.achat.R
 import com.hyapp.achat.databinding.ActivityEditProfileBinding
 import com.hyapp.achat.model.entity.*
@@ -42,16 +46,24 @@ class EditProfileActivity : EventActivity() {
 
     private lateinit var avatarsResult: MutableList<String>
 
+    private var isValidUsername = true
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         init()
         setupScrollView()
         setupUser()
         setupGender()
-        setupPassword()
         setupSaveButton()
         setupAddPic()
         binding.backBtn.setOnClickListener { onBackPressed() }
+        if (user.isGuest) {
+            binding.usernameLayout.visibility = View.GONE
+            binding.passwordLayout.visibility = View.GONE
+        } else {
+            setupUsername()
+            setupPassword()
+        }
     }
 
     override fun onRequestPermissionsResult(
@@ -121,7 +133,7 @@ class EditProfileActivity : EventActivity() {
         binding.nameEditText.setText(user.name)
         binding.bioEditText.setText(user.bio)
         binding.genderEditText.setText(if (user.isMale) R.string.male else R.string.female)
-        binding.usernameEditText.setText(user.username.replace("-",""))
+        binding.usernameEditText.setText(user.username.replace("-", ""))
         binding.passwordEditText.setText(if (user.isGuest) "" else "0000000000000000")
     }
 
@@ -160,6 +172,45 @@ class EditProfileActivity : EventActivity() {
                 || user.username != username)
     }
 
+    private fun setupUsername() {
+        binding.usernameEditText.addTextChangedListener(object : TextWatcherAdapter() {
+            override fun onTextChanged(
+                username: CharSequence,
+                start: Int,
+                before: Int,
+                count: Int
+            ) {
+                lifecycleScope.launch {
+                    viewModel.requestCheckUsername(username.toString()).collect { event ->
+                        if (event.status == Event.Status.ERROR) {
+                            isValidUsername = false
+                            binding.progressBar.visibility = View.INVISIBLE
+                            when (event.msg) {
+                                Event.MSG_MATCH -> {
+                                    binding.usernameLayout.error =
+                                        getString(R.string.invalid_username)
+                                }
+                                Event.MSG_EXIST -> {
+                                    binding.usernameLayout.error =
+                                        getString(R.string.username_exist)
+                                }
+                            }
+                        } else {
+                            binding.usernameLayout.error = null
+                            binding.title.setText(R.string.register)
+                            if (event.status == Event.Status.LOADING) {
+                                binding.progressBar.visibility = View.VISIBLE
+                            } else if (event.status == Event.Status.SUCCESS) {
+                                isValidUsername = true
+                                binding.progressBar.visibility = View.INVISIBLE
+                                binding.usernameLayout.error = null
+                            }
+                        }
+                    }
+                }
+            }
+        })
+    }
 
     private fun setupSaveButton() {
         binding.btnSave.setOnClickListener {
@@ -179,7 +230,7 @@ class EditProfileActivity : EventActivity() {
                             )
                         )
                     }
-                    username.trim().isEmpty() -> {
+                    !isValidUsername || username.trim().isEmpty() -> {
                         UiUtils.vibrate(this, 200)
                         binding.usernameLayout.startAnimation(
                             AnimationUtils.loadAnimation(

@@ -33,7 +33,10 @@ object UsersRoomsRepo {
     const val USER_INFO_MSG_SUCCESS = "success"
     const val USER_INFO_MSG_NOT_FOUND = "notFound"
 
-    private val _flow = MutableSharedFlow<Pair<Byte, Any>>(extraBufferCapacity = 1)
+    const val CHNG_PASS_MSG_SUCCESS = "success"
+    const val CHNG_PASS_MSG_WRONG_PASS = "wrongPass"
+
+    private val _flow = MutableSharedFlow<Pair<Byte, Any>>(extraBufferCapacity = 10)
     val flow = _flow.asSharedFlow()
 
     fun listen(socket: Socket) {
@@ -232,5 +235,17 @@ object UsersRoomsRepo {
             ChatRepo.emitContactToViewModel(it)
         }
         _flow.tryEmit(Pair(USER_UPDATE, user))
+    }
+
+    fun requestChangePassword(currPass: String, newPass: String): Flow<String> = callbackFlow {
+        SocketService.ioSocket?.socket?.let { socket ->
+            socket.emit(Config.ON_REQUEST_CHANGE_PASS, currPass, newPass)
+            socket.on(Config.ON_REQUEST_CHANGE_PASS) { args ->
+                socket.off(Config.ON_REQUEST_CHANGE_PASS)
+                val status = args[0].toString()
+                trySend(status)
+            }
+        }
+        awaitClose { SocketService.ioSocket?.socket?.off(Config.ON_REQUEST_CHANGE_PASS) }
     }
 }

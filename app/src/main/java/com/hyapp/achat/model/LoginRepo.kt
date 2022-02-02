@@ -29,7 +29,7 @@ import kotlin.math.log
 @ExperimentalCoroutinesApi
 object LoginRepo {
 
-    private val _loggedState = MutableSharedFlow<Resource<User>>(extraBufferCapacity = 1)
+    private val _loggedState = MutableSharedFlow<Resource<User>>(extraBufferCapacity = 10)
     val loggedState = _loggedState.asSharedFlow()
 
     fun listen(socket: Socket) {

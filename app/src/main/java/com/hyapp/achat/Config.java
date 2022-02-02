@@ -43,6 +43,7 @@ public interface Config {
     String ON_USER_EDIT = "userEdit";
     String ON_REQUEST_CHECK_USERNAME = "requestCheckUsername";
     String ON_REQUEST_REGISTER = "requestRegister";
+    String ON_REQUEST_CHANGE_PASS = "requestChangePass";
 
     /*On Pv Chat*/
     String ON_MESSAGE = "msg";

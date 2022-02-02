@@ -70,42 +70,49 @@ class ChangePassBottomSheet : BottomSheetDialogFragment() {
 
     private fun setupButton() {
         binding.btn.setOnClickListener {
-            if (binding.inputOne.text?.isEmpty() == true) {
-                UiUtils.vibrate(requireContext(), 200)
-                binding.inputOne.startAnimation(
-                    AnimationUtils.loadAnimation(
-                        requireContext(),
-                        R.anim.shake
+            when {
+                binding.inputOne.text?.isEmpty() == true -> {
+                    UiUtils.vibrate(requireContext(), 200)
+                    binding.inputOne.startAnimation(
+                        AnimationUtils.loadAnimation(
+                            requireContext(),
+                            R.anim.shake
+                        )
                     )
-                )
-            } else if (binding.inputTwo.text?.isEmpty() == true) {
-                UiUtils.vibrate(requireContext(), 200)
-                binding.inputTwo.startAnimation(
-                    AnimationUtils.loadAnimation(
-                        requireContext(),
-                        R.anim.shake
+                }
+                binding.inputTwo.text?.length ?: 0 < 4 -> {
+                    Toast.makeText(requireContext(), R.string.password_too_short, Toast.LENGTH_LONG)
+                        .show()
+                    UiUtils.vibrate(requireContext(), 200)
+                    binding.inputTwo.startAnimation(
+                        AnimationUtils.loadAnimation(
+                            requireContext(),
+                            R.anim.shake
+                        )
                     )
-                )
-            }
-            lifecycleScope.launch {
-                viewModel.requestChangePassword(
-                    binding.inputOne.text.toString(),
-                    binding.inputTwo.text.toString(),
-                ).collect { res ->
-                    when (res.status) {
-                        Resource.Status.SUCCESS -> {
-                            binding.progressBar.visibility = View.GONE
-                            dismiss()
-                            Toast.makeText(
-                                requireContext(),
-                                R.string.password_changed,
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }
-                        Resource.Status.ERROR -> onError(res)
-                        Resource.Status.LOADING -> {
-                            binding.progressBar.visibility = View.VISIBLE
-                            binding.btn.isEnabled = false
+                }
+                else -> {
+                    lifecycleScope.launch {
+                        viewModel.requestChangePassword(
+                            binding.inputOne.text.toString(),
+                            binding.inputTwo.text.toString(),
+                        ).collect { res ->
+                            when (res.status) {
+                                Resource.Status.SUCCESS -> {
+                                    binding.progressBar.visibility = View.GONE
+                                    dismiss()
+                                    Toast.makeText(
+                                        requireContext(),
+                                        R.string.password_changed,
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                }
+                                Resource.Status.ERROR -> onError(res)
+                                Resource.Status.LOADING -> {
+                                    binding.progressBar.visibility = View.VISIBLE
+                                    binding.btn.isEnabled = false
+                                }
+                            }
                         }
                     }
                 }
@@ -122,11 +129,20 @@ class ChangePassBottomSheet : BottomSheetDialogFragment() {
                 R.string.no_network_connection,
                 Toast.LENGTH_LONG
             ).show()
-            Event.MSG_MATCH -> Toast.makeText(
-                requireContext(),
-                R.string.wrong_password,
-                Toast.LENGTH_LONG
-            ).show()
+            Event.MSG_MATCH -> {
+                UiUtils.vibrate(requireContext(), 200)
+                binding.inputOne.startAnimation(
+                    AnimationUtils.loadAnimation(
+                        requireContext(),
+                        R.anim.shake
+                    )
+                )
+                Toast.makeText(
+                    requireContext(),
+                    R.string.wrong_password,
+                    Toast.LENGTH_LONG
+                ).show()
+            }
             else -> Toast.makeText(
                 requireContext(),
                 R.string.sorry_an_error_occurred,

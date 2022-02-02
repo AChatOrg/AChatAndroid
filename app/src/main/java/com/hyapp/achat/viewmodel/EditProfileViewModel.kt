@@ -1,8 +1,11 @@
 package com.hyapp.achat.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.hyapp.achat.App
+import com.hyapp.achat.model.LoginRepo
+import com.hyapp.achat.model.Preferences
 import com.hyapp.achat.model.UsersRoomsRepo
 import com.hyapp.achat.model.entity.Event
 import com.hyapp.achat.model.entity.Resource
@@ -21,9 +24,51 @@ class EditProfileViewModel(val user: User) : ViewModel() {
 
     fun requestChangePassword(currPassword: String, newPassword: String): Flow<Resource<Byte>> =
         callbackFlow {
-
+            trySend(Resource.loading(null))
+            if (!NetUtils.isNetConnected(App.context)) {
+                trySend(Resource.error(Event.MSG_NET, null))
+            } else {
+                UsersRoomsRepo.requestChangePassword(currPassword, newPassword).collect { status ->
+                    when (status) {
+                        UsersRoomsRepo.CHNG_PASS_MSG_SUCCESS -> trySend(Resource.success(0))
+                        UsersRoomsRepo.CHNG_PASS_MSG_WRONG_PASS -> trySend(
+                            Resource.error(
+                                Event.MSG_MATCH,
+                                0
+                            )
+                        )
+                        else -> trySend(
+                            Resource.error(
+                                Event.MSG_ERROR,
+                                0
+                            )
+                        )
+                    }
+                }
+            }
             awaitClose()
         }
+
+    fun requestCheckUsername(username: String): Flow<Event> = callbackFlow {
+        if (username.matches(Regex("^[a-zA-Z_][\\w](?!.*?\\.{2})[\\w.]{1,28}[\\w]\$"))) {
+            if (username != user.username) {
+                trySend(Event(Event.Status.LOADING))
+                LoginRepo.requestUsernameExist(username).collect { exist ->
+                    trySend(
+                        if (exist) Event(
+                            Event.Status.ERROR,
+                            Event.MSG_EXIST
+                        ) else Event(Event.Status.SUCCESS)
+                    )
+                }
+            } else {
+                trySend(Event(Event.Status.SUCCESS))
+            }
+        } else {
+            trySend(Event(Event.Status.ERROR, Event.MSG_MATCH))
+        }
+        awaitClose()
+    }
 
     fun requestEditProfile(
         avatars: List<String>,
@@ -50,6 +95,7 @@ class EditProfileViewModel(val user: User) : ViewModel() {
                     UserDao.put(usr.apply { id = User.CURRENT_USER_ID })
                     UserLive.value = usr
                     trySend(Resource.success(usr))
+                    Preferences.instance().putLoginUser(usr.username)
                 } else {
                     trySend(Resource.error(Event.MSG_ERROR, null))
                 }

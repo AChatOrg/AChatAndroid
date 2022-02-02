@@ -81,7 +81,8 @@ object ChatRepo {
                         account = UserLive.value?.uid ?: ""
                         id = 0
                     })
-                    Preferences.instance().incrementContactMessagesCount(UserLive.value?.uid ?: "", contact.uid)
+                    Preferences.instance()
+                        .incrementContactMessagesCount(UserLive.value?.uid ?: "", contact.uid)
                 } else {
                     MainViewModel.addPublicRoomUnreadMessage(contact.uid, message)
                 }
@@ -282,7 +283,8 @@ object ChatRepo {
                         account = UserLive.value?.uid ?: ""
                         id = 0
                     })
-                    Preferences.instance().incrementContactMessagesCount(UserLive.value?.uid ?: "", contact.uid)
+                    Preferences.instance()
+                        .incrementContactMessagesCount(UserLive.value?.uid ?: "", contact.uid)
                     /*send notif*/
                     if (ChatViewModel.isActivityStoppedForContact(contact.uid)) {
                         Notifs.notifyMessage(App.context, message, contact)
@@ -410,6 +412,15 @@ object ChatRepo {
         for (i in 0 until jsonArray.length()) {
             val json = JSONObject(jsonArray[i].toString())
             ContactDao.get(UserLive.value?.uid ?: "", json.getString("uid"))?.let { contact ->
+                contact.name = json.getString("name")
+                contact.bio = json.getString("bio")
+                contact.gender = json.getInt("gender").toByte()
+                val array = json.getJSONArray("avatars")
+                val avatars = mutableListOf<String>()
+                for (j in 0 until array.length()) {
+                    avatars.add(array.getString(j))
+                }
+                contact.avatars = avatars
                 contact.onlineTime = json.getLong("onlineTime")
                 ContactDao.put(contact.apply { account = UserLive.value?.uid ?: "" })
                 _contactFlow.tryEmit(Pair(CONTACT_UPDATE, contact))

@@ -164,6 +164,7 @@ class ProfileViewModel(var user: User) : ViewModel() {
                         SocketService.ioSocket?.setQuery(newJson)
                     }
                     trySend(Resource.success(user))
+                    Preferences.instance().putLoginUser(user.username)
                 } else {
                     trySend(Resource.error(Event.MSG_ERROR, null))
                 }
