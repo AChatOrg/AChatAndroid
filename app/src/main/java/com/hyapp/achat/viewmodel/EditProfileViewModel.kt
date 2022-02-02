@@ -1,5 +1,6 @@
 package com.hyapp.achat.viewmodel
 
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -18,6 +19,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.collect
+import java.io.File
 
 @ExperimentalCoroutinesApi
 class EditProfileViewModel(val user: User) : ViewModel() {
@@ -98,6 +100,32 @@ class EditProfileViewModel(val user: User) : ViewModel() {
                     Preferences.instance().putLoginUser(usr.username)
                 } else {
                     trySend(Resource.error(Event.MSG_ERROR, null))
+                }
+            }
+        }
+        awaitClose()
+    }
+
+    fun requestAddAvatar(uri: Uri?): Flow<Resource<String>> = callbackFlow {
+        if (uri == null || uri.path?.lastIndexOf(".")?.plus(1)
+                ?.let { it1 -> uri.path?.substring(it1)?.isEmpty() } == true
+        ) {
+            trySend(Resource.error(Event.MSG_ERROR, null))
+        } else if (!NetUtils.isNetConnected(App.context)) {
+            trySend(Resource.error(Event.MSG_NET, null))
+        } else {
+            trySend(Resource.loading(null))
+            UsersRoomsRepo.requestAddAvatar(user.uid, File(uri.path)).collect { res ->
+                when (res.status) {
+                    Resource.Status.SUCCESS -> {
+                        val avatars = user.avatars as MutableList
+                        avatars.add(0, res.data ?: "")
+                        user.avatars = avatars
+                        UserDao.put(user.apply { id = User.CURRENT_USER_ID })
+                        UserLive.value = user
+                        trySend(res)
+                    }
+                    else -> trySend(res)
                 }
             }
         }

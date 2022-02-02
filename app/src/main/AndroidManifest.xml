@@ -23,6 +23,11 @@
         android:theme="@style/Theme.AChat"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".view.component.cropper.CropImageActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:launchMode="singleTask"
+            android:theme="@style/Base.Theme.AppCompat" />
+        <activity
             android:name=".view.LoginUserActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="true"

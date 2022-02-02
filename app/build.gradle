@@ -68,4 +68,5 @@ dependencies {
     implementation 'io.github.ParkSangGwon:tedonactivityresult-rx2:1.0.10'
     implementation 'net.yslibrary.keyboardvisibilityevent:keyboardvisibilityevent:3.0.0-RC3'
     implementation("com.squareup.okhttp3:okhttp:4.9.2")
+    implementation 'id.zelory:compressor:3.0.1'
 }

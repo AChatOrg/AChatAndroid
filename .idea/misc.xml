@@ -51,6 +51,8 @@
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/bottom_sheet_change_pass.xml" value="0.1852355072463768" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/bottom_sheet_change_password.xml" value="0.25" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/bottom_sheet_new_room.xml" value="0.25" />
+        <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/crop_image_activity.xml" value="0.15896739130434784" />
+        <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/crop_image_view.xml" value="0.15896739130434784" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/dialog_permissions_rationale.xml" value="0.25" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/dimens.xml" value="0.14855072463768115" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/emoji_item.xml" value="0.14855072463768115" />
@@ -86,6 +88,7 @@
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/likeview.xml" value="0.1933876811594203" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/layout/recycler_view.xml" value="0.16576086956521738" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/menu/avatar.xml" value="0.20416666666666666" />
+        <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/menu/crop_image_menu.xml" value="0.1" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/menu/profile.xml" value="0.20416666666666666" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/menu/profile_curr.xml" value="0.20364583333333333" />
         <entry key="..\:/PROJECTS/Programming/Android/AChat/app/src/main/res/menu/profile_others.xml" value="0.20364583333333333" />

@@ -1,31 +1,36 @@
 package com.hyapp.achat.view
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.content.res.ColorStateList
-import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.internal.TextWatcherAdapter
 import com.hyapp.achat.R
 import com.hyapp.achat.databinding.ActivityEditProfileBinding
-import com.hyapp.achat.model.entity.*
+import com.hyapp.achat.model.entity.Event
+import com.hyapp.achat.model.entity.Resource
+import com.hyapp.achat.model.entity.User
+import com.hyapp.achat.model.entity.UserConsts
+import com.hyapp.achat.view.component.cropper.CropImage
+import com.hyapp.achat.view.component.cropper.CropImageView
 import com.hyapp.achat.view.fragment.ChangePassBottomSheet
 import com.hyapp.achat.view.utils.UiUtils
 import com.hyapp.achat.viewmodel.EditProfileViewModel
 import com.hyapp.achat.viewmodel.permissions.Permissions
 import gun0912.tedbottompicker.TedRxBottomPicker
+import id.zelory.compressor.Compressor
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import java.io.File
 
 @ExperimentalCoroutinesApi
 class EditProfileActivity : EventActivity() {
@@ -55,12 +60,13 @@ class EditProfileActivity : EventActivity() {
         setupUser()
         setupGender()
         setupSaveButton()
-        setupAddPic()
         binding.backBtn.setOnClickListener { onBackPressed() }
         if (user.isGuest) {
             binding.usernameLayout.visibility = View.GONE
             binding.passwordLayout.visibility = View.GONE
+            binding.addPicTextView.visibility = View.GONE
         } else {
+            setupAddPic()
             setupUsername()
             setupPassword()
         }
@@ -75,6 +81,7 @@ class EditProfileActivity : EventActivity() {
         Permissions.onRequestPermissionsResult(this, requestCode, permissions, grantResults)
     }
 
+    @SuppressLint("CheckResult")
     private fun setupAddPic() {
         binding.addPicTextView.setOnClickListener {
             Permissions.with(this)
@@ -101,9 +108,60 @@ class EditProfileActivity : EventActivity() {
                     TedRxBottomPicker.with(this)
                         .show()
                         .subscribe({ uri ->
-                            Log.e("ssss", uri.toString())
+                            if (uri.path?.lastIndexOf(".")?.plus(1)
+                                    ?.let { it1 -> uri.path?.substring(it1)?.isNotEmpty() } == true
+                            ) {
+                                lifecycleScope.launch {
+                                    val compressed = Compressor.compress(
+                                        this@EditProfileActivity,
+                                        File(uri.path)
+                                    )
+                                    CropImage.activity(Uri.fromFile(compressed))
+                                        .setFixAspectRatio(true)
+                                        .setCropShape(CropImageView.CropShape.OVAL)
+                                        .setInitialCropWindowPaddingRatio(0.0f)
+                                        .setCropMenuCropButtonTitle(getString(R.string.save))
+                                        .start(this@EditProfileActivity)
+                                }
+                            }
                         }, { t -> t.printStackTrace() })
                 }.execute()
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == RESULT_OK && data != null) {
+            if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+                val uri = CropImage.getActivityResult(data).uri
+                lifecycleScope.launch {
+                    viewModel.requestAddAvatar(uri).collect { res ->
+                        when (res.status) {
+                            Resource.Status.SUCCESS -> {
+                                binding.progressBar.visibility = View.GONE
+                            }
+                            Resource.Status.LOADING -> {
+                                binding.progressBar.visibility = View.VISIBLE
+                            }
+                            Resource.Status.ERROR -> {
+                                binding.progressBar.visibility = View.GONE
+                                when (res.message) {
+                                    Event.MSG_NET -> Toast.makeText(
+                                        this@EditProfileActivity,
+                                        R.string.no_network_connection,
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                    Event.MSG_ERROR -> Toast.makeText(
+                                        this@EditProfileActivity,
+                                        R.string.sorry_an_error_occurred,
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
