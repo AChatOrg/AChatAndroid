@@ -1,6 +1,5 @@
 package com.hyapp.achat.model
 
-import android.net.Uri
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
@@ -9,21 +8,16 @@ import com.hyapp.achat.model.entity.*
 import com.hyapp.achat.model.gson.RoomDeserializer
 import com.hyapp.achat.model.gson.UserDeserializer
 import com.hyapp.achat.model.objectbox.ContactDao
-import com.hyapp.achat.model.objectbox.UserDao
 import com.hyapp.achat.viewmodel.ProfileViewModel
 import com.hyapp.achat.viewmodel.service.SocketService
 import io.socket.client.Socket
 import io.socket.emitter.Emitter
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.*
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.asRequestBody
-import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import java.io.File
 import java.io.IOException
@@ -255,39 +249,5 @@ object UsersRoomsRepo {
             }
         }
         awaitClose { SocketService.ioSocket?.socket?.off(Config.ON_REQUEST_CHANGE_PASS) }
-    }
-
-    fun requestAddAvatar(uid: String, file: File): Flow<Resource<String>> = callbackFlow {
-
-        val mediaType = "image/*".toMediaType()
-        val client = OkHttpClient()
-        val body = MultipartBody.Builder()
-            .setType(MultipartBody.FORM)
-            .addFormDataPart("uid", uid)
-            .addFormDataPart(
-                "avatar", System.currentTimeMillis().toString(),
-                file.asRequestBody(mediaType)
-            )
-            .build()
-        val request = Request.Builder()
-            .url(Config.SERVER_UPLOAD_AVATAR_URL)
-            .post(body)
-            .build()
-        val response = client.newCall(request)
-
-        response.enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                trySend(Resource.error(Event.MSG_ERROR, null))
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                if (response.isSuccessful) {
-                    trySend(Resource.success(Config.SERVER_URL + response.body?.string()))
-                } else {
-                    trySend(Resource.error(Event.MSG_ERROR, null))
-                }
-            }
-        })
-        awaitClose { response.cancel() }
     }
 }

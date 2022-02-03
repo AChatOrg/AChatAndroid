@@ -66,7 +66,10 @@ class ProfileActivity : EventActivity() {
         observeUserInfo()
         setupCurrUserNotif()
         binding.swipeRefreshLayout.setOnRefreshListener { viewModel.requestUserInfo() }
-        binding.avatar.setOnClickListener { AvatarActivity.start(this, user) }
+        binding.avatar.setOnClickListener {
+            if (user.avatars.isNotEmpty())
+                AvatarActivity.start(this, user, false)
+        }
     }
 
 
@@ -385,11 +388,8 @@ class ProfileActivity : EventActivity() {
         binding.swipeRefreshLayout.isRefreshing = false
         binding.progressBar.visibility = View.GONE
         when (message) {
-            Event.MSG_NET -> alert(
-                R.string.proflie,
-                R.string.no_network_connection,
-                false
-            ) { p0, p1 -> finish() }
+            Event.MSG_NET -> Toast.makeText(this, R.string.no_network_connection, Toast.LENGTH_LONG)
+                .show()
             Event.MSG_EMPTY -> alert(
                 R.string.proflie,
                 R.string.not_found,

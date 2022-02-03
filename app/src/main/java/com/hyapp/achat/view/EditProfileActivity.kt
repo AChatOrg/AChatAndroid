@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.animation.AnimationUtils
 import android.widget.Toast
@@ -15,10 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.material.internal.TextWatcherAdapter
 import com.hyapp.achat.R
 import com.hyapp.achat.databinding.ActivityEditProfileBinding
-import com.hyapp.achat.model.entity.Event
-import com.hyapp.achat.model.entity.Resource
-import com.hyapp.achat.model.entity.User
-import com.hyapp.achat.model.entity.UserConsts
+import com.hyapp.achat.model.entity.*
 import com.hyapp.achat.view.component.cropper.CropImage
 import com.hyapp.achat.view.component.cropper.CropImageView
 import com.hyapp.achat.view.fragment.ChangePassBottomSheet
@@ -60,7 +58,12 @@ class EditProfileActivity : EventActivity() {
         setupUser()
         setupGender()
         setupSaveButton()
+        observeUser()
         binding.backBtn.setOnClickListener { onBackPressed() }
+        binding.avatar.setOnClickListener {
+            if (user.avatars.isNotEmpty())
+                AvatarActivity.start(this, user, true)
+        }
         if (user.isGuest) {
             binding.usernameLayout.visibility = View.GONE
             binding.passwordLayout.visibility = View.GONE
@@ -84,48 +87,70 @@ class EditProfileActivity : EventActivity() {
     @SuppressLint("CheckResult")
     private fun setupAddPic() {
         binding.addPicTextView.setOnClickListener {
-            Permissions.with(this)
-                .request(
-                    Manifest.permission.READ_EXTERNAL_STORAGE,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                    Manifest.permission.CAMERA
-                )
-                .ifNecessary()
-                .withRationaleDialog(
-                    R.string.storage_camera_permission_message,
-                    R.drawable.permission_cam,
-                    R.drawable.permission_storage
-                )
-                .withPermanentDenialDialog(R.string.storage_camera_permission_need)
-                .onAnyDenied {
-                    Toast.makeText(
-                        this,
-                        R.string.storage_camera_permission_need,
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-                .onAllGranted {
-                    TedRxBottomPicker.with(this)
-                        .show()
-                        .subscribe({ uri ->
-                            if (uri.path?.lastIndexOf(".")?.plus(1)
-                                    ?.let { it1 -> uri.path?.substring(it1)?.isNotEmpty() } == true
-                            ) {
-                                lifecycleScope.launch {
-                                    val compressed = Compressor.compress(
-                                        this@EditProfileActivity,
-                                        File(uri.path)
-                                    )
-                                    CropImage.activity(Uri.fromFile(compressed))
-                                        .setFixAspectRatio(true)
-                                        .setCropShape(CropImageView.CropShape.OVAL)
-                                        .setInitialCropWindowPaddingRatio(0.0f)
-                                        .setCropMenuCropButtonTitle(getString(R.string.save))
-                                        .start(this@EditProfileActivity)
-                                }
-                            }
-                        }, { t -> t.printStackTrace() })
-                }.execute()
+            if (user.avatars.size >= 10) {
+                alert(R.string.add_profile_picture, R.string.you_can_add_up_to_ten_avatars)
+            } else {
+                Permissions.with(this)
+                    .request(
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.CAMERA
+                    )
+                    .ifNecessary()
+                    .withRationaleDialog(
+                        R.string.storage_camera_permission_message,
+                        R.drawable.permission_cam,
+                        R.drawable.permission_storage
+                    )
+                    .withPermanentDenialDialog(R.string.storage_camera_permission_need)
+                    .onAnyDenied {
+                        Toast.makeText(
+                            this,
+                            R.string.storage_camera_permission_need,
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                    .onAllGranted {
+                        try {
+                            TedRxBottomPicker.with(this)
+                                .show()
+                                .subscribe({ uri ->
+                                    if (uri.path?.lastIndexOf(".")?.plus(1)
+                                            ?.let { it1 ->
+                                                uri.path?.substring(it1)?.isNotEmpty()
+                                            } == true
+                                    ) {
+                                        lifecycleScope.launch {
+                                            try {
+                                                val compressed = Compressor.compress(
+                                                    this@EditProfileActivity,
+                                                    File(uri.path)
+                                                )
+                                                CropImage.activity(Uri.fromFile(compressed))
+                                                    .setFixAspectRatio(true)
+                                                    .setCropShape(CropImageView.CropShape.OVAL)
+                                                    .setInitialCropWindowPaddingRatio(0.0f)
+                                                    .setCropMenuCropButtonTitle(getString(R.string.save))
+                                                    .start(this@EditProfileActivity)
+                                            } catch (e: Exception) {
+                                                e.printStackTrace()
+                                                Toast.makeText(
+                                                    this@EditProfileActivity,
+                                                    R.string.this_photo_not_exists,
+                                                    Toast.LENGTH_LONG
+                                                )
+                                                    .show()
+                                            }
+                                        }
+                                    }
+                                }, { t -> t.printStackTrace() })
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            Toast.makeText(this, R.string.this_photo_not_exists, Toast.LENGTH_LONG)
+                                .show()
+                        }
+                    }.execute()
+            }
         }
     }
 
@@ -151,11 +176,14 @@ class EditProfileActivity : EventActivity() {
                                         R.string.no_network_connection,
                                         Toast.LENGTH_LONG
                                     ).show()
-                                    Event.MSG_ERROR -> Toast.makeText(
-                                        this@EditProfileActivity,
-                                        R.string.sorry_an_error_occurred,
-                                        Toast.LENGTH_LONG
-                                    ).show()
+                                    else -> {
+                                        Log.e("ssss", res.message)
+                                        Toast.makeText(
+                                            this@EditProfileActivity,
+                                            R.string.sorry_an_error_occurred,
+                                            Toast.LENGTH_LONG
+                                        ).show()
+                                    }
                                 }
                             }
                         }
@@ -343,5 +371,14 @@ class EditProfileActivity : EventActivity() {
     private fun onLoading() {
         binding.progressBar.visibility = View.VISIBLE
         binding.btnSave.isEnabled = false
+    }
+
+    private fun observeUser() {
+        UserLive.observe(this) {
+            it?.let {
+                user = it
+                binding.avatar.setImageURI(it.firstAvatar)
+            }
+        }
     }
 }

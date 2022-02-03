@@ -56,21 +56,24 @@ object LoginRepo {
             if (args.size > 1) {
                 val token = args[1].toString()
                 val refreshToken = args[2].toString()
-                Preferences.instance().putTokens(token, refreshToken)
-
-                JSONObject(Preferences.instance().loginInfo).let {
-                    it.put("operation", Config.OPERATION_RECONNECT_USER)
-                    it.put("username", user.username)
-                    it.put("password", "")
-                    val newJson = it.toString()
-                    Preferences.instance().putLoginInfo(newJson)
-                    SocketService.ioSocket?.setQuery(newJson)
-                    SocketService.ioSocket?.setToken(token)
-                }
+                putLogin(user.username, token, refreshToken)
             }
         }
 
         _loggedState.tryEmit(Resource.success(user))
+    }
+
+    fun putLogin(username: String, token: String, refreshToken: String) {
+        Preferences.instance().putTokens(token, refreshToken)
+        JSONObject(Preferences.instance().loginInfo).let {
+            it.put("operation", Config.OPERATION_RECONNECT_USER)
+            it.put("username", username)
+            it.put("password", "")
+            val newJson = it.toString()
+            Preferences.instance().putLoginInfo(newJson)
+            SocketService.ioSocket?.setQuery(newJson)
+            SocketService.ioSocket?.setToken(token)
+        }
     }
 
     private val onConnectionError = Emitter.Listener { err ->

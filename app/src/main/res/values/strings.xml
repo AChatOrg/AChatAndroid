@@ -126,7 +126,7 @@
     <string name="username_exist">Username already exist</string>
     <string name="username_available">Username available</string>
     <string name="password_too_short">Password is too short</string>
-    <string name="are_you_sure_logout_user">Are you sure to logout?</string>
+    <string name="are_you_sure_logout_user">Are you sure you want to logout?</string>
     <string name="do_not_have_account">Do not have an account?</string>
     <string name="login_members">Login members</string>
     <string name="incorrect_username_or_password">Incorrect username or password</string>
@@ -141,5 +141,9 @@
     <string name="crop_image_menu_flip_vertically">Flip vertically</string>
     <string name="pick_image_intent_chooser_title">Select source</string>
     <string name="crop_image_activity_no_permissions">Cancelling, required permissions are not granted</string>
+    <string name="delete_avatar">Delete avatar</string>
+    <string name="are_you_sure_delete_avatar">Are you sure you want to delete this avatar?</string>
+    <string name="you_can_add_up_to_ten_avatars">You can add up to 10 avatars</string>
+    <string name="this_photo_not_exists">This photo does not exist.</string>
 
 </resources>

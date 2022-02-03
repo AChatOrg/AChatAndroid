@@ -51,4 +51,7 @@ data class User(
 
     val isMale
         get() = gender == GENDER_MALE
+
+    val firstAvatar
+        get() = if (avatars.isNotEmpty()) avatars[0] else ""
 }

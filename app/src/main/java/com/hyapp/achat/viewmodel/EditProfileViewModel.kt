@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.hyapp.achat.App
+import com.hyapp.achat.model.HttpRepo
 import com.hyapp.achat.model.LoginRepo
 import com.hyapp.achat.model.Preferences
 import com.hyapp.achat.model.UsersRoomsRepo
@@ -115,7 +116,8 @@ class EditProfileViewModel(val user: User) : ViewModel() {
             trySend(Resource.error(Event.MSG_NET, null))
         } else {
             trySend(Resource.loading(null))
-            UsersRoomsRepo.requestAddAvatar(user.uid, File(uri.path)).collect { res ->
+            HttpRepo.requestAddAvatar(user.username, File(uri.path)
+            ).collect { res ->
                 when (res.status) {
                     Resource.Status.SUCCESS -> {
                         val avatars = user.avatars as MutableList
@@ -131,7 +133,6 @@ class EditProfileViewModel(val user: User) : ViewModel() {
         }
         awaitClose()
     }
-
 
     class Factory(private var user: User) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {

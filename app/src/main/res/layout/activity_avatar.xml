@@ -99,7 +99,7 @@
                 tools:text="متخصص مغز و اعصاب" />
 
             <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/more"
+                android:id="@+id/delete"
                 android:layout_width="52dp"
                 android:layout_height="36dp"
                 android:paddingStart="14dp"
@@ -110,10 +110,23 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/backBtn"
                 app:layout_constraintVertical_bias="1.0"
-                app:srcCompat="@drawable/ic_action_more_small"
+                app:srcCompat="@drawable/action_delete"
                 app:tint="@color/white" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <com.google.android.material.progressindicator.LinearProgressIndicator xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/progressBar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/header"
+            app:trackColor="@color/white"
+            app:trackCornerRadius="100dp"
+            app:trackThickness="2dp" />
 
         <ru.tinkoff.scrollingpagerindicator.ScrollingPagerIndicator
             android:id="@+id/pageIndicator"

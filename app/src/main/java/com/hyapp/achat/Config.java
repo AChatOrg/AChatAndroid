@@ -14,6 +14,9 @@ public interface Config {
     String OPERATION_RECONNECT_USER = "reconnectUser";
     String OPERATION_RECONNECT_USER_BY_REFRESH_TOKEN = "reconnectUserByRefreshToken";
 
+    /*http endpoints*/
+    String HTTP_REFRESH_TOKEN = "refreshToken";
+
     /*On connection err*/
     String CONNECTION_ERR_INCORRECT_PASS = "incorrectPass";
     String CONNECTION_ERR_TOKEN_EXPIRED = "tokenExpired";
