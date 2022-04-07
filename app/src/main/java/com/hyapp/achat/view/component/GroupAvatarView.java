@@ -14,6 +14,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import com.facebook.drawee.generic.GenericDraweeHierarchy;
 import com.facebook.drawee.generic.RoundingParams;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.hyapp.achat.Config;
 import com.hyapp.achat.R;
 
 import java.util.List;
@@ -174,23 +175,23 @@ public class GroupAvatarView extends ConstraintLayout {
             case 4:
                 setTo4part();
                 for (int i = 0; i < length; i++) {
-                    draweeViews[i].setImageURI(avatars.get(i));
+                    draweeViews[i].setImageURI(Config.SERVER_URL + avatars.get(i));
                 }
                 return;
             case 3:
                 setTo3part();
-                draweeViews[0].setImageURI(avatars.get(0));
-                draweeViews[2].setImageURI(avatars.get(1));
-                draweeViews[3].setImageURI(avatars.get(2));
+                draweeViews[0].setImageURI(Config.SERVER_URL + avatars.get(0));
+                draweeViews[2].setImageURI(Config.SERVER_URL + avatars.get(1));
+                draweeViews[3].setImageURI(Config.SERVER_URL + avatars.get(2));
                 return;
             case 2:
                 setTo2part();
-                draweeViews[0].setImageURI(avatars.get(0));
-                draweeViews[2].setImageURI(avatars.get(1));
+                draweeViews[0].setImageURI(Config.SERVER_URL + avatars.get(0));
+                draweeViews[2].setImageURI(Config.SERVER_URL + avatars.get(1));
                 return;
             case 1:
                 setToCircle();
-                draweeViews[0].setImageURI(avatars.get(0));
+                draweeViews[0].setImageURI(Config.SERVER_URL + avatars.get(0));
                 return;
             case 0:
                 setToCircle();

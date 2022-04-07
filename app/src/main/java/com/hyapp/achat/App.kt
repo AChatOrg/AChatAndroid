@@ -25,7 +25,7 @@ class App : MultiDexApplication() {
             private set
     }
 
-    override fun onCreate() {
+     override fun onCreate() {
         super.onCreate()
         context = applicationContext
         Preferences.init(context)

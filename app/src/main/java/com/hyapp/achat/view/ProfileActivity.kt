@@ -15,6 +15,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.facebook.common.activitylistener.ActivityListenerManager.register
+import com.hyapp.achat.Config
 import com.hyapp.achat.R
 import com.hyapp.achat.databinding.ActivityProfileBinding
 import com.hyapp.achat.model.entity.*
@@ -300,7 +301,7 @@ class ProfileActivity : EventActivity() {
         binding.run {
             toolbar.title = user.username.replace("-", "")
             val avatars: List<String> = user.avatars
-            avatar.setImageURI(if (avatars.isNotEmpty()) avatars[0] else null)
+            avatar.setImageURI(if (avatars.isNotEmpty()) Config.SERVER_URL + avatars[0] else null)
             name.text = user.name
             bio.text = user.bio
             val pair = UserConsts.rankInt2rankStrResAndColor(user.rank)

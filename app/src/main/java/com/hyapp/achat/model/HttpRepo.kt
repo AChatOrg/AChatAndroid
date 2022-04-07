@@ -38,7 +38,7 @@ object HttpRepo {
 
         val response = executeAuthed(username, request, Preferences.instance().token, { json ->
             val avatar = json.getString("avatar")
-            trySend(Resource.success(Config.SERVER_URL + avatar))
+            trySend(Resource.success(avatar))
         }, { err ->
             trySend(Resource.error(err, null))
         })

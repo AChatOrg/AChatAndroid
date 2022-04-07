@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.drawee.view.SimpleDraweeView
+import com.hyapp.achat.Config
 import com.hyapp.achat.R
 import com.hyapp.achat.databinding.ItemContactGroupBinding
 import com.hyapp.achat.databinding.ItemContactSingleBinding
@@ -203,7 +204,7 @@ class ContactAdapter(private val context: Context) :
 
         private fun setAvatar(contact: Contact) {
             val avatars = contact.avatars
-            binding.avatarDraweeView.setImageURI(if (avatars.isNotEmpty()) avatars[0] else null)
+            binding.avatarDraweeView.setImageURI(if (avatars.isNotEmpty()) Config.SERVER_URL + avatars[0] else null)
         }
 
         private fun setOnlineTime(contact: Contact) {

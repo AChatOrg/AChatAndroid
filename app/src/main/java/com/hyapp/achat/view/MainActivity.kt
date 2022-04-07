@@ -6,6 +6,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.tabs.TabLayout
+import com.hyapp.achat.Config
 import com.hyapp.achat.R
 import com.hyapp.achat.databinding.ActivityMainBinding
 import com.hyapp.achat.model.entity.*
@@ -86,16 +87,14 @@ class MainActivity : EventActivity() {
     }
 
     private fun observeContacts() {
-        viewModel.contactsLive.observe(
-            this,
-            { contactList: ContactList? -> contactAdapter.submitList(contactList) })
+        viewModel.contactsLive.observe(this) { contactList: ContactList? -> contactAdapter.submitList(contactList) }
     }
 
     private fun observeUser() {
         UserLive.observe(this) {
             it?.let {
                 val avatars: List<String> = it.avatars
-                binding.userAvatar.setImageURI(if (avatars.isNotEmpty()) avatars[0] else null)
+                binding.userAvatar.setImageURI(if (avatars.isNotEmpty()) Config.SERVER_URL + avatars[0] else null)
             }
         }
     }

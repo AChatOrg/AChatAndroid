@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.hyapp.achat.Config
 import com.hyapp.achat.view.fragment.PhotoFragment
 
 class PhotoPagerAdapter(
@@ -17,7 +18,7 @@ class PhotoPagerAdapter(
     private val pageIds = paths.map { it.hashCode().toLong() }
 
     override fun createFragment(position: Int): Fragment {
-        val path = paths[position]
+        val path = Config.SERVER_URL + paths[position]
         return PhotoFragment.newInstance(path)
     }
 

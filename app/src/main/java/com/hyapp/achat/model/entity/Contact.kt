@@ -106,6 +106,7 @@ data class Contact(
                 && messageDelivery == c.messageDelivery
                 && notifCount == c.notifCount
                 && onlineTime == c.onlineTime
+                && typingName == c.typingName
                 && mediaPath == c.mediaPath
                 && name == c.name
                 && gender == c.gender

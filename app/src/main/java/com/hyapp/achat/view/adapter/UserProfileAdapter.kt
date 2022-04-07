@@ -9,6 +9,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.hyapp.achat.Config
 import com.hyapp.achat.R
 import com.hyapp.achat.databinding.ItemUserProfileBinding
 import com.hyapp.achat.model.entity.Contact
@@ -65,7 +66,7 @@ class UserProfileAdapter(private val context: Context) :
             binding.executePendingBindings()
 
             val avatars: List<String> = user.avatars
-            binding.avatar.setImageURI(if (avatars.isNotEmpty()) avatars[0] else null)
+            binding.avatar.setImageURI(if (avatars.isNotEmpty()) Config.SERVER_URL + avatars[0] else null)
 
             val pair = UserConsts.rankInt2rankStrResAndColor(user.rank)
             binding.rank.setText(pair.first)

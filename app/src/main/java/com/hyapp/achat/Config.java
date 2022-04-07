@@ -1,9 +1,7 @@
 package com.hyapp.achat;
 
-import org.jetbrains.annotations.NotNull;
-
 public interface Config {
-    String SERVER_URL = "http://192.168.1.103:24240";
+    String SERVER_URL = "https://maroon-jealous-bobcat.glitch.me";
     String SERVER_UPLOAD_AVATAR_URL = SERVER_URL + "/avatar";
 
     String SOCKET_QUERY_DATA = "data";

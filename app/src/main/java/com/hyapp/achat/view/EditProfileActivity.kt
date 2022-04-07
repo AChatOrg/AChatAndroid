@@ -14,6 +14,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.internal.TextWatcherAdapter
+import com.hyapp.achat.Config
 import com.hyapp.achat.R
 import com.hyapp.achat.databinding.ActivityEditProfileBinding
 import com.hyapp.achat.model.entity.*
@@ -215,12 +216,14 @@ class EditProfileActivity : EventActivity() {
 
     private fun setupUser() {
         val avatars: List<String> = user.avatars
-        binding.avatar.setImageURI(if (avatars.isNotEmpty()) avatars[0] else null)
-        binding.nameEditText.setText(user.name)
-        binding.bioEditText.setText(user.bio)
-        binding.genderEditText.setText(if (user.isMale) R.string.male else R.string.female)
-        binding.usernameEditText.setText(user.username.replace("-", ""))
-        binding.passwordEditText.setText(if (user.isGuest) "" else "0000000000000000")
+        binding.run {
+            avatar.setImageURI(if (avatars.isNotEmpty()) Config.SERVER_URL + avatars[0] else null)
+            nameEditText.setText(user.name)
+            bioEditText.setText(user.bio)
+            genderEditText.setText(if (user.isMale) R.string.male else R.string.female)
+            usernameEditText.setText(user.username.replace("-", ""))
+            passwordEditText.setText(if (user.isGuest) "" else "0000000000000000")   
+        }
     }
 
     private fun setupGender() {
@@ -377,7 +380,7 @@ class EditProfileActivity : EventActivity() {
         UserLive.observe(this) {
             it?.let {
                 user = it
-                binding.avatar.setImageURI(it.firstAvatar)
+                binding.avatar.setImageURI(Config.SERVER_URL + it.firstAvatar)
             }
         }
     }

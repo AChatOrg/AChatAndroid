@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.aghajari.rlottie.AXrLottieImageView
 import com.facebook.drawee.view.SimpleDraweeView
+import com.hyapp.achat.Config
 import com.hyapp.achat.R
 import com.hyapp.achat.model.entity.Contact
 import com.hyapp.achat.model.entity.Message
@@ -298,7 +299,7 @@ class MessageAdapter(val context: Context, val recyclerView: RecyclerView) :
                         avatar?.visibility = View.VISIBLE
                         time.visibility = View.VISIBLE
                         val avatars = message.senderAvatars
-                        avatar?.setImageURI(if (avatars.isNotEmpty()) avatars[0] else null)
+                        avatar?.setImageURI(if (avatars.isNotEmpty()) Config.SERVER_URL + avatars[0] else null)
                     } else {
                         avatar?.visibility = View.GONE
                         time.visibility = View.GONE
