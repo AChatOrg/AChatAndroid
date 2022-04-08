@@ -367,6 +367,7 @@ object ChatRepo {
                             uid = UUID.randomUUID().toString(),
                             type = Message.TYPE_TYPING,
                             receiverUid = it.uid,
+                            senderAvatars = it.avatars
                         )
                     )
                 )

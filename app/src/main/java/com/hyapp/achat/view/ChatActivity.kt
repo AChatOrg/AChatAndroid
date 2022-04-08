@@ -496,7 +496,8 @@ class ChatActivity : EventActivity() {
                 name.text = cont.name
                 bio.text = cont.bio
                 if (cont.isUser) {
-                    avatar.setAvatars(cont.avatars)
+                    avatar.placeHolderCircleRes = R.drawable.avatar_36
+                    avatar.setAvatars(cont.avatars, true)
                     if (cont.onlineTime == Contact.TIME_ONLINE) {
                         onlineTime.text = ""
                         onlineTime.setBackgroundResource(R.drawable.last_online_chat_bg_green)
@@ -506,7 +507,7 @@ class ChatActivity : EventActivity() {
                         onlineTime.setBackgroundResource(R.drawable.last_online_chat_bg_grey)
                     }
                 } else {
-                    avatar.setAvatars(cont.avatars)
+                    avatar.setAvatars(cont.avatars, false)
                     onlineTime.visibility = GONE
                 }
             }

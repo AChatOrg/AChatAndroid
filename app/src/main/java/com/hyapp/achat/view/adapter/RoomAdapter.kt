@@ -88,7 +88,7 @@ class RoomAdapter(private val context: Context) :
 
             setBio(room)
 
-            binding.avatar.setAvatars(room.avatars)
+            binding.avatar.setAvatars(room.avatars, false)
 
             when (room.gender) {
                 UserConsts.GENDER_MALE -> binding.genderCircle.setBackgroundResource(R.drawable.gender_circle_user_male_bg)

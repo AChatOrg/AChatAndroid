@@ -240,7 +240,7 @@ class ContactAdapter(private val context: Context) :
         }
 
         private fun setAvatar(contact: Contact) {
-            binding.groupAvatarView.setAvatars(contact.avatars)
+            binding.groupAvatarView.setAvatars(contact.avatars, false)
         }
     }
 }

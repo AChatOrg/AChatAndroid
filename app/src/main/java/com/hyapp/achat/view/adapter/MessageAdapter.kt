@@ -190,11 +190,13 @@ class MessageAdapter(val context: Context, val recyclerView: RecyclerView) :
             bio.text = message.senderBio
             val contact = message.getContact()
             if (message.isPv) {
-                avatar.setAvatars(contact.avatars)
+                avatar.placeHolderCircleRes = R.drawable.avatar_100
+                avatar.setAvatars(contact.avatars, message.isPv)
                 setOnlineTime(message.senderOnlineTime)
                 onlineTime.visibility = View.VISIBLE
             } else {
-                avatar.setAvatars(contact.avatars)
+                avatar.placeHolderCircleRes = R.drawable.avatar_group_100
+                avatar.setAvatars(contact.avatars, message.isPv)
                 onlineTime.visibility = View.GONE
             }
             val pair = UserConsts.rankInt2rankStrResAndColor(contact.rank)
@@ -358,11 +360,11 @@ class MessageAdapter(val context: Context, val recyclerView: RecyclerView) :
     }
 
     inner class TypingHolder(itemView: View) : Holder(itemView) {
-        val avatar = itemView.findViewById<SimpleDraweeView>(R.id.avatar)
+        val avatar: SimpleDraweeView = itemView.findViewById(R.id.avatar)
 
         override fun bind(message: Message) {
             val ava = message.senderAvatars
-            avatar.setImageURI(if (ava.isNotEmpty()) ava[0] else null)
+            avatar.setImageURI(if (ava.isNotEmpty()) Config.SERVER_URL + ava[0] else null)
         }
     }
 }

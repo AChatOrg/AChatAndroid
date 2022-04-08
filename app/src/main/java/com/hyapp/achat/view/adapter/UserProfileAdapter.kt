@@ -66,7 +66,7 @@ class UserProfileAdapter(private val context: Context) :
             binding.executePendingBindings()
 
             val avatars: List<String> = user.avatars
-            binding.avatar.setImageURI(if (avatars.isNotEmpty()) Config.SERVER_URL + avatars[0] else null)
+            binding.avatar.setImageURI(if (avatars.isNotEmpty()) /*Config.SERVER_URL +*/ avatars[0] else null)
 
             val pair = UserConsts.rankInt2rankStrResAndColor(user.rank)
             binding.rank.setText(pair.first)

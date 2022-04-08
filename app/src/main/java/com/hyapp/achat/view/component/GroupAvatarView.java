@@ -168,8 +168,9 @@ public class GroupAvatarView extends ConstraintLayout {
         hierarchy.setRoundingParams(circleParams);
     }
 
-    public void setAvatars(List<String> avatars) {
-        int length = Math.min(draweeViews.length, avatars.size());
+    public void setAvatars(List<String> avatars, boolean isSingle) {
+        int length = Math.min(draweeViews.length,
+                isSingle ? Math.min(avatars.size(), 1) : avatars.size());
 
         switch (length) {
             case 4:
@@ -233,5 +234,9 @@ public class GroupAvatarView extends ConstraintLayout {
 
     public int getPlaceHolderRightRes() {
         return placeHolderRightRes;
+    }
+
+    public void setPlaceHolderCircleRes(int placeHolderCircleRes) {
+        this.placeHolderCircleRes = placeHolderCircleRes;
     }
 }
