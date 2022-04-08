@@ -250,7 +250,7 @@
                         app:layout_constraintEnd_toEndOf="@+id/views"
                         app:layout_constraintStart_toStartOf="@+id/views"
                         app:layout_constraintTop_toTopOf="@+id/videoCall"
-                        app:tint="?colorPrimary" />
+                        app:tint="@color/black" />
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/videoCall"
@@ -265,7 +265,7 @@
                         app:layout_constraintEnd_toEndOf="@+id/likes"
                         app:layout_constraintStart_toStartOf="@+id/likes"
                         app:layout_constraintTop_toBottomOf="@+id/likes"
-                        app:tint="?colorPrimary" />
+                        app:tint="@color/black" />
 
                     <androidx.appcompat.widget.AppCompatImageView
                         android:id="@+id/chat"
@@ -280,7 +280,7 @@
                         app:layout_constraintEnd_toEndOf="@+id/friends"
                         app:layout_constraintStart_toStartOf="@+id/friends"
                         app:layout_constraintTop_toTopOf="@+id/videoCall"
-                        app:tint="?colorPrimary" />
+                        app:tint="@color/black" />
 
                     <TextView
                         android:id="@+id/mainButton"

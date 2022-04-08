@@ -52,9 +52,9 @@
                 android:layout_marginLeft="@dimen/margin_16"
                 android:layout_marginEnd="@dimen/margin_16"
                 android:layout_marginRight="@dimen/margin_16"
-                app:layout_constraintBottom_toBottomOf="@+id/title"
+                app:layout_constraintBottom_toBottomOf="@+id/userAvatar"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@+id/title" />
+                app:layout_constraintTop_toTopOf="@+id/userAvatar" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerView"

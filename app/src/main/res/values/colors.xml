@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="primary">#000</color>
-    <color name="primaryLight">@color/grey_50</color>
+    <color name="primary">#E91E63</color>
+    <color name="primaryLight">#F48FB1</color>
     <color name="link">#0645AD</color>
     <color name="red_nice">#EE4957</color>
 

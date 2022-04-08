@@ -15,6 +15,6 @@
         android:background="@drawable/action_bg"
         android:padding="6dp"
         android:src="@drawable/action_edit"
-        app:tint="?colorPrimary" />
+        app:tint="@color/black" />
 
 </FrameLayout>

@@ -7,7 +7,7 @@
         android:startColor="@color/primaryLight"
         android:type="linear" />
     <corners
-        android:bottomLeftRadius="@dimen/chat_bubble_corner_radius_middle"
+        android:bottomRightRadius="@dimen/chat_bubble_corner_radius_middle"
         android:radius="@dimen/chat_bubble_corner_radius"
-        android:topLeftRadius="@dimen/chat_bubble_corner_radius_middle" />
+        android:topRightRadius="@dimen/chat_bubble_corner_radius_middle" />
 </shape>

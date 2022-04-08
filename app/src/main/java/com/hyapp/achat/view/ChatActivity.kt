@@ -195,7 +195,7 @@ class ChatActivity : EventActivity() {
         binding.sendImageSwitcher.run {
             setFactory {
                 ImageView(this@ChatActivity).apply {
-                    setColorFilter(Color.BLACK)
+                    setColorFilter(UiUtils.getStyleColor(this@ChatActivity,R.attr.colorPrimary))
                     setImageResource(R.drawable.ic_action_mic)
                 }
             }

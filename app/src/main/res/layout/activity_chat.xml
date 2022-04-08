@@ -52,6 +52,7 @@
             android:focusable="true"
             android:padding="6dp"
             android:src="@drawable/ic_action_back"
+            android:tint="?colorPrimary"
             app:layout_constraintBottom_toBottomOf="@+id/avatar"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/avatar"
@@ -225,7 +226,7 @@
                 android:layout_gravity="center"
                 android:src="@drawable/fast_scroll"
                 android:tint="?colorPrimary"
-                app:tint="@color/black" />
+                app:tint="?colorPrimary" />
 
         </androidx.cardview.widget.CardView>
 
@@ -237,7 +238,7 @@
             android:layout_marginRight="22dp"
             android:layout_marginBottom="22dp"
             android:visibility="invisible"
-            app:cardBackgroundColor="@color/green_50"
+            app:cardBackgroundColor="?colorPrimary"
             app:cardCornerRadius="12dp"
             app:cardElevation="4dp"
             app:layout_constraintBottom_toBottomOf="@+id/fastScrollCard"
@@ -284,7 +285,7 @@
             android:src="@drawable/ic_action_emoji"
             app:layout_constraintBottom_toBottomOf="@+id/messageEditText"
             app:layout_constraintStart_toStartOf="@+id/messageEditText"
-            app:tint="@color/black" />
+            app:tint="?colorPrimary" />
 
         <ImageView
             android:id="@+id/attach"
@@ -300,7 +301,7 @@
             app:layout_constraintBottom_toBottomOf="@+id/emoji"
             app:layout_constraintEnd_toEndOf="@+id/messageEditText"
             app:layout_constraintTop_toTopOf="@+id/emoji"
-            app:tint="@color/black" />
+            app:tint="?colorPrimary" />
 
         <com.hyapp.achat.view.component.emojiview.view.AXEmojiPopupLayout
             android:id="@+id/emojiPopupLayout"
