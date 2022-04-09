@@ -173,8 +173,8 @@ class MainActivity : EventActivity() {
                 binding.peopleGroups.peopleGroupsTitle.setText(R.string.disconnected)
             }
             ConnLive.Status.NO_NET -> {
-                binding.title.setText(R.string.no_network_connection)
-                binding.peopleGroups.peopleGroupsTitle.setText(R.string.no_network_connection)
+                binding.title.setText(R.string.no_network)
+                binding.peopleGroups.peopleGroupsTitle.setText(R.string.no_network)
             }
         }
     }

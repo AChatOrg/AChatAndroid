@@ -21,7 +21,6 @@ import com.hyapp.achat.databinding.BottomSheetTwoInputButtonBinding
 import com.hyapp.achat.model.entity.Event
 import com.hyapp.achat.model.entity.Resource
 import com.hyapp.achat.view.utils.UiUtils
-import com.hyapp.achat.viewmodel.EditProfileViewModel
 import com.hyapp.achat.viewmodel.ProfileViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
@@ -177,7 +176,7 @@ class RegisterBottomSheet : BottomSheetDialogFragment() {
         when (msg) {
             Event.MSG_NET -> Toast.makeText(
                 requireContext(),
-                R.string.no_network_connection,
+                R.string.no_network,
                 Toast.LENGTH_LONG
             ).show()
             Event.MSG_EXIST -> Toast.makeText(

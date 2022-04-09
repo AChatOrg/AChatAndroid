@@ -126,7 +126,7 @@ class ChangePassBottomSheet : BottomSheetDialogFragment() {
         when (res.message) {
             Event.MSG_NET -> Toast.makeText(
                 requireContext(),
-                R.string.no_network_connection,
+                R.string.no_network,
                 Toast.LENGTH_LONG
             ).show()
             Event.MSG_MATCH -> {

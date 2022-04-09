@@ -25,6 +25,7 @@
     <dimen name="text_18">18sp</dimen>
     <dimen name="text_20">20sp</dimen>
     <dimen name="text_22">22sp</dimen>
+    <dimen name="text_24">24sp</dimen>
 
     <dimen name="design_fab_image_size" tools:override="true">56dp</dimen>
     <dimen name="fab_elevation">4dp</dimen>

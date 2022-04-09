@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:id="@+id/imageViewEmpty"
+            android:layout_width="220dp"
+            android:layout_height="220dp"
+            android:src="@drawable/empty_list"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.3" />
+
+        <TextView
+            android:id="@+id/textViewEmptyTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="@string/empty_apps_title"
+            android:textColor="@android:color/black"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="@+id/imageViewEmpty"
+            app:layout_constraintStart_toStartOf="@+id/imageViewEmpty"
+            app:layout_constraintTop_toBottomOf="@+id/imageViewEmpty" />
+
+        <TextView
+            android:id="@+id/textViewEmptySummary"
+            android:layout_width="280dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:lineSpacingExtra="8dp"
+            android:text="@string/empty_apps_summary"
+            android:textColor="@color/grey_30"
+            android:textSize="14sp"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintEnd_toEndOf="@+id/textViewEmptyTitle"
+            app:layout_constraintStart_toStartOf="@+id/textViewEmptyTitle"
+            app:layout_constraintTop_toBottomOf="@+id/textViewEmptyTitle" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

@@ -119,7 +119,7 @@ class LoginUserActivity : EventActivity() {
                 )
             }
             Event.MSG_EXIST -> alert(R.string.login_guest, R.string.this_user_is_online)
-            Event.MSG_NET -> alert(R.string.login_guest, R.string.no_network_connection)
+            Event.MSG_NET -> alert(R.string.login_guest, R.string.no_network)
             Event.MSG_ERROR -> alert(R.string.login_guest, R.string.sorry_an_error_occurred)
             else -> alert(R.string.login_guest, message)
         }

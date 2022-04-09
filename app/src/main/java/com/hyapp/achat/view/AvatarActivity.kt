@@ -114,7 +114,7 @@ class AvatarActivity : EventActivity() {
                                     when (res.message) {
                                         Event.MSG_NET -> Toast.makeText(
                                             this@AvatarActivity,
-                                            R.string.no_network_connection,
+                                            R.string.no_network,
                                             Toast.LENGTH_LONG
                                         ).show()
                                         else -> Toast.makeText(

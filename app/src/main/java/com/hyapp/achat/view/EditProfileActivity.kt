@@ -174,7 +174,7 @@ class EditProfileActivity : EventActivity() {
                                 when (res.message) {
                                     Event.MSG_NET -> Toast.makeText(
                                         this@EditProfileActivity,
-                                        R.string.no_network_connection,
+                                        R.string.no_network,
                                         Toast.LENGTH_LONG
                                     ).show()
                                     else -> {
@@ -360,7 +360,7 @@ class EditProfileActivity : EventActivity() {
         when (msg) {
             Event.MSG_NET -> Toast.makeText(
                 this,
-                R.string.no_network_connection,
+                R.string.no_network,
                 Toast.LENGTH_LONG
             ).show()
             else -> Toast.makeText(

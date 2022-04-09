@@ -5,7 +5,6 @@ import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -22,7 +21,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.aghajari.rlottie.AXrLottieDrawable
 import com.hyapp.achat.R
 import com.hyapp.achat.databinding.ActivityChatBinding
-import com.hyapp.achat.model.*
 import com.hyapp.achat.model.entity.*
 import com.hyapp.achat.view.adapter.MessageAdapter
 import com.hyapp.achat.view.component.SpeedyLinearLayoutManager
@@ -41,7 +39,6 @@ import com.hyapp.achat.view.utils.UiUtils
 import com.hyapp.achat.viewmodel.ChatViewModel
 import com.hyapp.achat.viewmodel.utils.TimeUtils
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import java.util.*
 
 @ExperimentalCoroutinesApi
 class ChatActivity : EventActivity() {
@@ -421,7 +418,7 @@ class ChatActivity : EventActivity() {
                 ConnLive.Status.CONNECTING -> binding.bio.setText(R.string.connecting)
                 ConnLive.Status.CONNECTED -> binding.bio.text = contact.bio
                 ConnLive.Status.DISCONNECTED -> binding.bio.setText(R.string.disconnected)
-                ConnLive.Status.NO_NET -> binding.bio.setText(R.string.no_network_connection)
+                ConnLive.Status.NO_NET -> binding.bio.setText(R.string.no_network)
                 null -> {}
             }
         })

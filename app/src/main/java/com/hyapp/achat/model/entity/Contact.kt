@@ -72,6 +72,7 @@ data class Contact(
         const val TYPE_USER: Byte = 1
         const val TYPE_ROOM: Byte = 2
         const val TYPE_PV_ROOM: Byte = 3
+        const val TYPE_EMPTY: Byte = 4
 
         const val TIME_ONLINE: Long = 0
     }

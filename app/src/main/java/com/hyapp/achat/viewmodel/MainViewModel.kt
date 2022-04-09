@@ -69,7 +69,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun loadContacts() {
-        _contactsLive.value = ContactList(ContactDao.all(UserLive.value?.uid ?: ""))
+        _contactsLive.value =
+            ContactList((ContactDao.all(UserLive.value?.uid ?: "") as MutableList).apply {
+                if (isEmpty()) {
+                    add(Contact(type = Contact.TYPE_EMPTY))
+                }
+            })
     }
 
     fun reloadUsers() {
@@ -183,6 +188,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private fun putContact(contact: Contact) {
         val contactList = _contactsLive.value ?: ContactList()
+        if (contactList.first.type == Contact.TYPE_EMPTY) {
+            contactList.removeFirst()
+        }
         contactList.putFirst(contact)
         _contactsLive.value = contactList
     }

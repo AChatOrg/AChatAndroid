@@ -14,7 +14,6 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.facebook.common.activitylistener.ActivityListenerManager.register
 import com.hyapp.achat.Config
 import com.hyapp.achat.R
 import com.hyapp.achat.databinding.ActivityProfileBinding
@@ -205,7 +204,7 @@ class ProfileActivity : EventActivity() {
                     Resource.Status.ERROR -> {
                         binding.progressBar.visibility = View.GONE
                         if (res.message == Event.MSG_NET) {
-                            alert(R.string.logout, R.string.no_network_connection)
+                            alert(R.string.logout, R.string.no_network)
                         } else {
                             alert(R.string.logout, R.string.sorry_an_error_occurred)
                         }
@@ -389,7 +388,7 @@ class ProfileActivity : EventActivity() {
         binding.swipeRefreshLayout.isRefreshing = false
         binding.progressBar.visibility = View.GONE
         when (message) {
-            Event.MSG_NET -> Toast.makeText(this, R.string.no_network_connection, Toast.LENGTH_LONG)
+            Event.MSG_NET -> Toast.makeText(this, R.string.no_network, Toast.LENGTH_LONG)
                 .show()
             Event.MSG_EMPTY -> alert(
                 R.string.proflie,

@@ -39,7 +39,7 @@
                 android:layout_marginLeft="@dimen/margin_16"
                 android:fontFamily="@font/iran_sans_bold"
                 android:text="@string/app_name"
-                android:textSize="@dimen/text_20"
+                android:textSize="@dimen/text_24"
                 app:layout_constraintBottom_toBottomOf="@+id/userAvatar"
                 app:layout_constraintStart_toEndOf="@+id/userAvatar"
                 app:layout_constraintTop_toTopOf="@+id/userAvatar" />

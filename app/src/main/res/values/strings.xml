@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><!DOCTYPE resources [<!ENTITY appname "Love Chat">]>
+<?xml version="1.0" encoding="utf-8"?><!DOCTYPE resources [<!ENTITY appname "Lovers">]>
 
 <resources>
     <string name="app_name">&appname;</string>
@@ -56,7 +56,7 @@
     <string name="last_seen_chat_s">last seen chat %1$s</string>
     <string name="no_emoji_found">No emoji found</string>
     <string name="sorry_an_error_occurred">Sorry, an error occurred</string>
-    <string name="no_network_connection">No network connection</string>
+    <string name="no_network">No Network</string>
     <string name="tray_again">Tray again</string>
     <string name="you_are_connected">You are connected.</string>
     <string name="start_chatting">Start chatting</string>
@@ -145,5 +145,8 @@
     <string name="are_you_sure_delete_avatar">Are you sure you want to delete this avatar?</string>
     <string name="you_can_add_up_to_ten_avatars">You can add up to 10 avatars</string>
     <string name="this_photo_not_exists">This photo does not exist.</string>
+
+    <string name="empty_apps_title">You don\'t have any contact</string>
+    <string name="empty_apps_summary">You can add a contact and chat with them by pressing the 🤍 button.</string>
 
 </resources>

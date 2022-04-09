@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.facebook.drawee.view.SimpleDraweeView
 import com.hyapp.achat.Config
 import com.hyapp.achat.R
+import com.hyapp.achat.databinding.ItemContactEmptyBinding
 import com.hyapp.achat.databinding.ItemContactGroupBinding
 import com.hyapp.achat.databinding.ItemContactSingleBinding
 import com.hyapp.achat.model.entity.Contact
@@ -25,7 +26,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @ExperimentalCoroutinesApi
 class ContactAdapter(private val context: Context) :
-    ListAdapter<Contact, ContactAdapter.Holder>(DIFF_CALLBACK) {
+    ListAdapter<Contact, ContactAdapter.EmptyHolder>(DIFF_CALLBACK) {
 
     val typingStr = context.getString(R.string.typing_three_dots)
 
@@ -78,7 +79,7 @@ class ContactAdapter(private val context: Context) :
         return getItem(position).type.toInt()
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Holder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EmptyHolder {
         if (viewType.toByte() == Contact.TYPE_USER) {
             val binding: ItemContactSingleBinding = DataBindingUtil.inflate(
                 LayoutInflater.from(context),
@@ -99,14 +100,24 @@ class ContactAdapter(private val context: Context) :
             binding.lifecycleOwner = context as LifecycleOwner
             return GroupHolder(binding)
         }
+        if (viewType.toByte() == Contact.TYPE_EMPTY) {
+            val binding: ItemContactEmptyBinding = DataBindingUtil.inflate(
+                LayoutInflater.from(context),
+                R.layout.item_contact_empty,
+                parent,
+                false
+            )
+            binding.lifecycleOwner = context as LifecycleOwner
+            return EmptyHolder(binding.root)
+        }
         throw RuntimeException("ContactAdapter: incorrect viewType: " + javaClass.name)
     }
 
-    override fun onBindViewHolder(holder: Holder, position: Int) {
+    override fun onBindViewHolder(holder: EmptyHolder, position: Int) {
         holder.bind(getItem(position))
     }
 
-    override fun onBindViewHolder(holder: Holder, position: Int, payloads: List<Any?>) {
+    override fun onBindViewHolder(holder: EmptyHolder, position: Int, payloads: List<Any?>) {
         if (payloads.isEmpty()) {
             onBindViewHolder(holder, position)
         } else {
@@ -114,8 +125,17 @@ class ContactAdapter(private val context: Context) :
         }
     }
 
+    open inner class EmptyHolder(view: View) : RecyclerView.ViewHolder(view) {
+
+        open fun bind(contact: Contact) {
+        }
+
+        open fun bind(contact: Contact, payloads: List<Any?>) {
+        }
+    }
+
     @Suppress("LeakingThis")
-    open inner class Holder(view: View) : RecyclerView.ViewHolder(view), View.OnClickListener {
+    open inner class Holder(view: View) : EmptyHolder(view), View.OnClickListener {
         private val message: TextView = view.findViewById(R.id.message)
         private val media: SimpleDraweeView = view.findViewById(R.id.media)
         private val messageDelivery: ImageView = view.findViewById(R.id.messageDelivery)
@@ -126,11 +146,11 @@ class ContactAdapter(private val context: Context) :
             itemView.setOnClickListener(this)
         }
 
-        open fun bind(contact: Contact) {
+        override fun bind(contact: Contact) {
             setMessage(contact)
         }
 
-        open fun bind(contact: Contact, payloads: List<Any?>) {
+        override fun bind(contact: Contact, payloads: List<Any?>) {
             for (payload in payloads) {
                 when (payload as Byte) {
                     PAYLOAD_MESSAGE -> setMessage(contact)
